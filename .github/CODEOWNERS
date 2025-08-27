@@ -1,0 +1,31 @@
+# Loqa Documentation - Code Owners
+
+# Global ownership
+* @annabarnes1138
+
+# Core documentation
+/docs/ @annabarnes1138
+
+# Architecture and technical docs require review
+/docs/architecture.md @annabarnes1138
+/docs/security.md @annabarnes1138
+/docs/messaging.md @annabarnes1138
+
+# Configuration and setup guides
+/docs/config.md @annabarnes1138
+/docs/quickstart.md @annabarnes1138
+
+# Community and contribution guidelines
+CONTRIBUTING.md @annabarnes1138
+CODE_OF_CONDUCT.md @annabarnes1138
+
+# Site configuration
+mkdocs.yml @annabarnes1138
+.markdown-link-check.json @annabarnes1138
+
+# CI/CD
+/.github/ @annabarnes1138
+
+# Main documentation files
+README.md @annabarnes1138
+LICENSE @annabarnes1138
