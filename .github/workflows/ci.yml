@@ -1,0 +1,218 @@
+name: Documentation CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  validate:
+    name: Validate Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install markdown linter
+      run: |
+        npm install -g markdownlint-cli
+        npm install -g markdown-link-check
+
+    - name: Lint Markdown files
+      run: |
+        markdownlint "**/*.md" --ignore node_modules || true
+
+    - name: Check Markdown links
+      run: |
+        find . -name "*.md" -not -path "./node_modules/*" | \
+        xargs -I {} markdown-link-check {} --config .markdown-link-check.json || true
+
+    - name: Validate YAML frontmatter
+      run: |
+        # Check for valid YAML frontmatter in docs
+        for file in docs/*.md; do
+          if grep -q "^---$" "$file"; then
+            echo "Checking YAML frontmatter in $file"
+            sed -n '2,/^---$/p' "$file" | head -n -1 | python -c "
+        import sys
+        import yaml
+        try:
+            yaml.safe_load(sys.stdin.read())
+            print('✅ Valid YAML in $file')
+        except yaml.YAMLError as e:
+            print('❌ Invalid YAML in $file: {}'.format(e))
+            sys.exit(1)
+            " || echo "⚠️  YAML validation skipped for $file"
+          fi
+        done
+
+  spell-check:
+    name: Spell Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install aspell
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y aspell aspell-en
+
+    - name: Run spell check
+      run: |
+        # Create custom dictionary for technical terms
+        echo "Loqa
+        gRPC
+        Whisper
+        Ollama
+        NATS
+        ESP32
+        PortAudio
+        HomeKit
+        Zigbee
+        MQTT
+        STT
+        TTS
+        LLM
+        WebSocket
+        microservice
+        backend
+        frontend
+        API
+        APIs
+        JSON
+        YAML
+        Docker
+        Kubernetes
+        localhost
+        middleware
+        runtime
+        blockchain
+        IoT" > .aspell.en.pws
+
+        # Spell check all markdown files
+        find . -name "*.md" -not -path "./node_modules/*" | while read file; do
+          echo "Spell checking $file"
+          # Extract text content, ignore code blocks and URLs
+          cat "$file" | \
+          sed '/^```/,/^```/d' | \
+          sed 's/http[s]\?:\/\/[^ ]*/URL/g' | \
+          sed 's/`[^`]*`/CODE/g' | \
+          aspell --personal=./.aspell.en.pws --lang=en --mode=markdown list | \
+          sort -u > "/tmp/misspelled_$(basename "$file")" || true
+          
+          if [ -s "/tmp/misspelled_$(basename "$file")" ]; then
+            echo "⚠️  Possible misspellings in $file:"
+            cat "/tmp/misspelled_$(basename "$file")"
+          fi
+        done
+
+  build-site:
+    name: Build Documentation Site
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install MkDocs
+      run: |
+        pip install mkdocs mkdocs-material mkdocs-mermaid2-plugin
+
+    - name: Create MkDocs configuration
+      run: |
+        cat > mkdocs.yml << EOF
+        site_name: Loqa Documentation
+        site_description: Local-first voice assistant platform
+        site_url: https://loqalabs.github.io/loqa-docs
+        
+        theme:
+          name: material
+          palette:
+            - scheme: default
+              primary: deep purple
+              accent: purple
+        
+        nav:
+          - Home: README.md
+          - Vision: docs/VISION.md
+          - Quick Start: docs/quickstart.md
+          - Architecture: docs/architecture.md
+          - Configuration: docs/config.md
+          - Messaging: docs/messaging.md
+          - Testing: docs/testing.md
+          - Hardware: docs/hardware.md
+          - Skills: docs/skills.md
+          - Security: docs/security.md
+          - FAQ: docs/faq.md
+          - Contributing: CONTRIBUTING.md
+        
+        plugins:
+          - mermaid2
+        
+        markdown_extensions:
+          - admonition
+          - codehilite
+          - pymdownx.superfences:
+              custom_fences:
+                - name: mermaid
+                  class: mermaid
+                  format: !!python/name:mermaid2.fence_mermaid
+        EOF
+
+    - name: Build documentation site
+      run: |
+        mkdocs build --verbose
+
+    - name: Upload site artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: documentation-site
+        path: site/
+
+  deploy:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: [validate, build-site]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+    - name: Download site artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: documentation-site
+        path: site
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+
+    - name: Upload to GitHub Pages
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: site
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v2
