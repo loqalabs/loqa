@@ -17,14 +17,18 @@ Welcome to **Loqa** — a local-first, privacy-respecting voice assistant platfo
 
 ---
 
-## 🐳 Run with Docker
+## 🚀 Quick Start Options
 
-Recommended for first-time users:
+### ⚡ **5-Minute Setup** (Recommended)
+For the fastest experience, follow our streamlined guide:
 
+👉 **[Get Loqa Running in 5 Minutes](./getting-started-5min.md)**
+
+### 🐳 **Docker Setup** (Standard)
 ```bash
-git clone https://github.com/YOUR_USERNAME/loqa.git
-cd loqa/deployments
-docker-compose up -d
+git clone https://github.com/loqalabs/loqa-labs.git
+cd loqa-labs
+./setup.sh
 ```
 
 This launches:
@@ -131,11 +135,24 @@ nats pub loqa.devices.commands.lights '{
 
 ---
 
+## 🆘 Having Issues?
+
+If you encounter problems, check our comprehensive troubleshooting guide:
+
+👉 **[Troubleshooting Guide](./troubleshooting.md)**
+
+Common quick fixes:
+- Restart services: `docker-compose restart`
+- Check microphone permissions
+- Verify PortAudio installation: `brew install portaudio`
+
 ## 📄 Next Steps
 
-- Learn how it all fits together: [`architecture.md`](./architecture.md)
-- Build your own skill: [`skills.md`](./skills.md)
-- Customize behavior and models: [`config.md`](./config.md)
+- ⚡ **Quick Start**: [`getting-started-5min.md`](./getting-started-5min.md)
+- 🏗️ **Architecture**: [`architecture.md`](./architecture.md)
+- 🧩 **Build Skills**: [`skills.md`](./skills.md)
+- ⚙️ **Configuration**: [`config.md`](./config.md)
+- 🔧 **Troubleshooting**: [`troubleshooting.md`](./troubleshooting.md)
 
 ---
 

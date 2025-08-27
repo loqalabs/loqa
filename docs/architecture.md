@@ -32,6 +32,10 @@ Loqa is built from the ground up as a **local-first**, event-driven voice assist
 
 ## 🔁 Voice Input → Action Flow
 
+![Loqa System Architecture](./loqa-system-diagram.png)
+
+*System overview showing the flow from puck audio input to device control*
+
 ```mermaid
 graph TB
     P[🎤 Puck Device] -->|gRPC| H[🧠 Hub Service]

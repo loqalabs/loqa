@@ -21,9 +21,11 @@ Whether you're automating your smart home, talking to a local journaling assista
 
 ## 🚀 Try It Out
 
-Want to launch Loqa locally or set up a dev environment?
+### ⚡ **New User? Start Here!**
+👉 **[Get Running in 5 Minutes](./docs/getting-started-5min.md)** ← Fastest way to try Loqa
 
-👉 **Start here:** [`docs/quickstart.md`](./docs/quickstart.md)
+### 🛠️ **Developer Setup**
+👉 **[Detailed Quickstart Guide](./docs/quickstart.md)** ← Full setup and configuration
 
 ---
 
@@ -90,11 +92,18 @@ These features will be **opt-in**, transparent, and built with the same values o
 
 Want to build with or contribute to Loqa? Start here:
 
-- [`docs/quickstart.md`](./docs/quickstart.md) – Getting started
+### 🚀 **Getting Started**
+- [`docs/getting-started-5min.md`](./docs/getting-started-5min.md) – 5-minute setup
+- [`docs/quickstart.md`](./docs/quickstart.md) – Detailed setup guide
+- [`docs/troubleshooting.md`](./docs/troubleshooting.md) – Common issues & fixes
+
+### 🏗️ **Architecture & Development**
 - [`docs/architecture.md`](./docs/architecture.md) – System overview
 - [`docs/config.md`](./docs/config.md) – Environment variables
 - [`docs/messaging.md`](./docs/messaging.md) – NATS subjects & flows
 - [`docs/testing.md`](./docs/testing.md) – Test tools & CLI commands
+
+### 🧩 **Extensions**
 - [`docs/skills.md`](./docs/skills.md) – Skill format and framework
 - [`docs/hardware.md`](./docs/hardware.md) – Puck hardware (ESP32)
 
