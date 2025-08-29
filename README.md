@@ -27,6 +27,14 @@ Whether you're automating your smart home, talking to a local journaling assista
 ### 🛠️ **Developer Setup**
 👉 **[Detailed Quickstart Guide](./docs/quickstart.md)** ← Full setup and configuration
 
+### 🏃‍♂️ **One-Command Demo:**
+```bash
+git clone https://github.com/loqalabs/loqa.git
+cd loqa && ./scripts/setup.sh
+
+# Test voice: "Hey Loqa, turn on the lights"
+```
+
 ---
 
 ## 🧱 How It Works
