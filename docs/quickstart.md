@@ -8,7 +8,7 @@ Welcome to **Loqa** — a local-first, privacy-respecting voice assistant platfo
 
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/)
-- [Go 1.21+](https://go.dev/dl/) (for development)
+- [Go 1.24+](https://go.dev/dl/) (for development)
 - PortAudio (for voice testing)
 
 **Optional (for full local LLM/STT):**

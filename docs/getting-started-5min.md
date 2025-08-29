@@ -8,13 +8,13 @@ The fastest way to experience Loqa's local-first voice assistant capabilities.
 # Verify you have Docker and Docker Compose
 docker --version && docker-compose --version
 
-# Verify Go 1.21+ (for puck testing)
+# Verify Go 1.24+ (for puck testing)
 go version
 ```
 
 **Requirements:**
 - Docker & Docker Compose
-- Go 1.21+ (for voice testing)
+- Go 1.24+ (for voice testing)
 - PortAudio (`brew install portaudio` on macOS)
 
 ## 🏃‍♂️ One-Command Setup (2 minutes)
