@@ -178,7 +178,7 @@ jobs:
         mkdocs build --verbose
 
     - name: Upload site artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: documentation-site
         path: site/
