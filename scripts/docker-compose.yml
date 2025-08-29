@@ -1,0 +1,90 @@
+services:
+  # NATS Message Bus
+  nats:
+    image: nats:2.10-alpine
+    container_name: loqa-nats
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    command: ["nats-server", "-js", "-m", "8222"]
+    networks:
+      - loqa-network
+
+  # Ollama LLM Service
+  ollama:
+    image: ollama/ollama:latest
+    container_name: loqa-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    networks:
+      - loqa-network
+    # Pull model on startup
+    command: >
+      sh -c "ollama serve & 
+             sleep 5 && 
+             ollama pull llama3.2:3b && 
+             wait"
+
+  # Loqa Hub - Central orchestrator
+  hub:
+    build: ./loqa-hub
+    container_name: loqa-hub
+    ports:
+      - "3000:3000"
+      - "50051:50051"
+    environment:
+      - WHISPER_MODEL_PATH=/models/ggml-tiny.bin
+      - OLLAMA_URL=http://ollama:11434
+      - NATS_URL=nats://nats:4222
+      - GRPC_PORT=50051
+      - HTTP_PORT=3000
+      - LOG_LEVEL=info
+    depends_on:
+      - nats
+      - ollama
+    volumes:
+      - whisper-models:/models
+    networks:
+      - loqa-network
+
+  # Device Control Service
+  device-service:
+    build: ./loqa-device-service
+    container_name: loqa-device-service
+    environment:
+      - NATS_URL=nats://nats:4222
+      - LOG_LEVEL=info
+    depends_on:
+      - nats
+    networks:
+      - loqa-network
+
+  # Test Puck (optional - for testing)
+  test-puck:
+    build: ./loqa-puck
+    container_name: loqa-test-puck
+    environment:
+      - HUB_ADDRESS=hub:50051
+      - PUCK_ID=docker-test-puck
+      - WAKE_WORD_THRESHOLD=0.7
+    depends_on:
+      - hub
+    networks:
+      - loqa-network
+    # Only run if you have audio devices available
+    profiles:
+      - testing
+
+volumes:
+  ollama-data:
+    driver: local
+  whisper-models:
+    driver: local
+
+networks:
+  loqa-network:
+    driver: bridge
