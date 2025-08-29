@@ -48,11 +48,29 @@ cd loqa-hub
 echo "📁 Creating necessary directories..."
 mkdir -p whisper-models
 
+# Function to download files with fallback methods
+download_file() {
+    local url=$1
+    local output=$2
+    
+    if command -v curl &> /dev/null; then
+        echo "Using curl to download..."
+        curl -L -o "$output" "$url"
+    elif command -v wget &> /dev/null; then
+        echo "Using wget to download..."
+        wget -O "$output" "$url"
+    else
+        echo "❌ Neither curl nor wget found. Please install one of them."
+        echo "   macOS: curl is pre-installed, or 'brew install wget'"
+        echo "   Ubuntu/Debian: 'sudo apt-get install curl' or 'sudo apt-get install wget'"
+        exit 1
+    fi
+}
+
 # Download Whisper model if it doesn't exist
 if [ ! -f "whisper-models/ggml-tiny.bin" ]; then
     echo "📥 Downloading Whisper tiny model..."
-    wget -O whisper-models/ggml-tiny.bin \
-        https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.bin
+    download_file "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.bin" "whisper-models/ggml-tiny.bin"
 else
     echo "✅ Whisper model already exists"
 fi
@@ -65,17 +83,25 @@ sleep 10
 
 # Check if services are running
 echo "🔍 Checking service health..."
-if curl -s -f http://localhost:3000/health > /dev/null; then
-    echo "✅ Hub service is running"
-else
-    echo "⚠️  Hub service may still be starting..."
-fi
 
-if curl -s -f http://localhost:11434/api/tags > /dev/null; then
-    echo "✅ Ollama service is running"
-else
-    echo "⚠️  Ollama service may still be starting..."
-fi
+# Function to check HTTP endpoints
+check_endpoint() {
+    local url=$1
+    local service_name=$2
+    
+    if command -v curl &> /dev/null; then
+        if curl -s -f "$url" > /dev/null 2>&1; then
+            echo "✅ $service_name is running"
+        else
+            echo "⚠️  $service_name may still be starting..."
+        fi
+    else
+        echo "ℹ️  $service_name status check skipped (no curl available)"
+    fi
+}
+
+check_endpoint "http://localhost:3000/health" "Hub service"
+check_endpoint "http://localhost:11434/api/tags" "Ollama service"
 
 echo ""
 echo "🎉 Loqa setup complete!"
