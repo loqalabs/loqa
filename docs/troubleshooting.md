@@ -383,7 +383,7 @@ docker-compose logs --tail=50 >> debug-report.txt
 - 🐛 **Bug Reports**: GitHub Issues in relevant repository
 - 💬 **Questions**: GitHub Discussions 
 - 📧 **Security Issues**: security@loqalabs.com
-- 📖 **Documentation**: [docs.loqalabs.com](https://loqalabs.github.io/loqa-docs)
+- 📖 **Documentation**: [docs.loqalabs.com](https://loqalabs.github.io/loqa)
 
 ### Issue Templates
 

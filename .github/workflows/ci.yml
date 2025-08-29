@@ -137,7 +137,7 @@ jobs:
         cat > mkdocs.yml << EOF
         site_name: Loqa Documentation
         site_description: Local-first voice assistant platform
-        site_url: https://loqalabs.github.io/loqa-docs
+        site_url: https://loqalabs.github.io/loqa
         
         theme:
           name: material
