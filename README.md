@@ -37,6 +37,26 @@ cd loqa && ./scripts/setup.sh
 
 ---
 
+## 📦 Repository Structure
+
+The Loqa platform consists of multiple focused repositories that work together:
+
+### Core Services
+| Repository | Purpose | Status |
+|------------|---------|---------|
+| **[loqa-hub](https://github.com/loqalabs/loqa-hub)** | Central orchestrator: gRPC API, STT/LLM pipeline, NATS integration | ✅ Active |
+| **[loqa-device-service](https://github.com/loqalabs/loqa-device-service)** | Device control service that listens on NATS for commands | ✅ Active |
+| **[loqa-puck](https://github.com/loqalabs/loqa-puck)** | Embedded and test clients for audio capture and streaming | ✅ Active |
+| **[loqa-proto](https://github.com/loqalabs/loqa-proto)** | Shared gRPC protocol definitions and generated bindings | ✅ Active |
+
+### Extensions & Documentation  
+| Repository | Purpose | Status |
+|------------|---------|---------|
+| **[loqa-skills](https://github.com/loqalabs/loqa-skills)** | Official and sample skills packaged as external services | 🏗️ In Development |
+| **[loqa](https://github.com/loqalabs/loqa)** | User and developer-facing documentation & main entry point | ✅ Active |
+
+---
+
 ## 🧱 How It Works
 
 Loqa follows a local-first, modular architecture:
@@ -64,6 +84,56 @@ Planned examples:
 - 🧠 AI chat / memory assistant
 
 👉 Details in [`docs/skills.md`](./docs/skills.md)
+
+---
+
+## 📋 System Requirements
+
+### Minimum
+- **CPU**: 4+ cores
+- **RAM**: 8GB+ 
+- **Storage**: 10GB+ for models
+- **OS**: Linux, macOS, or Windows with Docker
+
+### Recommended  
+- **CPU**: 8+ cores with AVX2 support
+- **RAM**: 16GB+
+- **Storage**: SSD for model loading performance
+- **Network**: Isolated network segment for privacy
+
+---
+
+## 🏗️ Development Workflow
+
+### Alternative: Individual Repository Setup
+
+If you prefer to work with individual repositories:
+
+```bash
+# Core services
+git clone https://github.com/loqalabs/loqa-hub.git
+git clone https://github.com/loqalabs/loqa-device-service.git  
+git clone https://github.com/loqalabs/loqa-puck.git
+git clone https://github.com/loqalabs/loqa-proto.git
+
+# Documentation
+git clone https://github.com/loqalabs/loqa.git
+
+# Use docker-compose from loqa-hub for orchestration
+cd loqa-hub
+docker-compose up -d
+```
+
+### Development Commands
+```bash
+# Development commands (from scripts/)
+make setup    # Initial setup
+make build    # Build all services  
+make start    # Start all services
+make test     # Run test suite
+make dev      # Start development environment
+make logs     # View service logs
+```
 
 ---
 
@@ -117,10 +187,34 @@ Want to build with or contribute to Loqa? Start here:
 
 ---
 
+## 🤝 Contributing
+
+We welcome contributions to any part of the Loqa ecosystem! Please see:
+
+- [Contributing Guidelines](./CONTRIBUTING.md)
+- [Code of Conduct](./CODE_OF_CONDUCT.md)
+- [Security Policy](./docs/security.md)
+
+## 💬 Community & Support
+
+- 🐛 **Bug Reports**: Open issues in the relevant repository
+- 💡 **Feature Requests**: Discuss in GitHub Discussions  
+- 📧 **Security Issues**: Email anna@steckybarnes.com
+- 💬 **General Questions**: Check the [FAQ](./docs/faq.md)
+
+---
+
 ## 📜 License
 
 Loqa is licensed under the Apache License 2.0. See LICENSE for full details.
 
+## 🌟 Vision
+
+Loqa exists to reclaim voice computing for the people. We believe voice assistants can be **powerful, private, and personal** — without requiring you to surrender your data to Big Tech.
+
+> Local-first. Values-first. Sustainability through trust.
+
 ---
 
-> Created with 🧠 + ❤️ by [Anna Barnes](https://www.linkedin.com/in/annabethbarnes), because voice assistants should serve *you* — not surveillance capitalism.
+**Created with 🧠 + ❤️ by [Anna Barnes](https://www.linkedin.com/in/annabethbarnes)**  
+*Because voice assistants should serve you — not surveillance capitalism.*
