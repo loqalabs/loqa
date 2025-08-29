@@ -46,7 +46,7 @@ These features are in progress as Loqa matures toward production-readiness.
 
 If you discover a vulnerability or security concern:
 
-📬 **Email: anna@steckybarnes.com**
+📬 **Email: anna@loqalabs.com**
 
 Please do **not** open public GitHub issues for security reports.  
 We’ll respond promptly and work with you to resolve any concerns.

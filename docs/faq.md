@@ -77,4 +77,4 @@ Plus it’s short, friendly, and unique — like the assistant it powers.
 ---
 
 Still have questions?  
-Open an issue or [start a discussion](https://github.com/your-repo/discussions)!
+Open an issue in any relevant repository or contact anna@loqalabs.com!

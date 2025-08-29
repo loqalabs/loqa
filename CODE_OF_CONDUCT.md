@@ -40,7 +40,7 @@ Violations of this Code of Conduct may result in actions including:
 
 If you experience or witness behavior that violates this code, please report it via email:
 
-📬 **anna@steckybarnes.com**
+📬 **anna@loqalabs.com**
 
 All reports will be handled with discretion.
 

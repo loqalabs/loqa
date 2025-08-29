@@ -69,7 +69,7 @@ Loqa follows a local-first, modular architecture:
 
 > 🎯 It’s like a tiny personal Alexa that runs entirely on your own terms.
 
-![Mermaid Diagram Placeholder — See `architecture.md`](./docs/architecture.md)
+👉 **[Complete Architecture Details](./docs/architecture.md)** with system diagram and data flows
 
 ---
 
@@ -105,6 +105,8 @@ Planned examples:
 
 ## 🏗️ Development Workflow
 
+The main setup script handles everything automatically, but for advanced users who want to work with individual repositories:
+
 ### Alternative: Individual Repository Setup
 
 If you prefer to work with individual repositories:
@@ -125,14 +127,18 @@ docker-compose up -d
 ```
 
 ### Development Commands
+For multi-repository development, use the Makefile in the `scripts/` directory:
+
 ```bash
-# Development commands (from scripts/)
-make setup    # Initial setup
-make build    # Build all services  
+cd loqa/scripts/
+
+make setup    # Initial setup and model download
+make build    # Build all Docker images  
 make start    # Start all services
-make test     # Run test suite
-make dev      # Start development environment
+make test     # Run test suite across all repos
+make dev      # Start development environment with status
 make logs     # View service logs
+make help     # See all available commands
 ```
 
 ---
@@ -199,7 +205,7 @@ We welcome contributions to any part of the Loqa ecosystem! Please see:
 
 - 🐛 **Bug Reports**: Open issues in the relevant repository
 - 💡 **Feature Requests**: Discuss in GitHub Discussions  
-- 📧 **Security Issues**: Email anna@steckybarnes.com
+- 📧 **Security Issues**: Email anna@loqalabs.com
 - 💬 **General Questions**: Check the [FAQ](./docs/faq.md)
 
 ---
