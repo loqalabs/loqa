@@ -86,7 +86,7 @@ make help     # See all available commands
 - **RAM**: 16GB+
 - **Storage**: SSD with 20GB+ free space
 - **Network**: Isolated network segment for testing
-- **Tools**: Docker, Go 1.21+, Protocol Buffers compiler
+- **Tools**: Docker, Go 1.24+, Protocol Buffers compiler
 
 ---
 
