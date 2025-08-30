@@ -50,9 +50,8 @@ You don’t need to be an expert in AI or embedded systems to help. Here are jus
 
 4. Write clean commit messages  
    - Use clear, descriptive commit messages
-   - Avoid AI tool attribution in commit messages
+   - Avoid AI tool attribution in commit messages (automatically enforced by CI)
    - Focus on the "what" and "why" of the change
-   - Optional: Install Git hooks to automatically enforce this: `git config core.hooksPath .githooks`
 
 5. Submit a PR  
    - Use a clear title and description
