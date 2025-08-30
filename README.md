@@ -64,6 +64,25 @@ cd loqa && ./scripts/setup.sh
 
 ---
 
+## 🔧 Recent Improvements
+
+**2025 Infrastructure Enhancements:**
+- ✅ **Modern CI/CD** - GitHub Actions with automated testing, security scanning, and multi-platform builds
+- ✅ **Quality Assurance** - Automated commit message validation and coding standards enforcement  
+- ✅ **Security-First** - Comprehensive security policies and vulnerability reporting processes
+- ✅ **AGPLv3 License** - Strong copyleft protection ensuring community contributions stay open source
+- ✅ **Cross-Platform** - Linux, Docker, and embedded device support with proper dependency management
+- ✅ **Developer Experience** - Consistent tooling, documentation, and contribution workflows across all repositories
+
+**All repositories now feature:**
+- Automated CI/CD pipelines with status badges
+- Security vulnerability scanning with Trivy
+- Modern Go 1.24+ with static analysis  
+- Protocol buffer integration and code generation
+- Comprehensive documentation and security policies
+
+---
+
 ## 🏗️ For Developers
 
 Building something with Loqa? Start here:
@@ -72,6 +91,7 @@ Building something with Loqa? Start here:
 - **[Architecture Overview](./docs/architecture.md)** - How everything fits together  
 - **[Skills Development](./docs/skills.md)** - Build your own voice commands
 - **[API Reference](./docs/messaging.md)** - NATS messaging and protocols
+- **[Security Policy](./SECURITY.md)** - Vulnerability reporting and security guidelines
 
 ---
 
@@ -79,8 +99,9 @@ Building something with Loqa? Start here:
 
 - 🐛 **Found a bug?** Open an issue in the relevant repository
 - 💡 **Have an idea?** Start a discussion or contribute!
-- 📧 **Security concern?** Email anna@loqalabs.com
+- 🔒 **Security concern?** Email security@loqalabs.com (see [SECURITY.md](./SECURITY.md))
 - ❓ **Questions?** Check the **[FAQ](./docs/faq.md)**
+- 💖 **Support the project** via [GitHub Sponsors](https://github.com/sponsors/annabarnes1138) or [Ko-fi](https://ko-fi.com/annabarnes)
 
 ---
 
