@@ -13,18 +13,20 @@ Prevents AI tool attribution from being included in commit messages. Blocks patt
 
 ## Installation
 
-To activate the hooks in your local repository:
-
-```bash
-# From the repository root
-cp .githooks/commit-msg .git/hooks/
-chmod +x .git/hooks/commit-msg
-```
-
-Or use Git's built-in hooks directory feature:
+To activate the hooks in your local repository, use Git's built-in hooks directory feature:
 
 ```bash
 git config core.hooksPath .githooks
+```
+
+This tells Git to use the `.githooks` directory instead of `.git/hooks/` for all hooks. Since the `.githooks` directory is committed to the repository, everyone gets the same hooks automatically.
+
+### Alternative (manual installation)
+If you prefer the traditional approach:
+
+```bash
+cp .githooks/commit-msg .git/hooks/
+chmod +x .git/hooks/commit-msg
 ```
 
 ## Why These Hooks?
