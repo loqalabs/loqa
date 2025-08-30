@@ -52,6 +52,7 @@ You don’t need to be an expert in AI or embedded systems to help. Here are jus
    - Use clear, descriptive commit messages
    - Avoid AI tool attribution in commit messages
    - Focus on the "what" and "why" of the change
+   - Optional: Install Git hooks to automatically enforce this: `cp .githooks/commit-msg .git/hooks/`
 
 5. Submit a PR  
    - Use a clear title and description
