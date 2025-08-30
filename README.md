@@ -85,7 +85,7 @@ We believe voice assistants should be **powerful, private, and personal** — wi
 
 > Local-first. Values-first. Your voice, your choice.
 
-**[Contributing](./CONTRIBUTING.md)** • **[Code of Conduct](./CODE_OF_CONDUCT.md)** • **[Apache 2.0 License](./LICENSE)**
+**[Contributing](./CONTRIBUTING.md)** • **[Code of Conduct](./CODE_OF_CONDUCT.md)** • **[AGPLv3 License](./LICENSE)**
 
 ---
 
