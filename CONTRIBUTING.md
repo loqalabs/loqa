@@ -48,7 +48,12 @@ You don’t need to be an expert in AI or embedded systems to help. Here are jus
 3. Make your changes  
    Format Go code with `gofmt` and ensure clean commits
 
-4. Submit a PR  
+4. Write clean commit messages  
+   - Use clear, descriptive commit messages
+   - Avoid AI tool attribution in commit messages
+   - Focus on the "what" and "why" of the change
+
+5. Submit a PR  
    - Use a clear title and description
    - Reference related issues if applicable
    - Be kind and constructive in your comments
