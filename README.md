@@ -2,6 +2,8 @@
 
 # 🦜 Loqa – A Local-First Voice Assistant
 
+[![CI/CD Pipeline](https://github.com/loqalabs/loqa/actions/workflows/ci.yml/badge.svg)](https://github.com/loqalabs/loqa/actions/workflows/ci.yml)
+
 **Loqa** is a privacy-respecting voice assistant that runs entirely on your own devices. No cloud, no Big Tech, no data mining — just fast, private voice control that you actually own.
 
 > 🎯 Think "personal Alexa" that never leaves your house.
