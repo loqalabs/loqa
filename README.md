@@ -74,6 +74,14 @@ cd loqa && ./scripts/setup.sh
 - ✅ **Cross-Platform** - Linux, Docker, and embedded device support with proper dependency management
 - ✅ **Developer Experience** - Consistent tooling, documentation, and contribution workflows across all repositories
 
+**Phase 2: Observability & Event Tracking (NEW):**
+- ✅ **Complete Voice Traceability** - Every voice interaction generates structured, queryable events with full metadata
+- ✅ **SQLite Integration** - Persistent storage with optimized performance (WAL mode, indexes, migrations)
+- ✅ **Structured Logging** - Rich context logging with Zap (JSON/console output, configurable levels)
+- ✅ **HTTP API** - RESTful endpoints for event access: `/api/voice-events` with filtering and pagination
+- ✅ **Audio Fingerprinting** - SHA-256 hashing for deduplication and analysis
+- ✅ **Real-time Metrics** - Processing time tracking and error state capture throughout the pipeline
+
 **All repositories now feature:**
 - Automated CI/CD pipelines with status badges
 - Security vulnerability scanning with Trivy
