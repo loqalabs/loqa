@@ -16,7 +16,7 @@ This is a multi-repository project with individual services:
 - `loqa-observer/` - Vue.js web timeline UI for voice event visualization
 - `loqa-puck/` - Audio capture client (Go): test implementation and future embedded firmware
 - `loqa-proto/` - gRPC protocol definitions and generated bindings
-- `loqa-skills/` - Skills framework (in development)
+- `loqa-skills/` - Modular skill plugin system with manifest-driven architecture
 
 ## Development Commands
 
@@ -63,6 +63,10 @@ cd loqa-observer && npm run dev     # Development server
 cd loqa-observer && npm run build   # Production build
 cd loqa-observer && npm run lint    # ESLint with --fix
 cd loqa-observer && npm run format  # Prettier formatting
+
+# Skills Management
+cd loqa-hub && go run ./cmd/skills-cli --help     # Skills CLI help
+cd loqa-hub && go run ./cmd/skills-cli --action list    # List loaded skills
 ```
 
 ### Protocol Buffer Generation
@@ -183,9 +187,16 @@ LOG_LEVEL=info
 ## Common Tasks
 
 ### Adding New Voice Commands
-1. Update LLM prompt in `loqa-hub/internal/llm/command_parser.go`
-2. Add NATS subject handling in `loqa-device-service/`
-3. Test with `./tools/run-test-puck.sh` or NATS CLI
+1. Create a skill manifest in `loqa-skills/` with intent patterns
+2. Implement the skill using the SkillPlugin interface
+3. Load the skill via CLI: `skills-cli --action load --path /path/to/skill`
+4. Test with `./tools/run-test-puck.sh` or via Observer UI
+
+### Managing Skills  
+1. List skills: `skills-cli --action list`
+2. Enable/disable: `skills-cli --action enable --skill skill-id`
+3. Configure via Observer UI Skills page
+4. View logs and metrics in the Timeline
 
 ### Protocol Changes
 1. Modify `loqa-proto/audio.proto`
