@@ -35,6 +35,7 @@ cd loqa && ./scripts/setup.sh
 - 🎤 **Wake word detection** - Just say "Hey Loqa"
 - 🧠 **Natural language** - Talk normally, not like a robot
 - 🏠 **Smart home control** - Lights, music, devices (simulated for now)
+- 📊 **Voice Command Timeline** - Visual web interface to see every interaction
 - 🔒 **100% private** - Everything stays on your network
 - 🛠️ **Fully hackable** - Build your own skills and commands
 
@@ -45,7 +46,8 @@ cd loqa && ./scripts/setup.sh
 1. **Speak** → Microphone captures your voice
 2. **Process** → Local AI understands what you want  
 3. **Act** → Your devices respond instantly
-4. **Privacy** → Nothing ever leaves your house
+4. **Visualize** → See all interactions in real-time web timeline
+5. **Privacy** → Nothing ever leaves your house
 
 👉 **[See the Full Architecture](./docs/architecture.md)** with diagrams and technical details
 
@@ -74,13 +76,21 @@ cd loqa && ./scripts/setup.sh
 - ✅ **Cross-Platform** - Linux, Docker, and embedded device support with proper dependency management
 - ✅ **Developer Experience** - Consistent tooling, documentation, and contribution workflows across all repositories
 
-**Phase 2: Observability & Event Tracking (NEW):**
+**Phase 2: Observability & Event Tracking:**
 - ✅ **Complete Voice Traceability** - Every voice interaction generates structured, queryable events with full metadata
 - ✅ **SQLite Integration** - Persistent storage with optimized performance (WAL mode, indexes, migrations)
 - ✅ **Structured Logging** - Rich context logging with Zap (JSON/console output, configurable levels)
 - ✅ **HTTP API** - RESTful endpoints for event access: `/api/voice-events` with filtering and pagination
 - ✅ **Audio Fingerprinting** - SHA-256 hashing for deduplication and analysis
 - ✅ **Real-time Metrics** - Processing time tracking and error state capture throughout the pipeline
+
+**Phase 3: Voice Command Timeline UI (NEW):**
+- ✅ **Real-time Web Interface** - Vue.js timeline showing all voice interactions as they happen
+- ✅ **Event Visualization** - See transcriptions, intents, confidence scores, and success/failure states
+- ✅ **Audio Playback** - Listen to original voice commands directly in the browser
+- ✅ **Detailed Event Inspection** - Drill-down modals with complete JSON payloads for debugging
+- ✅ **Dark Mode Support** - Modern, responsive interface that adapts to your preferences
+- ✅ **Auto-refresh** - Timeline updates automatically every 5 seconds to show new voice events
 
 **All repositories now feature:**
 - Automated CI/CD pipelines with status badges
