@@ -41,8 +41,8 @@ for repo in "${REPOS[@]}"; do
     fi
 done
 
-# Go to hub directory for orchestration
-cd loqa-hub
+# Go back to main directory for orchestration
+cd loqa
 
 # Create necessary directories
 echo "📁 Creating necessary directories..."
@@ -76,7 +76,9 @@ else
 fi
 
 echo "🐳 Starting Loqa services..."
-docker-compose -f deployments/docker-compose.yml up -d
+cd scripts
+docker-compose up -d
+cd ..
 
 echo "⏳ Waiting for services to start..."
 sleep 10
@@ -117,7 +119,7 @@ echo "  cd ../loqa-puck/test-go"
 echo "  go run ./cmd --hub localhost:50051"
 echo ""
 echo "To stop services:"
-echo "  cd loqa-hub && docker-compose -f deployments/docker-compose.yml down"
+echo "  cd loqa/scripts && docker-compose down"
 echo ""
 echo "For more information, see:"
 echo "  📖 Documentation: loqa/README.md"
