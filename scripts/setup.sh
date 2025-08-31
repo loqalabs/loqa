@@ -28,6 +28,7 @@ REPOS=(
     "loqa-puck"
     "loqa-proto"
     "loqa-skills"
+    "loqa-observer"
 )
 
 echo "📦 Cloning Loqa repositories..."

@@ -8,55 +8,36 @@ The fastest way to experience Loqa's local-first voice assistant capabilities, i
 # Verify you have Docker and Docker Compose
 docker --version && docker-compose --version
 
-# Verify Go 1.24+ (for puck testing)
+# Verify Go 1.24+ (for voice testing)
 go version
-
-# Verify Node.js 20+ (for timeline UI)
-node --version && npm --version
 ```
 
 **Requirements:**
 - Docker & Docker Compose
 - Go 1.24+ (for voice testing)
-- Node.js 20+ (for timeline UI)
 - PortAudio (`brew install portaudio` on macOS)
 
-## 🏃‍♂️ Complete System Setup (3 minutes)
+## 🏃‍♂️ Complete System Setup (4 minutes)
 
 ```bash
 # Clone the main repository
 git clone https://github.com/loqalabs/loqa.git
 cd loqa
 
-# Start all backend services
+# Start all services (including Timeline UI)
 ./scripts/setup.sh
 ```
 
 This automatically:
-- 🐳 Starts NATS, Ollama, Hub, and Device services
+- 🐳 Starts NATS, Ollama, Hub, Device services, and Timeline UI
 - 🤖 Downloads Llama 3.2 3B model
 - 📝 Sets up Whisper.cpp for speech recognition
 - 💡 Configures simulated smart devices
-
-## 📊 Start the Timeline UI (1 minute)
-
-In a new terminal window:
-
-```bash
-# Clone and start the voice command timeline interface
-git clone https://github.com/loqalabs/loqa-observer.git
-cd loqa-observer
-
-# Install and start the web interface
-npm install
-npm run dev
-```
-
-**Timeline UI will be available at: http://localhost:5173**
+- 📊 Launches web interface at http://localhost:5173
 
 ## 🎤 Test Voice Commands (1 minute)
 
-In a third terminal window:
+In a new terminal window:
 
 ```bash
 # Navigate to the test puck
@@ -80,13 +61,13 @@ go run ./cmd --hub localhost:50051
 
 ## 🔍 Verify It's Working (1 minute)
 
-**Check Backend Services:**
+**Check All Services:**
 ```bash
-# Check all services are running
+# Check all services are running (including Timeline UI)
 docker-compose ps
 
 # Watch the logs
-docker-compose logs -f hub device-service
+docker-compose logs -f hub device-service observer
 ```
 
 **Check Timeline UI:**
@@ -179,8 +160,9 @@ You now have a complete local-first voice assistant system running:
 - Puck client using your laptop's microphone/speakers
 - Hub service processing speech-to-text and intent parsing
 - Device service controlling smart home devices (simulated)
+- Timeline UI automatically running at http://localhost:5173
 
-**📊 Timeline UI:**
+**📊 Complete Observability:**
 - Real-time web interface showing all voice interactions
 - Event details with transcriptions, intents, and confidence scores
 - Audio playback and full JSON event inspection

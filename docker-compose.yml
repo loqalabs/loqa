@@ -1,0 +1,140 @@
+services:
+  # NATS Message Bus
+  nats:
+    image: nats:2.10-alpine
+    container_name: loqa-nats
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    command: ["nats-server", "-js", "-m", "8222"]
+    networks:
+      - loqa-network
+    healthcheck:
+      test: ["CMD", "nats", "server", "check", "--connect", "nats://localhost:4222"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Ollama LLM Service
+  ollama:
+    image: ollama/ollama:latest
+    container_name: loqa-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    networks:
+      - loqa-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    # Pull model on startup
+    command: >
+      sh -c "ollama serve &
+             sleep 10 &&
+             ollama pull llama3.2:3b &&
+             wait"
+
+  # Loqa Hub - Central orchestrator
+  hub:
+    build:
+      context: ../loqa-hub
+      dockerfile: Dockerfile
+    container_name: loqa-hub
+    ports:
+      - "3000:3000"
+      - "50051:50051"
+    environment:
+      - WHISPER_MODEL_PATH=/models/ggml-base.en.bin
+      - WHISPER_LANGUAGE=en
+      - OLLAMA_URL=http://ollama:11434
+      - OLLAMA_MODEL=llama3.2:3b
+      - NATS_URL=nats://nats:4222
+      - NATS_SUBJECT=loqa.commands
+      - LOQA_HOST=0.0.0.0
+      - LOQA_PORT=3000
+      - LOQA_GRPC_PORT=50051
+      - LOG_LEVEL=info
+      - LOG_FORMAT=json
+    depends_on:
+      nats:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    volumes:
+      - hub-data:/app/data
+      - whisper-models:/models
+    networks:
+      - loqa-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Device Control Service
+  device-service:
+    build:
+      context: ../loqa-device-service
+      dockerfile: Dockerfile
+    container_name: loqa-device-service
+    environment:
+      - NATS_URL=nats://nats:4222
+      - LOG_LEVEL=info
+      - LOG_FORMAT=json
+    depends_on:
+      nats:
+        condition: service_healthy
+    networks:
+      - loqa-network
+
+  # Observer Timeline UI
+  observer:
+    build:
+      context: ../loqa-observer
+      dockerfile: Dockerfile
+    container_name: loqa-observer
+    ports:
+      - "5173:80"
+    environment:
+      - VITE_HUB_API_URL=http://localhost:3000
+    depends_on:
+      hub:
+        condition: service_healthy
+    networks:
+      - loqa-network
+
+  # Test Puck (optional - for testing)
+  test-puck:
+    build:
+      context: ../loqa-puck
+      dockerfile: Dockerfile
+    container_name: loqa-test-puck
+    environment:
+      - HUB_ADDRESS=hub:50051
+      - PUCK_ID=docker-test-puck
+      - WAKE_WORD_THRESHOLD=0.7
+    depends_on:
+      hub:
+        condition: service_healthy
+    networks:
+      - loqa-network
+    # Only run if you have audio devices available
+    profiles:
+      - testing
+
+volumes:
+  ollama-data:
+    driver: local
+  hub-data:
+    driver: local
+  whisper-models:
+    driver: local
+
+networks:
+  loqa-network:
+    driver: bridge
