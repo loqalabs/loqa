@@ -76,7 +76,7 @@ cd loqa && ./scripts/setup.sh
 - ✅ **Cross-Platform** - Linux, Docker, and embedded device support with proper dependency management
 - ✅ **Developer Experience** - Consistent tooling, documentation, and contribution workflows across all repositories
 
-**Phase 2: Observability & Event Tracking:**
+**Milestone 2: Observability & Event Tracking:**
 - ✅ **Complete Voice Traceability** - Every voice interaction generates structured, queryable events with full metadata
 - ✅ **SQLite Integration** - Persistent storage with optimized performance (WAL mode, indexes, migrations)
 - ✅ **Structured Logging** - Rich context logging with Zap (JSON/console output, configurable levels)
@@ -84,7 +84,7 @@ cd loqa && ./scripts/setup.sh
 - ✅ **Audio Fingerprinting** - SHA-256 hashing for deduplication and analysis
 - ✅ **Real-time Metrics** - Processing time tracking and error state capture throughout the pipeline
 
-**Phase 3: Voice Command Timeline UI (NEW):**
+**Milestone 3: Voice Command Timeline UI (NEW):**
 - ✅ **Real-time Web Interface** - Vue.js timeline showing all voice interactions as they happen
 - ✅ **Event Visualization** - See transcriptions, intents, confidence scores, and success/failure states
 - ✅ **Audio Playback** - Listen to original voice commands directly in the browser

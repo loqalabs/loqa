@@ -20,62 +20,69 @@ setup:
 
 build:
 	@echo "🔨 Building all Docker images..."
-	docker-compose build
+	cd .. && docker-compose build
 
 start:
 	@echo "🚀 Starting Loqa services..."
-	docker-compose up -d
+	cd .. && docker-compose up -d
 	@echo "✅ Services started. Access at:"
 	@echo "   Hub API: http://localhost:3000"
+	@echo "   Observer Timeline: http://localhost:5173"
 	@echo "   NATS: http://localhost:8222"
 
 stop:
 	@echo "🛑 Stopping Loqa services..."
-	docker-compose down
+	cd .. && docker-compose down
 
 clean:
 	@echo "🧹 Cleaning up containers and volumes..."
-	docker-compose down -v
+	cd .. && docker-compose down -v
 	docker system prune -f
 
 test:
 	@echo "🧪 Running tests..."
-	cd loqa-hub && go test ./...
-	cd loqa-device-service && go test ./...
-	cd loqa-puck/test-go && go test ./...
+	cd ../loqa-hub && go test ./...
+	cd ../loqa-device-service && go test ./...
+	cd ../loqa-puck/test-go && go test ./...
 
 proto:
 	@echo "🔧 Regenerating protocol buffers..."
-	cd loqa-proto && ./generate.sh
+	cd ../loqa-proto && ./generate.sh
 
 dev: start
 	@echo "🛠️ Development environment ready!"
 	@echo "Services running:"
-	@docker-compose ps
+	@cd .. && docker-compose ps
 	@echo ""
 	@echo "To run test puck:"
-	@echo "  cd loqa-puck/test-go && go run ./cmd"
+	@echo "  cd ../loqa-puck/test-go && go run ./cmd"
 
 logs:
 	@echo "📊 Showing service logs..."
-	docker-compose logs -f
+	cd .. && docker-compose logs -f
 
 # Individual service commands
 start-hub:
-	cd loqa-hub && go run ./cmd
+	cd ../loqa-hub && go run ./cmd
 
 start-device-service:
-	cd loqa-device-service && go run ./cmd
+	cd ../loqa-device-service && go run ./cmd
+
+start-observer:
+	cd ../loqa-observer && npm run dev
 
 start-puck:
-	cd loqa-puck/test-go && go run ./cmd
+	cd ../loqa-puck/test-go && go run ./cmd
 
 # Build individual services
 build-hub:
-	cd loqa-hub && go build -o bin/hub ./cmd
+	cd ../loqa-hub && go build -o bin/hub ./cmd
 
 build-device-service:
-	cd loqa-device-service && go build -o bin/device-service ./cmd
+	cd ../loqa-device-service && go build -o bin/device-service ./cmd
+
+build-observer:
+	cd ../loqa-observer && npm run build
 
 build-puck:
-	cd loqa-puck/test-go && go build -o bin/test-puck ./cmd
+	cd ../loqa-puck/test-go && go build -o bin/test-puck ./cmd
