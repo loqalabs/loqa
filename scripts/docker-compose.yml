@@ -31,7 +31,7 @@ services:
 
   # Loqa Hub - Central orchestrator
   hub:
-    build: ./loqa-hub
+    build: ../../loqa-hub
     container_name: loqa-hub
     ports:
       - "3000:3000"
@@ -53,7 +53,7 @@ services:
 
   # Device Control Service
   device-service:
-    build: ./loqa-device-service
+    build: ../../loqa-device-service
     container_name: loqa-device-service
     environment:
       - NATS_URL=nats://nats:4222
@@ -65,7 +65,7 @@ services:
 
   # Test Puck (optional - for testing)
   test-puck:
-    build: ./loqa-puck
+    build: ../../loqa-puck
     container_name: loqa-test-puck
     environment:
       - HUB_ADDRESS=hub:50051
