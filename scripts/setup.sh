@@ -77,7 +77,6 @@ else
 fi
 
 echo "🐳 Starting Loqa services..."
-cd ../loqa-hub/deployments
 docker-compose up -d
 cd ../../loqa
 
