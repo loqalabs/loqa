@@ -42,8 +42,8 @@ services:
   # Loqa Hub - Central orchestrator
   hub:
     build:
-      context: ../loqa-hub
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: loqa-hub/Dockerfile
     container_name: loqa-hub
     ports:
       - "3000:3000"
@@ -111,8 +111,8 @@ services:
   # Test Puck (optional - for testing)
   test-puck:
     build:
-      context: ../loqa-puck
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: loqa-puck/Dockerfile
     container_name: loqa-test-puck
     environment:
       - HUB_ADDRESS=hub:50051
