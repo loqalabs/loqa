@@ -10,7 +10,7 @@ services:
     networks:
       - loqa-network
     healthcheck:
-      test: ["CMD", "nats", "server", "check", "--connect", "nats://localhost:4222"]
+      test: ["CMD-SHELL", "nc -z localhost 4222"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -28,16 +28,17 @@ services:
     networks:
       - loqa-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      test: ["CMD-SHELL", "nc -z localhost 11434"]
       interval: 30s
       timeout: 10s
       retries: 3
     # Pull model on startup
+    entrypoint: ["/bin/sh", "-c"]
     command: >
-      sh -c "ollama serve &
-             sleep 10 &&
-             ollama pull llama3.2:3b &&
-             wait"
+      "ollama serve &
+       sleep 10 &&
+       ollama pull llama3.2:3b &&
+       wait"
 
   # Loqa Hub - Central orchestrator
   hub:
