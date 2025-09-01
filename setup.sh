@@ -58,6 +58,11 @@ echo "📥 Downloading Whisper model..."
 PROJECT_NAME=$(basename "$(pwd)")
 VOLUME_NAME="${PROJECT_NAME}_whisper-models"
 
+# Create volumes that Docker Compose will use (prevents warning messages)
+docker volume create "${PROJECT_NAME}_ollama-data" >/dev/null 2>&1 || true
+docker volume create "${PROJECT_NAME}_hub-data" >/dev/null 2>&1 || true  
+docker volume create "${PROJECT_NAME}_whisper-models" >/dev/null 2>&1 || true
+
 # Create a temporary container to download the model to the volume
 docker run --rm -v "${VOLUME_NAME}:/tmp/whisper.cpp/models" alpine/curl:latest sh -c "
   if [ ! -f /tmp/whisper.cpp/models/ggml-tiny.bin ]; then
