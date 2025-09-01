@@ -77,9 +77,7 @@ else
 fi
 
 echo "🐳 Starting Loqa services..."
-cd ../loqa-hub/deployments
 docker-compose up -d
-cd ../../loqa
 
 echo "⏳ Waiting for services to start..."
 sleep 10
@@ -120,7 +118,7 @@ echo "  cd ../loqa-puck/test-go"
 echo "  go run ./cmd --hub localhost:50051"
 echo ""
 echo "To stop services:"
-echo "  cd loqa-hub/deployments && docker-compose down"
+echo "  docker-compose down"
 echo ""
 echo "For more information, see:"
 echo "  📖 Documentation: loqa/README.md"
