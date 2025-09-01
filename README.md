@@ -17,13 +17,12 @@
 
 ## 🚀 Try It Now
 
-**Get running in under 5 minutes:**
+**Get running in under 5 minutes with one command:**
 
 ```bash
-git clone https://github.com/loqalabs/loqa.git
-cd loqa && ./setup.sh
+curl -fsSL https://raw.githubusercontent.com/loqalabs/loqa/main/setup.sh | bash
 
-# Test voice: "Hey Loqa, turn on the lights"
+# Then open http://localhost:5173 to see the voice assistant UI
 ```
 
 👉 **Having issues?** Check the **[5-Minute Setup Guide](./docs/getting-started-5min.md)** or **[Troubleshooting](./docs/troubleshooting.md)**
@@ -108,11 +107,10 @@ cd loqa && ./setup.sh
 For users who just want to run Loqa quickly with pre-built images:
 
 ```bash
-git clone https://github.com/loqalabs/loqa.git
-cd loqa && ./setup.sh
+curl -fsSL https://raw.githubusercontent.com/loqalabs/loqa/main/setup.sh | bash
 ```
 
-This uses pre-built Docker images from our CI/CD pipeline - no compilation needed!
+This downloads the docker-compose.yml and uses pre-built Docker images from our CI/CD pipeline - no compilation needed!
 
 ### 🛠️ Development Setup
 
