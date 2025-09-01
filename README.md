@@ -21,7 +21,7 @@
 
 ```bash
 git clone https://github.com/loqalabs/loqa.git
-cd loqa && ./scripts/setup.sh
+cd loqa && ./setup.sh
 
 # Test voice: "Hey Loqa, turn on the lights"
 ```
@@ -101,7 +101,33 @@ cd loqa && ./scripts/setup.sh
 
 ---
 
-## 🏗️ For Developers
+## 🏗️ Setup Options
+
+### 🚀 5-Minute User Setup (Recommended)
+
+For users who just want to run Loqa quickly with pre-built images:
+
+```bash
+git clone https://github.com/loqalabs/loqa.git
+cd loqa && ./setup.sh
+```
+
+This uses pre-built Docker images from our CI/CD pipeline - no compilation needed!
+
+### 🛠️ Development Setup
+
+For developers who want to build from source and modify the code:
+
+```bash
+git clone https://github.com/loqalabs/loqa.git
+cd loqa/scripts && ./setup-dev.sh
+# OR use Make commands
+cd loqa/scripts && make setup-dev
+```
+
+This clones all repositories and builds Docker images locally from source.
+
+### 🔧 Developer Resources
 
 Building something with Loqa? Start here:
 

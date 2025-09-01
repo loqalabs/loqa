@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-echo "🦜 Setting up Loqa Labs - Local Voice Assistant Platform"
-echo "========================================================="
+echo "🛠️ Loqa Labs - Development Environment Setup"
+echo "============================================="
 echo ""
 
 # Check if Docker is installed
@@ -76,8 +76,8 @@ else
     echo "✅ Whisper model already exists"
 fi
 
-echo "🐳 Starting Loqa services..."
-docker-compose up -d
+echo "🐳 Starting Loqa services with development build..."
+docker-compose -f docker-compose.dev.yml up -d
 
 echo "⏳ Waiting for services to start..."
 sleep 10

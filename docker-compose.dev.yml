@@ -42,7 +42,9 @@ services:
 
   # Loqa Hub - Central orchestrator
   hub:
-    image: ghcr.io/loqalabs/loqa-hub:latest
+    build:
+      context: ..
+      dockerfile: loqa-hub/Dockerfile
     container_name: loqa-hub
     ports:
       - "3000:3000"
@@ -78,7 +80,9 @@ services:
 
   # Device Control Service
   device-service:
-    image: ghcr.io/loqalabs/loqa-device-service:latest
+    build:
+      context: ../loqa-device-service
+      dockerfile: Dockerfile
     container_name: loqa-device-service
     environment:
       - NATS_URL=nats://nats:4222
@@ -92,7 +96,9 @@ services:
 
   # Observer Timeline UI
   observer:
-    image: ghcr.io/loqalabs/loqa-observer:latest
+    build:
+      context: ../loqa-observer
+      dockerfile: Dockerfile
     container_name: loqa-observer
     ports:
       - "5173:80"
@@ -106,7 +112,9 @@ services:
 
   # Test Puck (optional - for testing)
   test-puck:
-    image: ghcr.io/loqalabs/loqa-puck:latest
+    build:
+      context: ..
+      dockerfile: loqa-puck/Dockerfile
     container_name: loqa-test-puck
     environment:
       - HUB_ADDRESS=hub:50051

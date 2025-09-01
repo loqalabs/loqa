@@ -7,25 +7,30 @@ The fastest way to experience Loqa's local-first voice assistant capabilities, i
 ```bash
 # Verify you have Docker and Docker Compose
 docker --version && docker-compose --version
-
-# Verify Go 1.24+ (for voice testing)
-go version
 ```
 
 **Requirements:**
 - Docker & Docker Compose
-- Go 1.24+ (for voice testing)
-- PortAudio (`brew install portaudio` on macOS)
 
 ## 🏃‍♂️ Complete System Setup (4 minutes)
 
-```bash
-# Clone the main repository
-git clone https://github.com/loqalabs/loqa.git
-cd loqa
+**Just copy and paste this single command:**
 
-# Start all services (including Timeline UI)
-./scripts/setup.sh
+```bash
+curl -fsSL https://raw.githubusercontent.com/loqalabs/loqa/main/setup.sh | bash
+```
+
+That's it! This command:
+- Downloads the setup script
+- Downloads the Docker Compose configuration  
+- Pulls all pre-built images
+- Starts all services automatically
+
+### Alternative: Full Repository
+If you prefer to have the full repository locally:
+
+```bash
+git clone https://github.com/loqalabs/loqa.git && cd loqa && ./setup.sh
 ```
 
 This automatically:
@@ -37,16 +42,16 @@ This automatically:
 
 ## 🎤 Test Voice Commands (1 minute)
 
-In a new terminal window:
+Your setup includes a containerized test puck. Enable it:
 
 ```bash
-# Navigate to the test puck
-cd loqa-puck/test-go
+# Start the test puck container
+docker-compose --profile testing up -d test-puck
 
-# Start the voice client (connects to Hub at localhost:50051)
-go run ./cmd --hub localhost:50051
+# Check it's running
+docker logs loqa-test-puck
 
-# Speak these commands:
+# Speak these commands near your microphone:
 # "Hey Loqa, turn on the kitchen lights"
 # "Hey Loqa, play music in the living room"
 # "Hey Loqa, turn off all lights"
@@ -112,18 +117,19 @@ nats pub loqa.devices.commands.lights '{
 
 ## 🛠️ Next Steps
 
-### Customize Your Setup
+### For Users
 - **Timeline UI**: Explore dark mode, event filtering, and analytics
 - **Add Real Devices**: Configure Home Assistant integration
-- **Build Hardware Pucks**: Deploy ESP32 firmware
 - **Create Custom Skills**: Extend with your own voice commands
-- **Production Deploy**: Use Docker Compose or Kubernetes
+
+### For Developers
+- 🛠️ **[Developer Guide](./DEVELOPER.md)** - Development setup, testing, and contributing
+- 🏗️ **[Architecture Deep Dive](./architecture.md)** - System design and technical details
+- 🧩 **[Build Your First Skill](./skills.md)** - Skills development guide
 
 ### Learn More
 - 📖 [Full Documentation](./quickstart.md)
-- 🏗️ [Architecture Deep Dive](./architecture.md)  
 - 🔧 [Configuration Guide](./config.md)
-- 🧩 [Build Your First Skill](./skills.md)
 
 ## 🛑 Stop Everything
 

@@ -26,13 +26,28 @@ The Loqa platform consists of multiple focused repositories that work together:
 
 ## 🏗️ Development Workflow
 
-### Quick Multi-Repo Setup
+### Quick Development Setup
 
-The main setup script handles everything automatically:
+For developers who want to build from source and modify the code:
 
 ```bash
 git clone https://github.com/loqalabs/loqa.git
-cd loqa && ./scripts/setup.sh
+cd loqa && ./scripts/setup-dev.sh
+```
+
+This automatically:
+- Clones all Loqa repositories
+- Downloads the Whisper model
+- Builds Docker images from source
+- Starts all services in development mode
+
+### User Setup (Pre-built Images)
+
+For users who just want to run Loqa without development:
+
+```bash
+git clone https://github.com/loqalabs/loqa.git
+cd loqa && ./setup.sh
 ```
 
 ### Alternative: Individual Repository Setup
@@ -62,14 +77,38 @@ For multi-repository development, use the Makefile in the `scripts/` directory:
 ```bash
 cd loqa/scripts/
 
-make setup    # Initial setup and model download
-make build    # Build all Docker images  
-make start    # Start all services
-make test     # Run test suite across all repos
-make dev      # Start development environment with status
-make logs     # View service logs
-make help     # See all available commands
+make setup-dev # Development setup (build from source)
+make build     # Build all Docker images  
+make start-dev # Start development services
+make test      # Run test suite across all repos
+make dev       # Start development environment with status
+make logs      # View service logs
+make help      # See all available commands
 ```
+
+### Testing Voice Commands (Development)
+
+After running development setup, test with the local puck:
+
+```bash
+# Navigate to the test puck
+cd loqa-puck/test-go
+
+# Start the voice client (connects to Hub at localhost:50051)
+go run ./cmd --hub localhost:50051
+
+# Speak these commands:
+# "Hey Loqa, turn on the kitchen lights"
+# "Hey Loqa, play music in the living room"
+# "Hey Loqa, turn off all lights"
+```
+
+**Expected behavior:**
+1. 🎤 See "Voice detected!" in the terminal when you speak
+2. 📝 Watch speech-to-text conversion in real-time
+3. 🤖 See LLM parse your intent and extract commands
+4. 💡 Observe device actions in the service logs
+5. 📊 Watch events appear instantly in the Timeline UI at http://localhost:5173
 
 ---
 
