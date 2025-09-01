@@ -47,6 +47,13 @@ services:
     ports:
       - "3000:3000"
       - "50051:50051"
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+    restart: unless-stopped
     environment:
       - WHISPER_MODEL_PATH=/tmp/whisper.cpp/models/ggml-tiny.bin
       - WHISPER_LANGUAGE=en
