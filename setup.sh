@@ -54,8 +54,12 @@ download_file() {
 }
 
 echo "📥 Downloading Whisper model..."
+# Get the Docker Compose project name (directory name) to find the correct volume
+PROJECT_NAME=$(basename "$(pwd)")
+VOLUME_NAME="${PROJECT_NAME}_whisper-models"
+
 # Create a temporary container to download the model to the volume
-docker run --rm -v whisper-models:/tmp/whisper.cpp/models alpine/curl:latest sh -c "
+docker run --rm -v "${VOLUME_NAME}:/tmp/whisper.cpp/models" alpine/curl:latest sh -c "
   if [ ! -f /tmp/whisper.cpp/models/ggml-tiny.bin ]; then
     echo 'Downloading Whisper model...'
     curl -L -o /tmp/whisper.cpp/models/ggml-tiny.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin
