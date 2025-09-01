@@ -55,10 +55,10 @@ download_file() {
 
 echo "📥 Downloading Whisper model..."
 # Create a temporary container to download the model to the volume
-docker run --rm -v loqa_whisper-models:/models alpine/curl:latest sh -c "
-  if [ ! -f /models/ggml-tiny.bin ]; then
+docker run --rm -v whisper-models:/tmp/whisper.cpp/models alpine/curl:latest sh -c "
+  if [ ! -f /tmp/whisper.cpp/models/ggml-tiny.bin ]; then
     echo 'Downloading Whisper model...'
-    curl -L -o /models/ggml-tiny.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin
+    curl -L -o /tmp/whisper.cpp/models/ggml-tiny.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin
     echo 'Model downloaded successfully'
   else
     echo 'Whisper model already exists'
