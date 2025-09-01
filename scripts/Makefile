@@ -1,12 +1,14 @@
-.PHONY: help setup build start stop clean test proto dev logs
+.PHONY: help setup setup-dev build start start-dev stop clean test proto dev logs
 
 # Default target
 help:
 	@echo "Loqa Development Commands"
 	@echo "========================"
-	@echo "  setup     - Initial setup and model download"
-	@echo "  build     - Build all Docker images"
-	@echo "  start     - Start all services"
+	@echo "  setup     - 5-minute user setup (pre-built images)"
+	@echo "  setup-dev - Developer setup (build from source)"
+	@echo "  build     - Build all Docker images for development"
+	@echo "  start     - Start all services (production images)"
+	@echo "  start-dev - Start development services (from source)"
 	@echo "  stop      - Stop all services"
 	@echo "  clean     - Clean up containers and volumes"
 	@echo "  test      - Run test suite"
@@ -15,17 +17,29 @@ help:
 	@echo "  logs      - View service logs"
 
 setup:
-	@echo "🦜 Setting up Loqa development environment..."
-	./setup.sh
+	@echo "🦜 5-minute Loqa setup with pre-built images..."
+	cd .. && ./setup.sh
+
+setup-dev:
+	@echo "🛠️ Setting up Loqa development environment with source code..."
+	./setup-dev.sh
 
 build:
-	@echo "🔨 Building all Docker images..."
-	cd .. && docker-compose build
+	@echo "🔨 Building all Docker images for development..."
+	cd .. && docker-compose -f docker-compose.dev.yml build
 
 start:
-	@echo "🚀 Starting Loqa services..."
+	@echo "🚀 Starting Loqa services (5-minute setup)..."
 	cd .. && docker-compose up -d
 	@echo "✅ Services started. Access at:"
+	@echo "   Hub API: http://localhost:3000"
+	@echo "   Observer Timeline: http://localhost:5173"
+	@echo "   NATS: http://localhost:8222"
+
+start-dev:
+	@echo "🛠️ Starting Loqa development services..."
+	cd .. && docker-compose -f docker-compose.dev.yml up -d
+	@echo "✅ Development services started. Access at:"
 	@echo "   Hub API: http://localhost:3000"
 	@echo "   Observer Timeline: http://localhost:5173"
 	@echo "   NATS: http://localhost:8222"
@@ -33,10 +47,12 @@ start:
 stop:
 	@echo "🛑 Stopping Loqa services..."
 	cd .. && docker-compose down
+	cd .. && docker-compose -f docker-compose.dev.yml down
 
 clean:
 	@echo "🧹 Cleaning up containers and volumes..."
 	cd .. && docker-compose down -v
+	cd .. && docker-compose -f docker-compose.dev.yml down -v
 	docker system prune -f
 
 test:
