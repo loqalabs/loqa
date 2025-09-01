@@ -122,11 +122,14 @@ services:
 
 volumes:
   ollama-data:
-    driver: local
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_ollama-data
   hub-data:
-    driver: local
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_hub-data
   whisper-models:
-    driver: local
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_whisper-models
 
 networks:
   loqa-network:
