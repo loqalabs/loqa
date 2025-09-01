@@ -69,6 +69,7 @@ services:
     volumes:
       - hub-data:/app/data
       - whisper-models:/models
+      - whisper-models:/tmp/whisper.cpp/models
     networks:
       - loqa-network
     healthcheck:
