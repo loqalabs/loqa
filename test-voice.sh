@@ -32,6 +32,16 @@ else
     cd loqa-puck && git pull && cd ..
 fi
 
+# Clone the proto repository if it doesn't exist (needed for dependencies)
+if [ ! -d "loqa-proto" ]; then
+    echo "📥 Cloning loqa-proto repository..."
+    git clone https://github.com/loqalabs/loqa-proto.git
+else
+    echo "✅ loqa-proto repository already exists"
+    echo "🔄 Updating repository..."
+    cd loqa-proto && git pull && cd ..
+fi
+
 # Navigate to test-go directory
 cd loqa-puck/test-go
 
