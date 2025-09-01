@@ -21,9 +21,9 @@
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/loqalabs/loqa/main/setup.sh | bash
-
-# Then open http://localhost:5173 to see the voice assistant UI
 ```
+
+Then open http://localhost:5173 to see the voice assistant UI
 
 👉 **Having issues?** Check the **[5-Minute Setup Guide](./docs/getting-started-5min.md)** or **[Troubleshooting](./docs/troubleshooting.md)**
 
