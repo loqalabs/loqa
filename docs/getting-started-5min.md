@@ -58,16 +58,15 @@ docker logs loqa-test-puck
 Use the automated voice testing script:
 
 ```bash
-# Download and run the voice testing script
 curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/test-voice.sh?$(date +%s)" | bash
-
-# The script will:
-# - Check for Go and Git
-# - Clone the loqa-puck repository
-# - Install dependencies
-# - Start the test puck with microphone access
-# - Show you example voice commands to try
 ```
+
+The script will:
+- Check for Go and Git
+- Clone the loqa-puck repository
+- Install dependencies
+- Start the test puck with microphone access
+- Show you example voice commands to try
 
 **Manual approach** (if you prefer):
 ```bash
