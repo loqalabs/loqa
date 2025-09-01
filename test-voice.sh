@@ -75,4 +75,4 @@ echo "Press Ctrl+C to stop"
 echo ""
 
 # Run the test puck with microphone access
-go run ./cmd --hub-address localhost:50051 --puck-id host-test-puck
+go run ./cmd -hub localhost:50051 -id host-test-puck
