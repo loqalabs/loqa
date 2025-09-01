@@ -48,7 +48,7 @@ services:
       - "3000:3000"
       - "50051:50051"
     environment:
-      - WHISPER_MODEL_PATH=/models/ggml-base.en.bin
+      - WHISPER_MODEL_PATH=/models/ggml-tiny.bin
       - WHISPER_LANGUAGE=en
       - OLLAMA_URL=http://ollama:11434
       - OLLAMA_MODEL=llama3.2:3b
