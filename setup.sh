@@ -53,12 +53,6 @@ download_file() {
     fi
 }
 
-echo "📥 Pulling pre-built Loqa images..."
-docker pull ghcr.io/loqalabs/loqa-hub:latest
-docker pull ghcr.io/loqalabs/loqa-device-service:latest
-docker pull ghcr.io/loqalabs/loqa-observer:latest
-docker pull ghcr.io/loqalabs/loqa-puck:latest
-
 echo "📥 Downloading Whisper model..."
 # Create a temporary container to download the model to the volume
 docker run --rm -v loqa_whisper-models:/models alpine/curl:latest sh -c "
