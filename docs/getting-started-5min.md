@@ -17,7 +17,7 @@ docker --version && docker-compose --version
 **Just copy and paste this single command:**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/loqalabs/loqa/main/setup.sh | bash
+curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/setup.sh?$(date +%s)" | bash
 ```
 
 That's it! This command:

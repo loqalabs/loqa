@@ -20,7 +20,7 @@
 **Get running in under 5 minutes with one command:**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/loqalabs/loqa/main/setup.sh | bash
+curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/setup.sh?$(date +%s)" | bash
 ```
 
 Then open http://localhost:5173 to see the voice assistant UI
@@ -107,7 +107,7 @@ Then open http://localhost:5173 to see the voice assistant UI
 For users who just want to run Loqa quickly with pre-built images:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/loqalabs/loqa/main/setup.sh | bash
+curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/setup.sh?$(date +%s)" | bash
 ```
 
 This downloads the docker-compose.yml and uses pre-built Docker images from our CI/CD pipeline - no compilation needed!
