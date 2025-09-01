@@ -78,7 +78,7 @@ cd loqa-puck/test-go
 go mod download
 
 # Run the test puck with microphone access
-go run ./cmd --hub-address localhost:50051
+go run ./cmd -hub localhost:50051
 
 # Now speak these commands near your microphone:
 # "Hey Loqa, turn on the kitchen lights"
