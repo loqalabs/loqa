@@ -25,9 +25,9 @@ echo "✅ Docker and Docker Compose found"
 if [ ! -f "docker-compose.yml" ]; then
     echo "📥 Downloading docker-compose.yml..."
     if command -v curl &> /dev/null; then
-        curl -L -o "docker-compose.yml" "https://raw.githubusercontent.com/loqalabs/loqa/main/docker-compose.yml"
+        curl -L -o "docker-compose.yml" "https://raw.githubusercontent.com/loqalabs/loqa/main/docker-compose.yml?$(date +%s)"
     elif command -v wget &> /dev/null; then
-        wget -O "docker-compose.yml" "https://raw.githubusercontent.com/loqalabs/loqa/main/docker-compose.yml"
+        wget -O "docker-compose.yml" "https://raw.githubusercontent.com/loqalabs/loqa/main/docker-compose.yml?$(date +%s)"
     else
         echo "❌ Neither curl nor wget found. Please install one of them."
         exit 1

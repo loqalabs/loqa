@@ -11,6 +11,7 @@ docker --version && docker-compose --version
 
 **Requirements:**
 - Docker & Docker Compose
+- curl
 
 ## 🏃‍♂️ Complete System Setup (4 minutes)
 
