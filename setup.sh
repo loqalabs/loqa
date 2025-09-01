@@ -67,6 +67,9 @@ docker run --rm -v loqa_whisper-models:/models alpine/curl:latest sh -c "
   fi
 "
 
+echo "📥 Pulling latest Docker images..."
+docker-compose pull
+
 echo "🐳 Starting Loqa services..."
 docker-compose up -d
 
