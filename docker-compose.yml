@@ -103,7 +103,8 @@ services:
     networks:
       - loqa-network
 
-  # Test Puck (optional - for testing)
+  # Test Puck (for gRPC connection testing only - no audio access in container)
+  # For real voice testing, run the test puck directly on the host
   test-puck:
     image: loqalabs/loqa-test-puck:latest
     container_name: loqa-test-puck
@@ -111,12 +112,14 @@ services:
       - HUB_ADDRESS=hub:50051
       - PUCK_ID=docker-test-puck
       - WAKE_WORD_THRESHOLD=0.7
+      - AUDIO_ENABLED=false  # Disable audio in container
     depends_on:
       hub:
         condition: service_healthy
     networks:
       - loqa-network
-    # Only run if you have audio devices available
+    # Note: This container cannot access host audio devices
+    # Use for gRPC connection testing only
     profiles:
       - testing
 

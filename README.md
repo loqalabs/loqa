@@ -25,7 +25,9 @@ curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/setup.sh?$(date
 
 Then open http://localhost:5173 to see the voice assistant UI
 
-👉 **Having issues?** Check the **[5-Minute Setup Guide](./docs/getting-started-5min.md)** or **[Troubleshooting](./docs/troubleshooting.md)**
+**For voice testing:** Run `curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/test-voice.sh?$(date +%s)" | bash` to test with your microphone, or see the **[5-Minute Setup Guide](./docs/getting-started-5min.md)** for details.
+
+👉 **Having issues?** Check **[Troubleshooting](./docs/troubleshooting.md)**
 
 ---
 

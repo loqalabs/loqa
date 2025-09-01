@@ -41,20 +41,49 @@ This automatically:
 - 💡 Configures simulated smart devices
 - 📊 Launches web interface at http://localhost:5173
 
-## 🎤 Test Voice Commands (1 minute)
+## 🎤 Test Voice Commands (2-3 minutes)
 
-Your setup includes a containerized test puck. Enable it:
+The containerized test puck cannot access your microphone. For real voice testing, you need to run the test puck on your host system:
 
+### Option 1: Quick Container Test (gRPC connection only)
 ```bash
-# Start the test puck container
+# Start the test puck container (no audio, just connection testing)
 docker-compose --profile testing up -d test-puck
 
-# Check it's running
+# Check connection status
 docker logs loqa-test-puck
+```
 
-# Speak these commands near your microphone:
+### Option 2: Real Voice Testing (Recommended)
+Use the automated voice testing script:
+
+```bash
+# Download and run the voice testing script
+curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/test-voice.sh?$(date +%s)" | bash
+
+# The script will:
+# - Check for Go and Git
+# - Clone the loqa-puck repository
+# - Install dependencies
+# - Start the test puck with microphone access
+# - Show you example voice commands to try
+```
+
+**Manual approach** (if you prefer):
+```bash
+# Clone the test puck repository
+git clone https://github.com/loqalabs/loqa-puck.git
+cd loqa-puck/test-go
+
+# Install Go dependencies
+go mod download
+
+# Run the test puck with microphone access
+go run ./cmd --hub-address localhost:50051
+
+# Now speak these commands near your microphone:
 # "Hey Loqa, turn on the kitchen lights"
-# "Hey Loqa, play music in the living room"
+# "Hey Loqa, play music in the living room"  
 # "Hey Loqa, turn off all lights"
 ```
 
