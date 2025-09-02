@@ -14,7 +14,7 @@ Loqa is built from the ground up as a **local-first**, event-driven voice assist
 
 ### 🧠 Hub Service
 - Central logic for speech-to-text, intent parsing, and event routing
-- Uses Whisper.cpp for offline transcription
+- Uses faster-whisper gRPC service for offline transcription
 - Sends text to Ollama (Llama 3.2) for command parsing
 - Records all voice events in SQLite database for observability
 - Exposes REST API for event access and provides real-time data
@@ -78,7 +78,7 @@ graph TB
 
 | Area         | Technology              |
 |--------------|--------------------------|
-| Voice STT    | Whisper.cpp              |
+| Voice STT    | faster-whisper (gRPC)    |
 | LLM          | Ollama + Llama 3.2       |
 | Messaging    | NATS                     |
 | Database     | SQLite with WAL mode     |
