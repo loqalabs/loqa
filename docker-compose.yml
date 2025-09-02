@@ -40,6 +40,30 @@ services:
        ollama pull llama3.2:3b &&
        wait"
 
+  # Faster-Whisper STT Service
+  whisper:
+    build:
+      context: ../loqa-whisper-service
+      dockerfile: Dockerfile
+    container_name: loqa-whisper
+    ports:
+      - "50052:50052"
+    environment:
+      - WHISPER_PORT=50052
+      - WHISPER_MODEL_SIZE=tiny
+      - WHISPER_DEVICE=cpu
+      - WHISPER_MAX_WORKERS=2
+    volumes:
+      - whisper-cache:/root/.cache/huggingface
+    networks:
+      - loqa-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import grpc; import whisper_pb2_grpc; import whisper_pb2; channel = grpc.insecure_channel('localhost:50052'); stub = whisper_pb2_grpc.WhisperServiceStub(channel); response = stub.Health(whisper_pb2.HealthRequest()); assert response.status == 'healthy'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
   # Loqa Hub - Central orchestrator
   hub:
     image: loqalabs/loqa-hub:latest
@@ -55,7 +79,9 @@ services:
           memory: 1G
     restart: unless-stopped
     environment:
-      - WHISPER_MODEL_PATH=/tmp/whisper.cpp/models/ggml-tiny.bin
+      - USE_GRPC_WHISPER=true
+      - WHISPER_GRPC_ADDR=whisper:50052
+      - WHISPER_MODEL_PATH=/tmp/whisper.cpp/models/ggml-tiny.bin  # Fallback for whisper.cpp mode
       - WHISPER_LANGUAGE=en
       - OLLAMA_URL=http://ollama:11434
       - OLLAMA_MODEL=llama3.2:3b
@@ -70,6 +96,8 @@ services:
       nats:
         condition: service_healthy
       ollama:
+        condition: service_healthy
+      whisper:
         condition: service_healthy
     volumes:
       - hub-data:/app/data
@@ -140,6 +168,9 @@ volumes:
   whisper-models:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_whisper-models
+  whisper-cache:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_whisper-cache
 
 networks:
   loqa-network:
