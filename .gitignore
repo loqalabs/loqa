@@ -48,3 +48,6 @@ whisper-models/
 models/
 *.bin
 *.gguf
+# Individual service repositories - maintained separately
+loqa-proto/
+loqa-puck/
