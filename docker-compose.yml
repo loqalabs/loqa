@@ -42,9 +42,7 @@ services:
 
   # Faster-Whisper STT Service
   whisper:
-    build:
-      context: ../loqa-whisper-service
-      dockerfile: Dockerfile
+    image: loqalabs/loqa-whisper-service:latest
     container_name: loqa-whisper
     ports:
       - "50052:50052"
