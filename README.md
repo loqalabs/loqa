@@ -127,6 +127,11 @@ cd loqa/scripts && make setup-dev
 
 This clones all repositories and builds Docker images locally from source.
 
+### 📋 Development Roadmap
+
+- **[TODO.md](./TODO.md)** - Priority 1 & 2 tasks: Must-fix issues and high-impact UX improvements
+- **[BACKLOG.md](./BACKLOG.md)** - Priority 3 features: Optional post-MVP enhancements and future ideas
+
 ### 🔧 Developer Resources
 
 Building something with Loqa? Start here:
