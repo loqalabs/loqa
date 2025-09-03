@@ -15,11 +15,11 @@
 - [x] Make event boxes more compact or collapsed by default
 
 ### 🗣️ Speech-to-Text (STT)
-- [ ] Remove Whisper.cpp fallback
-  - [ ] Remove whisper.cpp code from STT pipeline
-  - [ ] Remove whisper model download logic
-  - [ ] Clean up WHISPER_MODEL_PATH
-  - [ ] Remove whisper-models volume from Docker
+- [x] Remove Whisper.cpp fallback
+  - [x] Remove whisper.cpp code from STT pipeline
+  - [x] Remove whisper model download logic
+  - [x] Clean up WHISPER_MODEL_PATH
+  - [x] Remove whisper-models volume from Docker
 - [ ] Strip wake word ("Hey Loqa") before passing to intent parser
 - [ ] Normalize common misspellings of "Loqa" (e.g., "Luca") in post-STT
 - [ ] Define and enforce default confidence threshold for rejecting low-quality transcriptions
