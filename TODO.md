@@ -34,7 +34,7 @@
   - [ ] Handle multiple timers if possible (e.g., "set a tea timer for 3 minutes and an oven timer for 10 minutes")
   - [ ] Announce when timer expires via TTS playback
   - [ ] Store and cancel timers locally on the hub
-- [ ] Add built-in "What time is it?" skill using hub local time
+- [x] Add built-in "What time is it?" skill using hub local time
 
 ---
 
