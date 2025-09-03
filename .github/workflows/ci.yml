@@ -132,6 +132,14 @@ jobs:
       run: |
         pip install mkdocs mkdocs-material mkdocs-mermaid2-plugin
 
+    - name: Copy root files to docs directory for MkDocs
+      run: |
+        cp README.md docs/
+        cp TODO.md docs/ 2>/dev/null || echo "TODO.md not found, skipping"
+        cp BACKLOG.md docs/ 2>/dev/null || echo "BACKLOG.md not found, skipping"
+        cp CONTRIBUTING.md docs/ 2>/dev/null || echo "CONTRIBUTING.md not found, skipping"
+        cp CLAUDE.md docs/ 2>/dev/null || echo "CLAUDE.md not found, skipping"
+
     - name: Create MkDocs configuration
       run: |
         cat > mkdocs.yml << EOF
@@ -152,22 +160,22 @@ jobs:
             - TODO: TODO.md
             - Backlog: BACKLOG.md
           - Getting Started:
-            - Vision: docs/VISION.md
-            - Quick Start: docs/quickstart.md
-            - 5-Minute Setup: docs/getting-started-5min.md
-            - Troubleshooting: docs/troubleshooting.md
+            - Vision: VISION.md
+            - Quick Start: quickstart.md
+            - 5-Minute Setup: getting-started-5min.md
+            - Troubleshooting: troubleshooting.md
           - Development:
-            - Architecture: docs/architecture.md
-            - Developer Guide: docs/DEVELOPER.md
-            - Configuration: docs/config.md
-            - Messaging: docs/messaging.md
-            - Testing: docs/testing.md
-            - Skills: docs/skills.md
+            - Architecture: architecture.md
+            - Developer Guide: DEVELOPER.md
+            - Configuration: config.md
+            - Messaging: messaging.md
+            - Testing: testing.md
+            - Skills: skills.md
           - Advanced:
-            - Hardware: docs/hardware.md
-            - Security: docs/security.md
+            - Hardware: hardware.md
+            - Security: security.md
           - Support:
-            - FAQ: docs/faq.md
+            - FAQ: faq.md
             - Contributing: CONTRIBUTING.md
         
         plugins:
