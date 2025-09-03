@@ -148,17 +148,27 @@ jobs:
         
         nav:
           - Home: README.md
-          - Vision: docs/VISION.md
-          - Quick Start: docs/quickstart.md
-          - Architecture: docs/architecture.md
-          - Configuration: docs/config.md
-          - Messaging: docs/messaging.md
-          - Testing: docs/testing.md
-          - Hardware: docs/hardware.md
-          - Skills: docs/skills.md
-          - Security: docs/security.md
-          - FAQ: docs/faq.md
-          - Contributing: CONTRIBUTING.md
+          - Roadmap:
+            - TODO: TODO.md
+            - Backlog: BACKLOG.md
+          - Getting Started:
+            - Vision: docs/VISION.md
+            - Quick Start: docs/quickstart.md
+            - 5-Minute Setup: docs/getting-started-5min.md
+            - Troubleshooting: docs/troubleshooting.md
+          - Development:
+            - Architecture: docs/architecture.md
+            - Developer Guide: docs/DEVELOPER.md
+            - Configuration: docs/config.md
+            - Messaging: docs/messaging.md
+            - Testing: docs/testing.md
+            - Skills: docs/skills.md
+          - Advanced:
+            - Hardware: docs/hardware.md
+            - Security: docs/security.md
+          - Support:
+            - FAQ: docs/faq.md
+            - Contributing: CONTRIBUTING.md
         
         plugins:
           - mermaid2
