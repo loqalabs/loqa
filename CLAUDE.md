@@ -184,9 +184,7 @@ Each service can be built individually from its own directory or collectively vi
 ### Environment Variables (Hub Service)
 ```bash
 # STT Configuration
-USE_GRPC_WHISPER=true                    # Use gRPC whisper service (default: true)
 WHISPER_GRPC_ADDR=whisper:50052         # gRPC whisper service address
-WHISPER_MODEL_PATH=/models/ggml-tiny.bin # Fallback whisper.cpp model path
 
 # Service URLs
 OLLAMA_URL=http://ollama:11434

@@ -77,10 +77,7 @@ services:
           memory: 1G
     restart: unless-stopped
     environment:
-      - USE_GRPC_WHISPER=true
       - WHISPER_GRPC_ADDR=whisper:50052
-      - WHISPER_MODEL_PATH=/tmp/whisper.cpp/models/ggml-tiny.bin  # Fallback for whisper.cpp mode
-      - WHISPER_LANGUAGE=en
       - OLLAMA_URL=http://ollama:11434
       - OLLAMA_MODEL=llama3.2:3b
       - NATS_URL=nats://nats:4222
@@ -99,7 +96,6 @@ services:
         condition: service_healthy
     volumes:
       - hub-data:/app/data
-      - whisper-models:/tmp/whisper.cpp/models
     networks:
       - loqa-network
     healthcheck:
@@ -163,9 +159,6 @@ volumes:
   hub-data:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_hub-data
-  whisper-models:
-    external: true
-    name: ${COMPOSE_PROJECT_NAME}_whisper-models
   whisper-cache:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_whisper-cache
