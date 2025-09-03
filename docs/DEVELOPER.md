@@ -13,7 +13,7 @@ The Loqa platform consists of multiple focused repositories that work together:
 |------------|---------|---------|
 | **[loqa-hub](https://github.com/loqalabs/loqa-hub)** | Central orchestrator: gRPC API, STT/LLM pipeline, NATS integration | ✅ Active |
 | **[loqa-device-service](https://github.com/loqalabs/loqa-device-service)** | Device control service that listens on NATS for commands | ✅ Active |
-| **[loqa-puck](https://github.com/loqalabs/loqa-puck)** | Embedded and test clients for audio capture and streaming | ✅ Active |
+| **[loqa-puck](https://github.com/loqalabs/loqa-puck)** | DIY hardware reference designs, firmware, and test clients | ✅ Active |
 | **[loqa-proto](https://github.com/loqalabs/loqa-proto)** | Shared gRPC protocol definitions and generated bindings | ✅ Active |
 
 ### Extensions & Documentation  
