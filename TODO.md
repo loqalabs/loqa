@@ -9,7 +9,7 @@
   - [ ] If chaining fails, gracefully fallback to the first valid command
 
 ### 🖥️ Observer UI & API Surface
-- [ ] Fix "Active Pucks" count to reflect disconnections (e.g., when puck exits unexpectedly)
+- [x] Fix "Active Pucks" count to reflect disconnections (e.g., when puck exits unexpectedly)
 - [ ] Ensure timeline audio playback works correctly (verify path, MIME type, player logic)
 - [ ] Add ability to filter timeline by success, failure, or low-confidence events
 - [x] Make event boxes more compact or collapsed by default
