@@ -18,11 +18,16 @@ Future optional features may support limited, **opt-in** remote access, but the 
 
 ### 🎤 What hardware do I need?
 
-- A computer or mini PC (for the Loqa hub)
-- A microphone (USB or ESP32 puck)
-- Optional smart devices (or use simulated ones)
+**For the Loqa Hub (required):**
+- A computer or mini PC with 4+ CPU cores and 8GB+ RAM
+- Docker installed
 
-We’re also developing support for embedded pucks based on ESP32-S3.
+**For voice input (choose one):**
+- Any USB microphone (for testing and development)
+- DIY ESP32-based voice assistant device (build your own using our reference designs)
+- Existing voice hardware like Home Assistant Voice Preview Edition (planned support)
+
+> **🛠️ DIY-Friendly**: We don't manufacture hardware ourselves. Instead, we provide open-source firmware, reference designs, and assembly instructions so you can build your own voice assistant devices or use existing maker-friendly hardware.
 
 ---
 

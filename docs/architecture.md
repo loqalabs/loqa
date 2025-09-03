@@ -6,11 +6,12 @@ Loqa is built from the ground up as a **local-first**, event-driven voice assist
 
 ## 🧱 Core Components
 
-### 🎤 Puck Device
-- Edge device for capturing voice input
-- Runs wake word detection and streams audio over gRPC
-- Prototype implemented in Go with PortAudio
-- Future versions will use ESP32-S3 with wake word firmware
+### 🎤 Puck Device (DIY Hardware)
+- **DIY-friendly design**: Open-source reference designs and firmware for ESP32-S3
+- **Community-driven**: We provide specifications, not manufactured products  
+- **Multiple options**: Build your own, use existing maker hardware, or adapt development boards
+- **Local processing**: Runs wake word detection and streams audio over gRPC
+- **Development testing**: Go-based test client with PortAudio for microphone access
 
 ### 🧠 Hub Service
 - Central logic for speech-to-text, intent parsing, and event routing

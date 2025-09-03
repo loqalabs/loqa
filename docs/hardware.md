@@ -1,10 +1,14 @@
-# 🔧 Hardware
+# 🔧 DIY Hardware Guide
 
-Puck hardware specifications, assembly instructions, and embedded development.
+Loqa is designed to be **DIY-friendly and community-driven**. We provide specifications, firmware, and support for building your own voice assistant hardware rather than manufacturing devices ourselves.
 
-## ESP32-S3 Puck Design
+> **🛠️ Our Philosophy**: We believe in empowering the community to build, modify, and improve hardware designs. While we may support specific chips (like ESP32) and collaborate with existing hardware (like the Home Assistant Voice Preview Edition), the goal is to keep Loqa accessible to makers and developers who want to create their own devices.
 
-The production Loqa Puck is based on the ESP32-S3 microcontroller with the following specifications:
+This guide covers puck hardware specifications, assembly instructions, and embedded development for DIY builders.
+
+## ESP32-S3 Reference Design
+
+This reference design shows how to build a Loqa-compatible voice assistant using readily available components. All designs, firmware, and assembly instructions are open-source to encourage community contributions and modifications.
 
 ### Core Components
 
@@ -205,12 +209,39 @@ Optimized custom PCB:
 - Battery charging circuit
 - Professional enclosure
 
-## Future Hardware Plans
+## Community Hardware Ecosystem
 
-### Puck v2 Features
+### DIY Community Goals
 
-- **Battery**: Integrated LiPo with charging
-- **Sensors**: Temperature, humidity, light
-- **Display**: Small OLED for status
-- **Mesh**: ESP-MESH networking for coverage
-- **Thread/Matter**: Smart home protocol support
+Rather than producing our own hardware, we aim to:
+
+- **Support Popular Platforms**: Provide firmware for existing development boards and maker-friendly hardware
+- **Partner with Existing Products**: Collaborate with projects like Home Assistant Voice Preview Edition
+- **Enable Custom Builds**: Offer reference designs and component libraries for unique applications
+- **Foster Innovation**: Encourage community members to share their own hardware variations
+
+### Supported Platforms
+
+We currently provide firmware support for:
+
+- **ESP32-S3 Development Boards**: DevKit-C, custom PCBs
+- **Existing Voice Hardware**: Home Assistant Voice Preview Edition (planned)
+- **Generic ESP32 Devices**: With compatible peripherals
+
+### Community Contributions
+
+Have a hardware design or modification? We'd love to feature it:
+
+- Submit designs via GitHub issues or discussions
+- Share assembly guides and modifications
+- Contribute firmware improvements for new chip variants
+- Document compatibility with existing maker hardware
+
+### Future Collaboration Areas
+
+We're interested in supporting:
+
+- **Popular Maker Platforms**: Additional ESP32 variants, Raspberry Pi integrations
+- **Commercial Partnerships**: Working with existing hardware manufacturers
+- **Specialized Applications**: Industrial, automotive, or accessibility-focused hardware
+- **Regional Availability**: Ensuring components are accessible worldwide

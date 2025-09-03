@@ -43,11 +43,13 @@ This automatically:
 
 ## 🎤 Test Voice Commands (2-3 minutes)
 
-The containerized test puck cannot access your microphone. For real voice testing, you need to run the test puck on your host system:
+The containerized test client cannot access your microphone. For real voice testing, you need to run the test client on your host system:
+
+> **🛠️ Hardware Note**: This test client simulates the functionality you'd get from DIY puck hardware. We provide open-source designs for ESP32-based voice devices, but don't manufacture hardware ourselves.
 
 ### Option 1: Quick Container Test (gRPC connection only)
 ```bash
-# Start the test puck container (no audio, just connection testing)
+# Start the test client container (no audio, just connection testing)
 docker-compose --profile testing up -d test-puck
 
 # Check connection status
@@ -63,14 +65,14 @@ curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/test-voice.sh?$
 
 The script will:
 - Check for Go and Git
-- Clone the loqa-puck repository
+- Clone the loqa-puck repository (contains DIY hardware designs and test software)
 - Install dependencies
-- Start the test puck with microphone access
+- Start the test client with microphone access
 - Show you example voice commands to try
 
 **Manual approach** (if you prefer):
 ```bash
-# Clone the test puck repository
+# Clone the DIY hardware repository (includes test software)
 git clone https://github.com/loqalabs/loqa-puck.git
 cd loqa-puck/test-go
 
