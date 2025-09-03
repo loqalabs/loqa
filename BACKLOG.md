@@ -29,11 +29,6 @@ _These post-MVP expansions focus on making the STT system more extensible, plugg
 - [ ] Add auth config for STT APIs (keys, OAuth, etc.)
 - [ ] Add streaming chunked upload support for HTTP STT
 - [ ] Implement sample integrations for OpenAI, Google, Azure
-- [ ] Remove Whisper.cpp fallback
-  - [ ] Remove whisper.cpp code from STT pipeline
-  - [ ] Remove whisper model download logic
-  - [ ] Clean up WHISPER_MODEL_PATH
-  - [ ] Remove whisper-models volume from Docker
 
 ---
 
