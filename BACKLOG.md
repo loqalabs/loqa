@@ -62,6 +62,20 @@ _This section adds structured feature tiers to clearly distinguish between free 
 
 ---
 
+### 🧺 Shopping List Sync (Paid Feature)
+_This section outlines a privacy-preserving, cloud-assisted mobile sync feature for shopping lists — designed as a showcase paid-tier skill._
+
+- [ ] Create shopping-list skill with local SQLite persistence
+- [ ] Add gRPC and HTTP API endpoints for list manipulation
+- [ ] Define encrypted sync blob format (JSON + age or AES-GCM)
+- [ ] Build ephemeral QR-based pairing system (Hub ↔ Mobile)
+- [ ] Implement Loqa Relay microservice (stateless E2EE message routing)
+- [ ] Add pairing state + public key registry to loqa-hub
+- [ ] Build minimal PWA or native mobile app to sync and view list
+- [ ] Gate feature behind `config.license` or `--paid` flag
+- [ ] Add Observer UI component to manage sync status and pairing
+---
+
 ### 🧭 Messaging & Positioning
 _These tasks focus on refining external messaging, public perception, and product framing to better communicate the platform’s value and positioning._
 
