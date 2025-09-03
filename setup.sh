@@ -51,27 +51,14 @@ download_file() {
     fi
 }
 
-echo "📥 Downloading Whisper model..."
+echo "📦 Creating Docker volumes..."
 # Get the Docker Compose project name (directory name) to find the correct volume
 PROJECT_NAME=$(basename "$(pwd)")
-VOLUME_NAME="${PROJECT_NAME}_whisper-models"
 
 # Create volumes that Docker Compose will use (prevents warning messages)
 docker volume create "${PROJECT_NAME}_ollama-data" >/dev/null 2>&1 || true
 docker volume create "${PROJECT_NAME}_hub-data" >/dev/null 2>&1 || true  
-docker volume create "${PROJECT_NAME}_whisper-models" >/dev/null 2>&1 || true
 docker volume create "${PROJECT_NAME}_whisper-cache" >/dev/null 2>&1 || true
-
-# Create a temporary container to download the model to the volume
-docker run --rm -v "${VOLUME_NAME}:/tmp/whisper.cpp/models" alpine/curl:latest sh -c "
-  if [ ! -f /tmp/whisper.cpp/models/ggml-tiny.bin ]; then
-    echo 'Downloading Whisper model...'
-    curl -L -o /tmp/whisper.cpp/models/ggml-tiny.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin
-    echo 'Model downloaded successfully'
-  else
-    echo 'Whisper model already exists'
-  fi
-"
 
 echo "📥 Pulling latest Docker images..."
 docker-compose pull
