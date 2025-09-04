@@ -1,4 +1,6 @@
 name: Commit Message Check
+permissions:
+  contents: read
 
 on:
   push:
