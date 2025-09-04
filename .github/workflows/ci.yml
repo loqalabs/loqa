@@ -118,6 +118,8 @@ jobs:
   build-site:
     name: Build Documentation Site
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
     - name: Checkout code
