@@ -9,234 +9,28 @@ on:
 jobs:
   validate:
     name: Validate Documentation
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v5
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v5
-      with:
-        node-version: '18'
-
-    - name: Install markdown linter
-      run: |
-        npm install -g markdownlint-cli
-        npm install -g markdown-link-check
-
-    - name: Lint Markdown files
-      run: |
-        markdownlint "**/*.md" --ignore node_modules || true
-
-    - name: Check Markdown links
-      run: |
-        find . -name "*.md" -not -path "./node_modules/*" | \
-        xargs -I {} markdown-link-check {} --config .markdown-link-check.json || true
-
-    - name: Validate YAML frontmatter
-      run: |
-        # Check for valid YAML frontmatter in docs
-        for file in docs/*.md; do
-          if grep -q "^---$" "$file"; then
-            echo "Checking YAML frontmatter in $file"
-            sed -n '2,/^---$/p' "$file" | head -n -1 | python -c "
-        import sys
-        import yaml
-        try:
-            yaml.safe_load(sys.stdin.read())
-            print('✅ Valid YAML in $file')
-        except yaml.YAMLError as e:
-            print('❌ Invalid YAML in $file: {}'.format(e))
-            sys.exit(1)
-            " || echo "⚠️  YAML validation skipped for $file"
-          fi
-        done
+    uses: loqalabs/.github/.github/workflows/js/validate-docs.yml@main
+    with:
+      node-version: '20'
 
   spell-check:
     name: Spell Check
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v5
-
-    - name: Install aspell
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y aspell aspell-en
-
-    - name: Run spell check
-      run: |
-        # Create custom dictionary for technical terms
-        echo "Loqa
-        gRPC
-        Whisper
-        Ollama
-        NATS
-        ESP32
-        PortAudio
-        HomeKit
-        Zigbee
-        MQTT
-        STT
-        TTS
-        LLM
-        WebSocket
-        microservice
-        backend
-        frontend
-        API
-        APIs
-        JSON
-        YAML
-        Docker
-        Kubernetes
-        localhost
-        middleware
-        runtime
-        blockchain
-        IoT" > .aspell.en.pws
-
-        # Spell check all markdown files
-        find . -name "*.md" -not -path "./node_modules/*" | while read file; do
-          echo "Spell checking $file"
-          # Extract text content, ignore code blocks and URLs
-          cat "$file" | \
-          sed '/^```/,/^```/d' | \
-          sed 's/http[s]\?:\/\/[^ ]*/URL/g' | \
-          sed 's/`[^`]*`/CODE/g' | \
-          aspell --personal=./.aspell.en.pws --lang=en --mode=markdown list | \
-          sort -u > "/tmp/misspelled_$(basename "$file")" || true
-          
-          if [ -s "/tmp/misspelled_$(basename "$file")" ]; then
-            echo "⚠️  Possible misspellings in $file:"
-            cat "/tmp/misspelled_$(basename "$file")"
-          fi
-        done
+    uses: loqalabs/.github/.github/workflows/js/spell-check.yml@main
+    with:
+      node-version: '20'
 
   build-site:
     name: Build Documentation Site
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v5
-
-    - name: Set up Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.11'
-
-    - name: Install MkDocs
-      run: |
-        pip install mkdocs mkdocs-material mkdocs-mermaid2-plugin
-
-    - name: Copy root files to docs directory for MkDocs
-      run: |
-        cp README.md docs/
-        cp TODO.md docs/ 2>/dev/null || echo "TODO.md not found, skipping"
-        cp BACKLOG.md docs/ 2>/dev/null || echo "BACKLOG.md not found, skipping"
-        cp CONTRIBUTING.md docs/ 2>/dev/null || echo "CONTRIBUTING.md not found, skipping"
-        cp CLAUDE.md docs/ 2>/dev/null || echo "CLAUDE.md not found, skipping"
-
-    - name: Create MkDocs configuration
-      run: |
-        cat > mkdocs.yml << EOF
-        site_name: Loqa Documentation
-        site_description: Local-first voice assistant platform
-        site_url: https://loqalabs.github.io/loqa
-        
-        theme:
-          name: material
-          palette:
-            - scheme: default
-              primary: deep purple
-              accent: purple
-        
-        nav:
-          - Home: README.md
-          - Roadmap:
-            - TODO: TODO.md
-            - Backlog: BACKLOG.md
-          - Getting Started:
-            - Vision: VISION.md
-            - Quick Start: quickstart.md
-            - 5-Minute Setup: getting-started-5min.md
-            - Troubleshooting: troubleshooting.md
-          - Development:
-            - Architecture: architecture.md
-            - Developer Guide: DEVELOPER.md
-            - Configuration: config.md
-            - Messaging: messaging.md
-            - Testing: testing.md
-            - Skills: skills.md
-          - Advanced:
-            - Hardware: hardware.md
-            - Security: security.md
-          - Support:
-            - FAQ: faq.md
-            - Contributing: CONTRIBUTING.md
-        
-        plugins:
-          - mermaid2
-        
-        markdown_extensions:
-          - admonition
-          - codehilite
-          - pymdownx.superfences:
-              custom_fences:
-                - name: mermaid
-                  class: mermaid
-                  format: !!python/name:mermaid2.fence_mermaid
-        EOF
-
-    - name: Build documentation site
-      run: |
-        mkdocs build --verbose
-
-    - name: Upload site artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: documentation-site
-        path: site/
+    uses: loqalabs/.github/.github/workflows/js/build-site.yml@main
+    needs: [validate, spell-check]
+    with:
+      node-version: '20'
 
   deploy:
     name: Deploy to GitHub Pages
-    runs-on: ubuntu-latest
     needs: [validate, build-site]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    
-    steps:
-    - name: Download site artifact
-      uses: actions/download-artifact@v5
-      with:
-        name: documentation-site
-        path: site
-
-    - name: Setup Pages
-      uses: actions/configure-pages@v5
-
-    - name: Upload to GitHub Pages
-      uses: actions/upload-pages-artifact@v4
-      with:
-        path: site
-
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+    uses: loqalabs/.github/.github/workflows/js/deploy-pages.yml@main
+    with:
+      node-version: '20'
+      cname: '' # Set to custom domain if needed
