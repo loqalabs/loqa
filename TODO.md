@@ -25,6 +25,13 @@
 - [ ] Define and enforce default confidence threshold for rejecting low-quality transcriptions
 - [ ] Fallback: Ask user to repeat command if confidence is too low
 
+### 🔀 Multi-Puck Collision Detection
+- [ ] Implement basic collision detection for multiple puck wake word activation
+  - [ ] Add ActiveStream tracking in AudioService with puck_id mapping
+  - [ ] Implement simple "last puck to connect wins" arbitration logic
+  - [ ] Send cancellation responses to losing pucks via gRPC stream
+  - [ ] Add proper stream cleanup when pucks are cancelled or disconnect
+
 ### 🔊 Text-to-Speech (TTS)
 - [ ] Play returned TTS phrase through speakers when using the test puck (not just print)
 
@@ -61,3 +68,11 @@
 
 ### 🧠 Skills & Plugin System
 - [ ] Add minimal built-in skills like "help", "version", "ping", "what can you do?"
+
+### 🔀 Smart Multi-Puck Arbitration
+- [ ] Implement intelligent wake word arbitration for multiple puck scenarios
+  - [ ] Add signal strength comparison (strongest signal wins)
+  - [ ] Add temporal window arbitration (500ms window with first-wins logic)
+  - [ ] Add location context awareness (prefer puck in user's current room)
+  - [ ] Store puck-to-room mappings in configuration
+  - [ ] Add arbitration logging and metrics for debugging

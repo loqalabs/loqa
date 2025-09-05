@@ -98,14 +98,14 @@ cd loqa-hub/tests/integration && go test -v
 ### Core Services & Ports
 - **Hub** (`:3000` HTTP, `:50051` gRPC) - Central orchestrator with STT/LLM pipeline
 - **Observer UI** (`:5173`) - Vue.js timeline interface
-- **Whisper** (`:50052` gRPC) - faster-whisper STT service with CTranslate2 backend
+- **STT** (`:8000` REST) - OpenAI-compatible Speech-to-Text service
 - **NATS** (`:4222`, `:8222` monitoring) - Message bus
 - **Ollama** (`:11434`) - Local LLM (Llama 3.2)
 - **Device Service** - Listens on NATS for device commands
 
 ### Voice Processing Flow
 1. Audio captured by puck → gRPC to Hub
-2. Hub transcribes via faster-whisper gRPC service → text parsed locally
+2. Hub transcribes via OpenAI-compatible STT service REST API → text parsed locally
 3. Intent routed through Skills System → appropriate skill handles command
 4. Skill processes request (e.g., Home Assistant API calls) → returns structured response
 5. Events stored in SQLite with skill tracking & metadata → visualized in Observer Timeline
@@ -113,8 +113,8 @@ cd loqa-hub/tests/integration && go test -v
 
 ### Key Technologies
 - **Backend**: Go 1.24+, gRPC, NATS messaging, SQLite with WAL mode
-- **AI**: faster-whisper (STT via gRPC), Ollama + Llama 3.2 (LLM)
-- **STT Architecture**: Modular `Transcriber` interface with pluggable backends
+- **AI**: OpenAI-compatible STT services, Ollama + Llama 3.2 (LLM)
+- **STT Architecture**: Modular `Transcriber` interface with OpenAI-compatible REST backend
 - **Skills System**: Go plugins, manifest-driven architecture, sandboxing
 - **Frontend**: Vue.js 3, Vite, Tailwind CSS, Pinia
 - **Infrastructure**: Docker Compose, Protocol Buffers
@@ -184,7 +184,7 @@ Each service can be built individually from its own directory or collectively vi
 ### Environment Variables (Hub Service)
 ```bash
 # STT Configuration
-WHISPER_GRPC_ADDR=whisper:50052         # gRPC whisper service address
+STT_URL=http://stt:8000                 # OpenAI-compatible STT service URL
 
 # Service URLs
 OLLAMA_URL=http://ollama:11434

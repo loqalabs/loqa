@@ -40,27 +40,25 @@ services:
        ollama pull llama3.2:3b &&
        wait"
 
-  # Faster-Whisper STT Service
-  whisper:
-    image: loqalabs/loqa-whisper-service:latest
-    container_name: loqa-whisper
+  # Speech-to-Text Service (OpenAI-compatible API)
+  stt:
+    image: fedirz/faster-whisper-server:latest-cpu
+    container_name: loqa-stt
     ports:
-      - "50052:50052"
+      - "8000:8000"
     environment:
-      - WHISPER_PORT=50052
-      - WHISPER_MODEL_SIZE=tiny
-      - WHISPER_DEVICE=cpu
-      - WHISPER_MAX_WORKERS=2
+      - MODEL=tiny
+      - DEVICE=cpu
     volumes:
-      - whisper-cache:/root/.cache/huggingface
+      - stt-cache:/app/.cache/huggingface
     networks:
       - loqa-network
     healthcheck:
-      test: ["CMD", "python", "-c", "import grpc; import whisper_pb2_grpc; import whisper_pb2; channel = grpc.insecure_channel('localhost:50052'); stub = whisper_pb2_grpc.WhisperServiceStub(channel); response = stub.Health(whisper_pb2.HealthRequest()); assert response.status == 'healthy'"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
-      retries: 5
-      start_period: 60s
+      retries: 3
+      start_period: 30s
 
   # Loqa Hub - Central orchestrator
   hub:
@@ -77,7 +75,7 @@ services:
           memory: 1G
     restart: unless-stopped
     environment:
-      - WHISPER_GRPC_ADDR=whisper:50052
+      - STT_URL=http://stt:8000
       - OLLAMA_URL=http://ollama:11434
       - OLLAMA_MODEL=llama3.2:3b
       - NATS_URL=nats://nats:4222
@@ -92,7 +90,7 @@ services:
         condition: service_healthy
       ollama:
         condition: service_healthy
-      whisper:
+      stt:
         condition: service_healthy
     volumes:
       - hub-data:/app/data
@@ -159,9 +157,9 @@ volumes:
   hub-data:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_hub-data
-  whisper-cache:
+  stt-cache:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_whisper-cache
+    name: ${COMPOSE_PROJECT_NAME}_stt-cache
 
 networks:
   loqa-network:

@@ -95,8 +95,8 @@ _This section collects longer-term, blue-sky ideas to explore once the core syst
 - [ ] Community-curated skill marketplace with optional monetization
 - [ ] Intent chaining (multi-command parsing)
 - [ ] Replay / Simulation mode for event testing
-- [ ] Composable voice macros (e.g., “Good morning” routines)
-- [ ] Voice-based configuration (e.g., “Enable search mode”)
+- [ ] Composable voice macros (e.g., "Good morning" routines)
+- [ ] Voice-based configuration (e.g., "Enable search mode")
 - [ ] On-device memory layer (e.g., reminders, preferences)
 - [ ] Local speaker recognition for personalization
 - [ ] Simple on-device fine-tuning of LLMs
@@ -105,7 +105,17 @@ _This section collects longer-term, blue-sky ideas to explore once the core syst
 - [ ] Observer as full config dashboard
 - [ ] Swappable LLMs with privacy warnings
 - [ ] Time-aware skills and scheduling
-- [ ] Explainability UX: “Why did you do that?”
+- [ ] Explainability UX: "Why did you do that?"
 - [ ] Mobile app as thin client
 - [ ] Fully headless mode support
 - [ ] Evaluate Docker Model Runner as alternative to Ollama
+
+### 🔀 Advanced Multi-Puck Features
+_Long-term enhancements for sophisticated multi-device voice coordination and spatial awareness._
+
+- [ ] Acoustic beamforming for directional voice detection across multiple pucks
+- [ ] User presence detection and automatic room-based puck preference learning
+- [ ] Multi-room voice handoff (start command in kitchen, continue in living room)
+- [ ] Puck clustering and load balancing for large deployments
+- [ ] Voice fingerprinting for automatic user identification across pucks
+- [ ] Spatial audio responses (route TTS to appropriate room/puck)
