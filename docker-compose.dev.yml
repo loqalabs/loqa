@@ -127,15 +127,15 @@ services:
     networks:
       - loqa-network
 
-  # Test Puck (optional - for testing)
-  test-puck:
+  # Test Relay (optional - for testing)
+  test-relay:
     build:
       context: ..
-      dockerfile: loqa-puck/Dockerfile
-    container_name: loqa-test-puck
+      dockerfile: loqa-relay/Dockerfile
+    container_name: loqa-test-relay
     environment:
       - HUB_ADDRESS=hub:50051
-      - PUCK_ID=docker-test-puck
+      - RELAY_ID=docker-test-relay
       - WAKE_WORD_THRESHOLD=0.7
     depends_on:
       hub:

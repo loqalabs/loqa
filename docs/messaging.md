@@ -49,7 +49,7 @@ loqa.system.metrics    -> Performance metrics
 {
   "request_id": "req_12345",
   "timestamp": "2025-01-15T10:30:00Z",
-  "puck_id": "puck_001",
+  "relay_id": "relay_001",
   "text": "turn on the kitchen lights",
   "confidence": 0.92,
   "intent": {
@@ -98,7 +98,7 @@ loqa.system.metrics    -> Performance metrics
 
 ### Complete Voice Command Flow
 
-1. **Puck** → `loqa.voice.input`: Audio data
+1. **Relay** → `loqa.voice.input`: Audio data
 2. **Hub** → `loqa.voice.transcribed`: "turn on kitchen lights"  
 3. **Hub** → `loqa.voice.commands`: Parsed intent with entities
 4. **Device Service** ← `loqa.devices.commands.lights`: Light command

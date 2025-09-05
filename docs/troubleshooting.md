@@ -6,7 +6,7 @@ Common issues and solutions for Loqa voice assistant platform.
 
 ### Voice Not Detected
 
-**Symptoms:** Puck client runs but doesn't respond to "Hey Loqa"
+**Symptoms:** Relay client runs but doesn't respond to "Hey Loqa"
 
 **Solutions:**
 ```bash
@@ -14,7 +14,7 @@ Common issues and solutions for Loqa voice assistant platform.
 # System Preferences → Security & Privacy → Privacy → Microphone
 
 # Test microphone access
-cd loqa-puck/test-go
+cd loqa-relay/test-go
 DEBUG=1 go run ./cmd --hub localhost:50051
 
 # Adjust wake word sensitivity
@@ -288,7 +288,7 @@ NATS_URL="nats://localhost:4222" LOG_LEVEL=debug ./bin/device-service
 export LOG_LEVEL=debug
 docker-compose up hub
 
-# Puck client debug
+# Relay client debug
 DEBUG=1 go run ./cmd --hub localhost:50051
 ```
 

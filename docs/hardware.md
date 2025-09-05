@@ -4,7 +4,7 @@ Loqa is designed to be **DIY-friendly and community-driven**. We provide specifi
 
 > **🛠️ Our Philosophy**: We believe in empowering the community to build, modify, and improve hardware designs. While we may support specific chips (like ESP32) and collaborate with existing hardware (like the Home Assistant Voice Preview Edition), the goal is to keep Loqa accessible to makers and developers who want to create their own devices.
 
-This guide covers puck hardware specifications, assembly instructions, and embedded development for DIY builders.
+This guide covers relay hardware specifications, assembly instructions, and embedded development for DIY builders.
 
 ## ESP32-S3 Reference Design
 
@@ -82,8 +82,8 @@ ESP32-S3 Pin Connections:
 
 ```bash
 # Clone firmware repository
-git clone https://github.com/loqalabs/loqa-puck
-cd loqa-puck/firmware
+git clone https://github.com/loqalabs/loqa-relay
+cd loqa-relay/firmware
 
 # Configure ESP-IDF
 . $HOME/esp/esp-idf/export.sh
@@ -97,7 +97,7 @@ idf.py -p /dev/ttyUSB0 flash monitor
 
 ```bash
 # Using PlatformIO
-cd loqa-puck/firmware
+cd loqa-relay/firmware
 pio run --target upload
 pio device monitor
 ```
@@ -106,7 +106,7 @@ pio device monitor
 
 ### WiFi Setup
 
-Pucks support WiFi provisioning via:
+Relays support WiFi provisioning via:
 1. **Web Portal**: Access point mode for initial setup
 2. **WPS**: Push-button WiFi connection
 3. **Hardcoded**: Compile-time credentials (development)
@@ -122,7 +122,7 @@ typedef struct {
     uint16_t hub_port;
     float wake_threshold;
     bool debug_mode;
-} puck_config_t;
+} relay_config_t;
 ```
 
 ## Assembly Instructions
@@ -201,7 +201,7 @@ Simple breadboard-friendly version:
 - Separate INMP441 breakout
 - External LED and button
 
-### Production Puck
+### Production Relay
 
 Optimized custom PCB:
 - Smaller form factor

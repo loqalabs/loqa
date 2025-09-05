@@ -6,7 +6,7 @@ Loqa is built from the ground up as a **local-first**, event-driven voice assist
 
 ## 🧱 Core Components
 
-### 🎤 Puck Device (DIY Hardware)
+### 🎤 Relay Device (DIY Hardware)
 - **DIY-friendly design**: Open-source reference designs and firmware for ESP32-S3
 - **Community-driven**: We provide specifications, not manufactured products  
 - **Multiple options**: Build your own, use existing maker hardware, or adapt development boards
@@ -44,7 +44,7 @@ Loqa is built from the ground up as a **local-first**, event-driven voice assist
 
 ```mermaid
 graph TB
-    P[🎤 Puck Device] -->|gRPC Audio| H[🧠 Hub Service]
+    P[🎤 Relay Device] -->|gRPC Audio| H[🧠 Hub Service]
     H -->|Audio| W[📝 STT Service]
     H -->|Text| L[🤖 LLM Intent Parser]
     H -->|Event Data| DB[(🗄️ SQLite DB)]
@@ -64,8 +64,8 @@ graph TB
     end
 ```
 
-1. **User speaks** near puck
-2. Puck captures audio and streams to Hub
+1. **User speaks** near relay
+2. Relay captures audio and streams to Hub
 3. Hub uses STT service to transcribe to text
 4. Text sent to LLM for intent parsing and entity extraction
 5. **Hub records complete event** in SQLite database
@@ -97,7 +97,7 @@ graph TB
 | Service         | Port | Protocol | Purpose |
 |------------------|------|----------|---------|
 | Hub HTTP API     | 3000 | HTTP     | Voice events REST API |
-| Hub gRPC Audio   | 50051| gRPC     | Puck audio streaming |
+| Hub gRPC Audio   | 50051| gRPC     | Relay audio streaming |
 | Observer Timeline| 5173 | HTTP     | Web interface (dev mode) |
 | NATS             | 4222 | NATS     | Message bus |
 | Ollama API       | 11434| HTTP     | LLM inference |

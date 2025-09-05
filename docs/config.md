@@ -23,12 +23,12 @@ Configuration options and environment variables for Loqa services.
 | `LOG_LEVEL` | Logging level | `info` |
 | `DEVICE_CONFIG_PATH` | Path to device configuration | `./devices.yaml` |
 
-### Puck (Go Test Client)
+### Relay (Go Test Client)
 
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `HUB_GRPC_ENDPOINT` | Hub gRPC endpoint | `localhost:50051` |
-| `PUCK_ID` | Unique identifier for puck | `test-puck-001` |
+| `RELAY_ID` | Unique identifier for relay | `test-relay-001` |
 | `WAKE_WORD_SENSITIVITY` | Wake word detection sensitivity | `0.8` |
 | `AUDIO_SAMPLE_RATE` | Audio sample rate | `16000` |
 

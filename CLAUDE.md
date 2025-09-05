@@ -14,7 +14,7 @@ This is a multi-repository project with individual services:
 - `loqa-hub/` - Central service (Go): gRPC API, STT/LLM pipeline, SQLite storage
 - `loqa-device-service/` - Device control service (Go): handles smart device commands
 - `loqa-observer/` - Vue.js web timeline UI for voice event visualization
-- `loqa-puck/` - Audio capture client (Go): test implementation and future embedded firmware
+- `loqa-relay/` - Audio capture client (Go): test implementation and future embedded firmware
 - `loqa-proto/` - gRPC protocol definitions and generated bindings
 - `loqa-skills/` - Modular skill plugin system with manifest-driven architecture
 
@@ -53,10 +53,10 @@ cd loqa-device-service && go run ./cmd
 cd loqa-device-service && go build -o bin/device-service ./cmd
 cd loqa-device-service && go test ./...
 
-# Test puck
-cd loqa-puck/test-go && go run ./cmd
-cd loqa-puck/test-go && go build -o bin/test-puck ./cmd
-cd loqa-puck/test-go && go test ./...
+# Test relay
+cd loqa-relay/test-go && go run ./cmd
+cd loqa-relay/test-go && go build -o bin/test-relay ./cmd
+cd loqa-relay/test-go && go test ./...
 
 # Observer UI
 cd loqa-observer && npm run dev     # Development server
@@ -89,7 +89,7 @@ cd loqa-hub/tests/e2e && go test -v
 cd loqa-hub/tests/integration && go test -v
 
 # Test tools
-./loqa-hub/tools/run-test-puck.sh    # Start test audio client
+./loqa-hub/tools/run-test-relay.sh    # Start test audio client
 ./loqa-hub/tools/test-wake-word.sh   # Wake word detection test
 ```
 
@@ -104,7 +104,7 @@ cd loqa-hub/tests/integration && go test -v
 - **Device Service** - Listens on NATS for device commands
 
 ### Voice Processing Flow
-1. Audio captured by puck → gRPC to Hub
+1. Audio captured by relay → gRPC to Hub
 2. Hub transcribes via OpenAI-compatible STT service REST API → text parsed locally
 3. Intent routed through Skills System → appropriate skill handles command
 4. Skill processes request (e.g., Home Assistant API calls) → returns structured response
@@ -205,7 +205,7 @@ LOG_FORMAT=json
 - Volumes for Ollama models, Hub data, and STT cache
 - Network isolation with `loqa-network`
 - Health checks for service dependencies
-- Test puck service in `testing` profile (optional)
+- Test relay service in `testing` profile (optional)
 
 ## Common Tasks
 
@@ -213,7 +213,7 @@ LOG_FORMAT=json
 1. Create a skill manifest in `loqa-skills/` with intent patterns
 2. Implement the skill using the SkillPlugin interface
 3. Load the skill via CLI: `skills-cli --action load --path /path/to/skill`
-4. Test with `./tools/run-test-puck.sh` or via Observer UI
+4. Test with `./tools/run-test-relay.sh` or via Observer UI
 
 ### Managing Skills  
 1. List skills: `skills-cli --action list`
@@ -224,7 +224,7 @@ LOG_FORMAT=json
 ### Protocol Changes
 1. Modify `loqa-proto/audio.proto`
 2. Run `./generate.sh` to regenerate bindings
-3. Update both hub and puck implementations
+3. Update both hub and relay implementations
 
 ### Database Schema Changes
 1. Update `loqa-hub/internal/storage/schema.sql`

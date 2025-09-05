@@ -130,14 +130,14 @@ services:
     networks:
       - loqa-network
 
-  # Test Puck (for gRPC connection testing only - no audio access in container)
-  # For real voice testing, run the test puck directly on the host
-  test-puck:
-    image: loqalabs/loqa-test-puck:latest
-    container_name: loqa-test-puck
+  # Test Relay (for gRPC connection testing only - no audio access in container)
+  # For real voice testing, run the test relay directly on the host
+  test-relay:
+    image: loqalabs/loqa-test-relay:latest
+    container_name: loqa-test-relay
     environment:
       - HUB_ADDRESS=hub:50051
-      - PUCK_ID=docker-test-puck
+      - RELAY_ID=docker-test-relay
       - WAKE_WORD_THRESHOLD=0.7
       - AUDIO_ENABLED=false  # Disable audio in container
     depends_on:

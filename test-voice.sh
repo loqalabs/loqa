@@ -22,14 +22,14 @@ fi
 
 echo "✅ Git found"
 
-# Clone the test puck repository if it doesn't exist
-if [ ! -d "loqa-puck" ]; then
-    echo "📥 Cloning loqa-puck repository..."
-    git clone https://github.com/loqalabs/loqa-puck.git
+# Clone the test relay repository if it doesn't exist
+if [ ! -d "loqa-relay" ]; then
+    echo "📥 Cloning loqa-relay repository..."
+    git clone https://github.com/loqalabs/loqa-relay.git
 else
-    echo "✅ loqa-puck repository already exists"
+    echo "✅ loqa-relay repository already exists"
     echo "🔄 Updating repository..."
-    cd loqa-puck && git pull && cd ..
+    cd loqa-relay && git pull && cd ..
 fi
 
 # Clone the proto repository if it doesn't exist (needed for dependencies)
@@ -43,7 +43,7 @@ else
 fi
 
 # Navigate to test-go directory
-cd loqa-puck/test-go
+cd loqa-relay/test-go
 
 # Check if hub is running
 echo "🔍 Checking if Loqa hub is running..."
@@ -61,9 +61,9 @@ echo "📦 Installing Go dependencies..."
 go mod download
 
 echo ""
-echo "🎙️  Starting voice test puck..."
+echo "🎙️  Starting voice test relay..."
 echo "   - Hub address: localhost:50051"
-echo "   - Puck ID: host-test-puck"
+echo "   - Relay ID: host-test-relay"
 echo "   - Wake word: 'Hey Loqa'"
 echo ""
 echo "Try saying:"
@@ -74,5 +74,5 @@ echo ""
 echo "Press Ctrl+C to stop"
 echo ""
 
-# Run the test puck with microphone access
-go run ./cmd -hub localhost:50051 -id host-test-puck
+# Run the test relay with microphone access
+go run ./cmd -hub localhost:50051 -id host-test-relay

@@ -59,7 +59,7 @@ test:
 	@echo "🧪 Running tests..."
 	cd ../loqa-hub && go test ./...
 	cd ../loqa-device-service && go test ./...
-	cd ../loqa-puck/test-go && go test ./...
+	cd ../loqa-relay/test-go && go test ./...
 
 proto:
 	@echo "🔧 Regenerating protocol buffers..."
@@ -70,8 +70,8 @@ dev: start
 	@echo "Services running:"
 	@cd .. && docker-compose ps
 	@echo ""
-	@echo "To run test puck:"
-	@echo "  cd ../loqa-puck/test-go && go run ./cmd"
+	@echo "To run test relay:"
+	@echo "  cd ../loqa-relay/test-go && go run ./cmd"
 
 logs:
 	@echo "📊 Showing service logs..."
@@ -87,8 +87,8 @@ start-device-service:
 start-observer:
 	cd ../loqa-observer && npm run dev
 
-start-puck:
-	cd ../loqa-puck/test-go && go run ./cmd
+start-relay:
+	cd ../loqa-relay/test-go && go run ./cmd
 
 # Build individual services
 build-hub:
@@ -100,5 +100,5 @@ build-device-service:
 build-observer:
 	cd ../loqa-observer && npm run build
 
-build-puck:
-	cd ../loqa-puck/test-go && go build -o bin/test-puck ./cmd
+build-relay:
+	cd ../loqa-relay/test-go && go build -o bin/test-relay ./cmd
