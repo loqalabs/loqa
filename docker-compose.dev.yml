@@ -40,6 +40,24 @@ services:
        ollama pull llama3.2:3b &&
        wait"
 
+  # STT Service
+  stt:
+    image: fedirz/faster-whisper-server:latest-cpu
+    container_name: loqa-stt
+    ports:
+      - "8000:8000"
+    volumes:
+      - stt-cache:/app/cache
+    environment:
+      - WHISPER_MODEL=tiny
+    networks:
+      - loqa-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   # Loqa Hub - Central orchestrator
   hub:
     build:
@@ -50,8 +68,7 @@ services:
       - "3000:3000"
       - "50051:50051"
     environment:
-      - WHISPER_MODEL_PATH=/models/ggml-base.en.bin
-      - WHISPER_LANGUAGE=en
+      - STT_URL=http://stt:8000
       - OLLAMA_URL=http://ollama:11434
       - OLLAMA_MODEL=llama3.2:3b
       - NATS_URL=nats://nats:4222
@@ -66,10 +83,10 @@ services:
         condition: service_healthy
       ollama:
         condition: service_healthy
+      stt:
+        condition: service_healthy
     volumes:
       - hub-data:/app/data
-      - whisper-models:/models
-      - whisper-models:/tmp/whisper.cpp/models
     networks:
       - loqa-network
     healthcheck:
@@ -134,7 +151,7 @@ volumes:
     driver: local
   hub-data:
     driver: local
-  whisper-models:
+  stt-cache:
     driver: local
 
 networks:

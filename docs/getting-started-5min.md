@@ -37,7 +37,7 @@ git clone https://github.com/loqalabs/loqa.git && cd loqa && ./setup.sh
 This automatically:
 - 🐳 Starts NATS, Ollama, Hub, Device services, and Timeline UI
 - 🤖 Downloads Llama 3.2 3B model
-- 📝 Sets up faster-whisper for speech recognition
+- 📝 Sets up OpenAI-compatible STT for speech recognition
 - 💡 Configures simulated smart devices
 - 📊 Launches web interface at http://localhost:5173
 
@@ -132,7 +132,7 @@ nats pub loqa.devices.commands.lights '{
 **Complete Voice-to-Visualization Pipeline:**
 - 🗣️ **Voice Input** → Puck captures audio via microphone
 - 📡 **gRPC Streaming** → Audio sent to Hub service  
-- 📝 **Speech-to-Text** → faster-whisper gRPC service converts to text
+- 📝 **Speech-to-Text** → OpenAI-compatible STT service converts to text
 - 🧠 **Intent Parsing** → Ollama LLM extracts commands
 - 💾 **Event Storage** → Hub records structured event data in SQLite
 - 📨 **Message Routing** → NATS delivers to device service

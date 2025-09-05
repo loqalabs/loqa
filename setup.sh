@@ -58,7 +58,7 @@ PROJECT_NAME=$(basename "$(pwd)")
 # Create volumes that Docker Compose will use (prevents warning messages)
 docker volume create "${PROJECT_NAME}_ollama-data" >/dev/null 2>&1 || true
 docker volume create "${PROJECT_NAME}_hub-data" >/dev/null 2>&1 || true  
-docker volume create "${PROJECT_NAME}_whisper-cache" >/dev/null 2>&1 || true
+docker volume create "${PROJECT_NAME}_stt-cache" >/dev/null 2>&1 || true
 
 echo "📥 Pulling latest Docker images..."
 docker-compose pull

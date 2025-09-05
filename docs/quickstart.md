@@ -74,7 +74,7 @@ docker-compose up -d nats ollama
 
 ```bash
 cd ../hub/loqa-hub
-export MODEL_PATH="/tmp/whisper.cpp/models/ggml-tiny.bin"
+export STT_URL="http://localhost:8000"
 export OLLAMA_URL="http://localhost:11434"
 export NATS_URL="nats://localhost:4222"
 go run ./cmd

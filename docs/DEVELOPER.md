@@ -37,7 +37,7 @@ cd loqa && ./scripts/setup-dev.sh
 
 This automatically:
 - Clones all Loqa repositories
-- Downloads the Whisper model
+- Sets up STT service container
 - Builds Docker images from source
 - Starts all services in development mode
 

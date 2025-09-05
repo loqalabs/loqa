@@ -202,7 +202,7 @@ LOG_FORMAT=json
 ### Docker Compose
 - Services defined in `loqa/docker-compose.yml` (main orchestration)
 - Individual Dockerfiles in each service repository
-- Volumes for Ollama models, Hub data, and Whisper binaries
+- Volumes for Ollama models, Hub data, and STT cache
 - Network isolation with `loqa-network`
 - Health checks for service dependencies
 - Test puck service in `testing` profile (optional)
