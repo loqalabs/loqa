@@ -189,20 +189,17 @@ docker-compose logs device-service
 
 ### Go Build Failures
 
-**Error:** `whisper.h file not found`
+**Error:** Build failures with missing dependencies
 
 **Solution:**
-This is expected for hub service - use Docker build:
+Hub service now uses REST-based STT - no CGO dependencies needed:
 ```bash
-# Use Docker instead of local build
+# Use Docker for consistent builds
 docker-compose build hub
 
-# For local development, install whisper.cpp:
-git clone https://github.com/ggerganov/whisper.cpp
-cd whisper.cpp
-make
-export CGO_CFLAGS="-I$(pwd)"
-export CGO_LDFLAGS="-L$(pwd) -lwhisper"
+# For local development:
+export CGO_ENABLED=0
+go build -o bin/hub ./cmd
 ```
 
 ### Module Dependency Issues
@@ -349,7 +346,7 @@ docker stats
 htop  # or top
 
 # Disk usage
-du -sh loqa-* whisper-models/
+du -sh loqa-* stt-models/
 
 # Network usage
 iftop  # or netstat -i

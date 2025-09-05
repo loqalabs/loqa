@@ -44,7 +44,7 @@ _site/
 config.local.yml
 
 # Downloaded models (from scripts)
-whisper-models/
+stt-models/
 models/
 *.bin
 *.gguf

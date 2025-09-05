@@ -14,7 +14,6 @@ All third-party dependencies use permissive licenses (MIT, BSD-3-Clause, Apache 
 
 | Dependency | License | Compatibility |
 |------------|---------|---------------|
-| `github.com/ggerganov/whisper.cpp/bindings/go` | MIT | ✅ Compatible |
 | `github.com/nats-io/nats.go` | Apache 2.0 | ✅ Compatible |
 | `google.golang.org/grpc` | Apache 2.0 | ✅ Compatible |
 | `github.com/klauspost/compress` | Apache 2.0/BSD/MIT | ✅ Compatible |
@@ -62,7 +61,7 @@ All third-party dependencies use permissive licenses (MIT, BSD-3-Clause, Apache 
 - **Highly permissive** license with minimal restrictions
 - **Compatible** with all copyleft licenses including AGPLv3
 - Only requires preservation of copyright notice
-- Used by: Whisper.cpp bindings, PortAudio bindings
+- Used by: PortAudio bindings
 
 ### BSD-3-Clause License
 - **Permissive license** similar to MIT with non-endorsement clause

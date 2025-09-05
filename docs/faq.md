@@ -39,7 +39,7 @@ Not at all! While Loqa is still in early development and best suited for tinkere
 
 ### 🧠 What models does it use?
 
-- **Speech Recognition:** [`whisper.cpp`](https://github.com/ggerganov/whisper.cpp) for offline STT
+- **Speech Recognition:** OpenAI-compatible STT services for offline transcription
 - **LLM Parsing:** [`Ollama`](https://ollama.com) using Llama 3.2 3B by default (runs locally)
 
 You can change the model by editing environment variables.
@@ -55,7 +55,7 @@ Loqa will support controlling HA devices via MQTT, REST, or WebSocket integratio
 
 ### 🌍 Will it support multiple languages?
 
-Eventually — yes. Whisper already supports multilingual speech recognition, and we plan to extend Loqa’s NLP capabilities to follow.
+Eventually — yes. OpenAI-compatible STT services already support multilingual speech recognition, and we plan to extend Loqa's NLP capabilities to follow.
 
 ---
 

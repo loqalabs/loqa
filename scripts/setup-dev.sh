@@ -47,7 +47,7 @@ cd loqa
 
 # Create necessary directories
 echo "📁 Creating necessary directories..."
-mkdir -p whisper-models
+mkdir -p data logs
 
 # Function to download files with fallback methods
 download_file() {
@@ -68,13 +68,8 @@ download_file() {
     fi
 }
 
-# Download Whisper model if it doesn't exist
-if [ ! -f "whisper-models/ggml-tiny.bin" ]; then
-    echo "📥 Downloading Whisper tiny model..."
-    download_file "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.bin" "whisper-models/ggml-tiny.bin"
-else
-    echo "✅ Whisper model already exists"
-fi
+# STT service will be provided via Docker container
+echo "✅ STT service will be provided via faster-whisper-server container"
 
 echo "🐳 Starting Loqa services with development build..."
 docker-compose -f docker-compose.dev.yml up -d

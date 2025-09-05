@@ -8,7 +8,7 @@ Configuration options and environment variables for Loqa services.
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `WHISPER_MODEL_PATH` | Path to Whisper model file | `/models/ggml-tiny.bin` |
+| `STT_URL` | OpenAI-compatible STT service URL | `http://stt:8000` |
 | `OLLAMA_URL` | Ollama API endpoint | `http://localhost:11434` |
 | `NATS_URL` | NATS server connection string | `nats://localhost:4222` |
 | `GRPC_PORT` | gRPC server port for audio | `50051` |
@@ -42,7 +42,7 @@ The main configuration is handled via `docker-compose.yml`:
 services:
   hub:
     environment:
-      - WHISPER_MODEL_PATH=/models/ggml-tiny.bin
+      - STT_URL=http://stt:8000
       - OLLAMA_URL=http://ollama:11434
       - NATS_URL=nats://nats:4222
 ```
@@ -64,13 +64,13 @@ devices:
 
 ## Model Configuration
 
-### Whisper Models
+### STT Models
 
-Supported Whisper.cpp models:
-- `ggml-tiny.bin` - Fastest, lower accuracy
-- `ggml-base.bin` - Balanced speed/accuracy
-- `ggml-small.bin` - Better accuracy, slower
-- `ggml-medium.bin` - High accuracy, much slower
+The STT service supports various models through the OpenAI-compatible API:
+- `tiny` - Fastest, lower accuracy
+- `base` - Balanced speed/accuracy
+- `small` - Better accuracy, slower
+- `medium` - High accuracy, much slower
 
 ### LLM Models
 

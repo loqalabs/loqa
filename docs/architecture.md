@@ -15,7 +15,7 @@ Loqa is built from the ground up as a **local-first**, event-driven voice assist
 
 ### 🧠 Hub Service
 - Central logic for speech-to-text, intent parsing, and event routing
-- Uses faster-whisper gRPC service for offline transcription
+- Uses OpenAI-compatible STT service for offline transcription
 - Sends text to Ollama (Llama 3.2) for command parsing
 - Records all voice events in SQLite database for observability
 - Exposes REST API for event access and provides real-time data
@@ -45,7 +45,7 @@ Loqa is built from the ground up as a **local-first**, event-driven voice assist
 ```mermaid
 graph TB
     P[🎤 Puck Device] -->|gRPC Audio| H[🧠 Hub Service]
-    H -->|Audio| W[📝 Whisper STT]
+    H -->|Audio| W[📝 STT Service]
     H -->|Text| L[🤖 LLM Intent Parser]
     H -->|Event Data| DB[(🗄️ SQLite DB)]
     H -->|REST API| UI[📊 Observer Timeline]
@@ -66,7 +66,7 @@ graph TB
 
 1. **User speaks** near puck
 2. Puck captures audio and streams to Hub
-3. Hub uses Whisper to transcribe to text
+3. Hub uses STT service to transcribe to text
 4. Text sent to LLM for intent parsing and entity extraction
 5. **Hub records complete event** in SQLite database
 6. Resulting command published to NATS
@@ -79,7 +79,7 @@ graph TB
 
 | Area         | Technology              |
 |--------------|--------------------------|
-| Voice STT    | faster-whisper (gRPC)    |
+| Voice STT    | OpenAI-compatible REST   |
 | LLM          | Ollama + Llama 3.2       |
 | Messaging    | NATS                     |
 | Database     | SQLite with WAL mode     |

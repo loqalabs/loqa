@@ -163,15 +163,15 @@ echo ""
 echo "🤖 Checking AI Models..."
 echo "------------------------"
 
-if [ -d "whisper-models" ]; then
-    model_count=$(ls whisper-models/*.bin 2>/dev/null | wc -l)
+if [ -d "stt-models" ]; then
+    model_count=$(ls stt-models/*.bin 2>/dev/null | wc -l)
     if [ $model_count -gt 0 ]; then
-        echo -e "✅ Whisper models: ${GREEN}$model_count found${NC}"
+        echo -e "✅ STT models: ${GREEN}$model_count found${NC}"
     else
-        echo -e "❌ Whisper models: ${RED}None found${NC}"
+        echo -e "❌ STT models: ${RED}None found${NC}"
     fi
 else
-    echo -e "ℹ️  Whisper models: ${YELLOW}Directory not found${NC}"
+    echo -e "ℹ️  STT models: ${YELLOW}Using external service${NC}"
 fi
 
 # Check Ollama models
