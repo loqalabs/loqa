@@ -164,4 +164,4 @@ We believe voice assistants should be **powerful, private, and personal** — wi
 
 ---
 
-*Created with 🧠 + ❤️ by [Anna Barnes](https://www.linkedin.com/in/annabethbarnes) — because voice assistants should serve you, not surveillance capitalism.*
+*Created with 🧠 + ❤️ by [Anna Barnes](https://www.linkedin.com/in/annabethbarnes) — because voice assistants should serve you, not surveillance capitalism.* 
