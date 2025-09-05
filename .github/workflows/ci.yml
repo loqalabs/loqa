@@ -14,28 +14,23 @@ permissions:
 jobs:
   validate:
     name: Validate Documentation
-    uses: loqalabs/.github/.github/workflows/js-validate-docs.yml@main
+    uses: loqalabs/.github/.github/workflows/validate-docs.yml@main
     with:
       node-version: '20'
 
   spell-check:
     name: Spell Check
-    uses: loqalabs/.github/.github/workflows/js-spell-check.yml@main
-    with:
-      node-version: '20'
+    uses: loqalabs/.github/.github/workflows/spell-check.yml@main
 
   build-site:
     name: Build Documentation Site
-    uses: loqalabs/.github/.github/workflows/js-build-site.yml@main
+    uses: loqalabs/.github/.github/workflows/mkdocs-build-site.yml@main
     needs: [validate, spell-check]
     with:
-      node-version: '20'
+      artifact-name: documentation-site
 
   deploy:
     name: Deploy to GitHub Pages
     needs: [validate, build-site]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    uses: loqalabs/.github/.github/workflows/js-deploy-pages.yml@main
-    with:
-      node-version: '20'
-      cname: '' # Set to custom domain if needed
+    uses: loqalabs/.github/.github/workflows/mkdocs-deploy-pages.yml@main
