@@ -132,7 +132,7 @@ services:
     build:
       context: ..
       dockerfile: loqa-relay/Dockerfile
-    container_name: loqa-test-relay
+    container_name: loqa-mock-relay
     environment:
       - HUB_ADDRESS=hub:50051
       - RELAY_ID=docker-test-relay
