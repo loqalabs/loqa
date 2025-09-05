@@ -9,7 +9,7 @@
   - [ ] If chaining fails, gracefully fallback to the first valid command
 
 ### 🖥️ Observer UI & API Surface
-- [x] Fix "Active Pucks" count to reflect disconnections (e.g., when puck exits unexpectedly)
+- [x] Fix "Active Relays" count to reflect disconnections (e.g., when relay exits unexpectedly)
 - [ ] Ensure timeline audio playback works correctly (verify path, MIME type, player logic)
 - [ ] Add ability to filter timeline by success, failure, or low-confidence events
 - [x] Make event boxes more compact or collapsed by default
@@ -25,15 +25,15 @@
 - [ ] Define and enforce default confidence threshold for rejecting low-quality transcriptions
 - [ ] Fallback: Ask user to repeat command if confidence is too low
 
-### 🔀 Multi-Puck Collision Detection
-- [ ] Implement basic collision detection for multiple puck wake word activation
-  - [ ] Add ActiveStream tracking in AudioService with puck_id mapping
-  - [ ] Implement simple "last puck to connect wins" arbitration logic
-  - [ ] Send cancellation responses to losing pucks via gRPC stream
-  - [ ] Add proper stream cleanup when pucks are cancelled or disconnect
+### 🔀 Multi-Relay Collision Detection
+- [ ] Implement basic collision detection for multiple relay wake word activation
+  - [ ] Add ActiveStream tracking in AudioService with relay_id mapping
+  - [ ] Implement simple "last relay to connect wins" arbitration logic
+  - [ ] Send cancellation responses to losing relay devices via gRPC stream
+  - [ ] Add proper stream cleanup when relay devices are cancelled or disconnect
 
 ### 🔊 Text-to-Speech (TTS)
-- [ ] Play returned TTS phrase through speakers when using the test puck (not just print)
+- [ ] Play returned TTS phrase through speakers when using the test relay (not just print)
 
 ### 🧠 Skills & Plugin System
 - [ ] Add built-in "Set a timer" skill with local tracking and TTS countdown/complete response
@@ -69,10 +69,10 @@
 ### 🧠 Skills & Plugin System
 - [ ] Add minimal built-in skills like "help", "version", "ping", "what can you do?"
 
-### 🔀 Smart Multi-Puck Arbitration
-- [ ] Implement intelligent wake word arbitration for multiple puck scenarios
+### 🔀 Smart Multi-Relay Arbitration
+- [ ] Implement intelligent wake word arbitration for multiple relay scenarios
   - [ ] Add signal strength comparison (strongest signal wins)
   - [ ] Add temporal window arbitration (500ms window with first-wins logic)
-  - [ ] Add location context awareness (prefer puck in user's current room)
-  - [ ] Store puck-to-room mappings in configuration
+  - [ ] Add location context awareness (prefer relay in user's current room)
+  - [ ] Store relay-to-room mappings in configuration
   - [ ] Add arbitration logging and metrics for debugging

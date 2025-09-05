@@ -230,7 +230,7 @@ echo ""
 echo "📋 Quick Actions:"
 echo "   Start services: docker-compose up -d"
 echo "   View logs: docker-compose logs -f"
-echo "   Test voice: cd loqa-puck/test-go && go run ./cmd"
+echo "   Test voice: cd loqa-relay/test-go && go run ./cmd"
 echo "   Get help: See docs/troubleshooting.md"
 
 exit 0

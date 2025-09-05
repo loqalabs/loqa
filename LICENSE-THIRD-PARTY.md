@@ -32,7 +32,7 @@ All third-party dependencies use permissive licenses (MIT, BSD-3-Clause, Apache 
 | `github.com/nats-io/nuid` | Apache 2.0 | ✅ Compatible |
 | `golang.org/x/*` | BSD-3-Clause | ✅ Compatible |
 
-### loqa-puck
+### loqa-relay
 
 | Dependency | License | Compatibility |
 |------------|---------|---------------|

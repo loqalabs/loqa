@@ -45,15 +45,15 @@ This automatically:
 
 The containerized test client cannot access your microphone. For real voice testing, you need to run the test client on your host system:
 
-> **🛠️ Hardware Note**: This test client simulates the functionality you'd get from DIY puck hardware. We provide open-source designs for ESP32-based voice devices, but don't manufacture hardware ourselves.
+> **🛠️ Hardware Note**: This test client simulates the functionality you'd get from DIY relay hardware. We provide open-source designs for ESP32-based voice devices, but don't manufacture hardware ourselves.
 
 ### Option 1: Quick Container Test (gRPC connection only)
 ```bash
 # Start the test client container (no audio, just connection testing)
-docker-compose --profile testing up -d test-puck
+docker-compose --profile testing up -d test-relay
 
 # Check connection status
-docker logs loqa-test-puck
+docker logs loqa-test-relay
 ```
 
 ### Option 2: Real Voice Testing (Recommended)
@@ -65,7 +65,7 @@ curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/test-voice.sh?$
 
 The script will:
 - Check for Go and Git
-- Clone the loqa-puck repository (contains DIY hardware designs and test software)
+- Clone the loqa-relay repository (contains DIY hardware designs and test software)
 - Install dependencies
 - Start the test client with microphone access
 - Show you example voice commands to try
@@ -73,13 +73,13 @@ The script will:
 **Manual approach** (if you prefer):
 ```bash
 # Clone the DIY hardware repository (includes test software)
-git clone https://github.com/loqalabs/loqa-puck.git
-cd loqa-puck/test-go
+git clone https://github.com/loqalabs/loqa-relay.git
+cd loqa-relay/test-go
 
 # Install Go dependencies
 go mod download
 
-# Run the test puck with microphone access
+# Run the test relay with microphone access
 go run ./cmd -hub localhost:50051
 
 # Now speak these commands near your microphone:
@@ -130,7 +130,7 @@ nats pub loqa.devices.commands.lights '{
 ## 🎯 What You Just Experienced
 
 **Complete Voice-to-Visualization Pipeline:**
-- 🗣️ **Voice Input** → Puck captures audio via microphone
+- 🗣️ **Voice Input** → Relay captures audio via microphone
 - 📡 **gRPC Streaming** → Audio sent to Hub service  
 - 📝 **Speech-to-Text** → OpenAI-compatible STT service converts to text
 - 🧠 **Intent Parsing** → Ollama LLM extracts commands
@@ -194,7 +194,7 @@ docker-compose down
 You now have a complete local-first voice assistant system running:
 
 **🎤 Voice Processing Stack:**
-- Puck client using your laptop's microphone/speakers
+- Relay client using your laptop's microphone/speakers
 - Hub service processing speech-to-text and intent parsing
 - Device service controlling smart home devices (simulated)
 - Timeline UI automatically running at http://localhost:5173

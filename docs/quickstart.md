@@ -39,12 +39,12 @@ This launches:
 
 ---
 
-## 🎤 Run the Test Puck (Voice Input)
+## 🎤 Run the Test Relay (Voice Input)
 
 From the root directory:
 
 ```bash
-./tools/run-test-puck.sh
+./tools/run-test-relay.sh
 ```
 
 > This will:
@@ -86,12 +86,12 @@ go run ./cmd
 NATS_URL="nats://localhost:4222" go run ./cmd/device-service
 ```
 
-### 4. Launch the Test Puck
+### 4. Launch the Test Relay
 
 ```bash
-cd ../../puck/test-go
-go build -o test-puck ./cmd
-./test-puck --hub localhost:50051 --id test-puck-001
+cd ../../relay/test-go
+go build -o test-relay ./cmd
+./test-relay --hub localhost:50051 --id test-relay-001
 ```
 
 ---

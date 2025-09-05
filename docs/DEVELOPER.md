@@ -13,7 +13,7 @@ The Loqa platform consists of multiple focused repositories that work together:
 |------------|---------|---------|
 | **[loqa-hub](https://github.com/loqalabs/loqa-hub)** | Central orchestrator: gRPC API, STT/LLM pipeline, NATS integration | ✅ Active |
 | **[loqa-device-service](https://github.com/loqalabs/loqa-device-service)** | Device control service that listens on NATS for commands | ✅ Active |
-| **[loqa-puck](https://github.com/loqalabs/loqa-puck)** | DIY hardware reference designs, firmware, and test clients | ✅ Active |
+| **[loqa-relay](https://github.com/loqalabs/loqa-relay)** | DIY hardware reference designs, firmware, and test clients | ✅ Active |
 | **[loqa-proto](https://github.com/loqalabs/loqa-proto)** | Shared gRPC protocol definitions and generated bindings | ✅ Active |
 
 ### Extensions & Documentation  
@@ -58,7 +58,7 @@ For advanced users who want to work with individual repositories:
 # Core services
 git clone https://github.com/loqalabs/loqa-hub.git
 git clone https://github.com/loqalabs/loqa-device-service.git  
-git clone https://github.com/loqalabs/loqa-puck.git
+git clone https://github.com/loqalabs/loqa-relay.git
 git clone https://github.com/loqalabs/loqa-proto.git
 
 # Documentation and skills
@@ -88,11 +88,11 @@ make help      # See all available commands
 
 ### Testing Voice Commands (Development)
 
-After running development setup, test with the local puck:
+After running development setup, test with the local relay:
 
 ```bash
-# Navigate to the test puck
-cd loqa-puck/test-go
+# Navigate to the test relay
+cd loqa-relay/test-go
 
 # Start the voice client (connects to Hub at localhost:50051)
 go run ./cmd --hub localhost:50051
@@ -191,14 +191,14 @@ These features will be **opt-in**, transparent, and built with the same values o
 
 ### Completed ✅
 - [x] Core platform (STT, LLM, gRPC, NATS)
-- [x] Test puck with wake word and VAD
+- [x] Test relay with wake word and VAD
 - [x] Multi-repository architecture
 - [x] Docker-based development environment
 
 ### In Progress 🏗️
 - [ ] Home Assistant integration skill
 - [ ] Skill framework (load, metadata, lifecycle)
-- [ ] ESP32 puck firmware (local wake word)
+- [ ] ESP32 relay firmware (local wake word)
 
 ### Future Plans 🚀
 - [ ] Premium remote access tier (opt-in)
@@ -217,7 +217,7 @@ These features will be **opt-in**, transparent, and built with the same values o
 
 ### Development Tools
 - **[Testing Guide](./testing.md)** – Test tools, frameworks, and best practices
-- **[Hardware Guide](./hardware.md)** – ESP32 puck development and firmware
+- **[Hardware Guide](./hardware.md)** – ESP32 relay development and firmware
 
 ### User Documentation
 - **[Quickstart Guide](./quickstart.md)** – Complete setup instructions

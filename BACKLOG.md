@@ -110,12 +110,12 @@ _This section collects longer-term, blue-sky ideas to explore once the core syst
 - [ ] Fully headless mode support
 - [ ] Evaluate Docker Model Runner as alternative to Ollama
 
-### 🔀 Advanced Multi-Puck Features
+### 🔀 Advanced Multi-Relay Features
 _Long-term enhancements for sophisticated multi-device voice coordination and spatial awareness._
 
-- [ ] Acoustic beamforming for directional voice detection across multiple pucks
-- [ ] User presence detection and automatic room-based puck preference learning
+- [ ] Acoustic beamforming for directional voice detection across multiple relay devices
+- [ ] User presence detection and automatic room-based relay preference learning
 - [ ] Multi-room voice handoff (start command in kitchen, continue in living room)
-- [ ] Puck clustering and load balancing for large deployments
-- [ ] Voice fingerprinting for automatic user identification across pucks
-- [ ] Spatial audio responses (route TTS to appropriate room/puck)
+- [ ] Relay clustering and load balancing for large deployments
+- [ ] Voice fingerprinting for automatic user identification across relay devices
+- [ ] Spatial audio responses (route TTS to appropriate room/relay)

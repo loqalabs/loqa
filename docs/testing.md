@@ -8,21 +8,21 @@ Loqa includes multiple levels of testing:
 - **Unit Tests**: Individual service logic
 - **Integration Tests**: Service-to-service communication  
 - **End-to-End Tests**: Full voice pipeline testing
-- **Hardware Tests**: Puck device validation
+- **Hardware Tests**: Relay device validation
 
 ## Development Tools
 
-### Test Puck (Go Client)
+### Test Relay (Go Client)
 
-Quick voice testing with the Go test puck:
+Quick voice testing with the Go test relay:
 
 ```bash
-# Start the test puck
-./tools/run-test-puck.sh
+# Start the test relay
+./tools/run-test-relay.sh
 
 # Or manually
-cd puck/test-go
-go run ./cmd --hub localhost:50051 --id test-puck-001
+cd relay/test-go
+go run ./cmd --hub localhost:50051 --id test-relay-001
 ```
 
 ### Manual Command Testing
@@ -54,7 +54,7 @@ Test wake word detection:
 ./tools/test-wake-word.sh
 
 # Manual testing with verbose output
-cd puck/test-go
+cd relay/test-go
 DEBUG=1 go run ./cmd --wake-word-sensitivity 0.6
 ```
 
@@ -136,8 +136,8 @@ echo "✅ All tests passed!"
 cd tests/performance
 go test -bench=BenchmarkVoiceProcessing
 
-# Test concurrent puck connections
-go test -bench=BenchmarkConcurrentPucks
+# Test concurrent relay connections
+go test -bench=BenchmarkConcurrentRelays
 ```
 
 ## Debugging Tools
@@ -169,7 +169,7 @@ docker-compose logs -f | grep -E "(error|warn|fail)"
 
 ```bash
 # Test microphone access
-cd puck/test-go
+cd relay/test-go
 go run ./internal/audio --test-mic
 
 # Audio quality validation
@@ -245,5 +245,5 @@ jobs:
 Target performance metrics:
 - **Voice to Command**: < 2 seconds end-to-end
 - **Wake Word Detection**: < 500ms response time
-- **Concurrent Pucks**: Support 10+ simultaneous streams  
+- **Concurrent Relays**: Support 10+ simultaneous streams  
 - **Memory Usage**: < 500MB per service under load
