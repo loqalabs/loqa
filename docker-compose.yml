@@ -133,11 +133,11 @@ services:
   # Test Relay (for gRPC connection testing only - no audio access in container)
   # For real voice testing, run the test relay directly on the host
   test-relay:
-    image: loqalabs/loqa-test-relay:latest
-    container_name: loqa-test-relay
+    image: loqalabs/loqa-mock-relay:latest
+    container_name: loqa-mock-relay
     environment:
       - HUB_ADDRESS=hub:50051
-      - RELAY_ID=docker-test-relay
+      - RELAY_ID=docker-mock-relay
       - WAKE_WORD_THRESHOLD=0.7
       - AUDIO_ENABLED=false  # Disable audio in container
     depends_on:

@@ -53,7 +53,7 @@ The containerized test client cannot access your microphone. For real voice test
 docker-compose --profile testing up -d test-relay
 
 # Check connection status
-docker logs loqa-test-relay
+docker logs loqa-mock-relay
 ```
 
 ### Option 2: Real Voice Testing (Recommended)
