@@ -108,7 +108,7 @@ cd loqa-hub/tests/integration && go test -v
 2. Hub transcribes via OpenAI-compatible STT service REST API → text parsed locally
 3. Intent routed through Skills System → appropriate skill handles command
 4. Skill processes request (e.g., Home Assistant API calls) → returns structured response
-5. Events stored in SQLite with skill tracking & metadata → visualized in Observer Timeline
+5. Events stored in SQLite with skill tracking & metadata → visualized in Commander Timeline
 6. Device commands published to NATS → Device Service controls hardware
 
 ### Key Technologies
@@ -140,7 +140,7 @@ loqa-device-service/
 └── ...
 
 loqa-commander/
-├── Dockerfile                 # Observer UI build
+├── Dockerfile                 # Commander UI build
 ├── package.json
 └── ...
 
@@ -222,12 +222,12 @@ These templates ensure comprehensive planning and consistent execution across al
 1. Create a skill manifest in `loqa-skills/` with intent patterns
 2. Implement the skill using the SkillPlugin interface
 3. Load the skill via CLI: `skills-cli --action load --path /path/to/skill`
-4. Test with `./tools/run-test-relay.sh` or via Observer UI
+4. Test with `./tools/run-test-relay.sh` or via Commander UI
 
 ### Managing Skills  
 1. List skills: `skills-cli --action list`
 2. Enable/disable: `skills-cli --action enable --skill skill-id`
-3. Configure via Observer UI Skills page
+3. Configure via Commander UI Skills page
 4. View logs and metrics in the Timeline
 
 ### Protocol Changes
@@ -242,7 +242,7 @@ These templates ensure comprehensive planning and consistent execution across al
 4. Update `events/voice_event.go` struct and JSON serialization methods
 5. Test with clean database: `make clean && make start`
 
-### Observer UI Features
+### Commander UI Features
 1. Add components in `loqa-commander/src/components/`
 2. Update API calls in composables or stores
 3. Test with `npm run dev` and hub API at `:3000`

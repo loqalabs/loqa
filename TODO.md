@@ -15,8 +15,8 @@
   - [ ] Combine or sequence TTS responses for multiple results
   - [ ] If chaining fails, gracefully fallback to the first valid command
 
-### 🖥️ Observer UI & API Surface
-**🔗 GitHub Issue**: [loqa-observer#14 - Timeline filtering and event categorization](https://github.com/loqalabs/loqa-observer/issues/14)
+### 🖥️ Commander UI & API Surface
+**🔗 GitHub Issue**: [loqa-commander#14 - Timeline filtering and event categorization](https://github.com/loqalabs/loqa-commander/issues/14)
 
 - [x] Fix "Active Relays" count to reflect disconnections (e.g., when relay exits unexpectedly)
 - [ ] Add ability to filter timeline by success, failure, or low-confidence events
@@ -108,22 +108,22 @@
 
 - [ ] **Professional Skills**: Legal dictation, medical terminology, business productivity skills
 - [ ] **Multi-user Support**: Voice recognition and user profiles for shared office environments
-- [ ] **Professional UI**: Simplified Observer interface for non-technical business users
+- [ ] **Professional UI**: Simplified Commander interface for non-technical business users
 - [ ] **Business Integrations**: Calendar systems, CRM integration, professional workflows
 - [ ] **Compliance Reporting**: Generate audit reports for HIPAA, legal compliance reviews
 - [ ] **Support Infrastructure**: Professional support portal and documentation
 
-### 🖥️ Observer UI & API Surface
+### 🖥️ Commander UI & API Surface
 - [ ] Add drill-down breakdown of slow events (e.g., STT, LLM parse, skill handling)
 - [ ] Add compact/toggle view mode for timeline events
 
-### 🖥️ Observer UI & API Surface (P1)
+### 🖥️ Commander UI & API Surface (P1)
 - [ ] Ensure UI gracefully degrades when logs are ephemeral or redacted
 
 ### 🎛️ Skill Management UI
-**🔗 GitHub Issue**: [loqa-observer#13 - Skills Management UI - Dashboard for installed plugins](https://github.com/loqalabs/loqa-observer/issues/13)
+**🔗 GitHub Issue**: [loqa-commander#13 - Skills Management UI - Dashboard for installed plugins](https://github.com/loqalabs/loqa-commander/issues/13)
 
-- [ ] Create a "Skills" tab in `loqa-observer` with list of installed plugins
+- [ ] Create a "Skills" tab in `loqa-commander` with list of installed plugins
 - [ ] Show skill name, description, version, and enabled status
 - [ ] Add toggles to enable/disable skills
 - [ ] Link to skill config editor (if `config` hook is present)
@@ -163,7 +163,7 @@
 - [ ] Add `LOG_TRANSCRIPTS`, `LOG_INTENTS_ONLY`, and `LOG_SANITIZE` environment flags
 - [ ] CLI: `loqa export-logs --redact` support for compliance auditing
 - [ ] **NEW**: Professional audit trail system for compliance reporting
-- [ ] **NEW**: Role-based access controls for Observer UI
+- [ ] **NEW**: Role-based access controls for Commander UI
 - [ ] **NEW**: Backup/restore with encryption for business continuity
 
 ### 🛠️ Developer Experience **[MOVED TO P3 - POST-BUSINESS MVP]**
@@ -178,13 +178,13 @@
 - [ ] Add hot-reload for skill development
 - [ ] Publish skill development containers/templates
 
-### 🖥️ Observer UI Evolution
-**🔗 GitHub Issue**: [loqa-observer#15 - Plugin-based Observer widgets system](https://github.com/loqalabs/loqa-observer/issues/15)
+### 🖥️ Commander UI Evolution
+**🔗 GitHub Issue**: [loqa-commander#15 - Plugin-based Commander widgets system](https://github.com/loqalabs/loqa-commander/issues/15)
 
-- [ ] Plugin-based Observer widgets (skills can add their own UI components)
-- [ ] Export Observer events to external monitoring tools
-- [ ] Add Observer embedding capability for custom dashboards
-- [ ] Progressive disclosure in Observer UI (beginner/advanced modes)
+- [ ] Plugin-based Commander widgets (skills can add their own UI components)
+- [ ] Export Commander events to external monitoring tools
+- [ ] Add Commander embedding capability for custom dashboards
+- [ ] Progressive disclosure in Commander UI (beginner/advanced modes)
 
 ### 🧠 Enhanced Skills System
 **🔗 GitHub Issue**: [loqa-skills#8 - Skill dependency management and versioning](https://github.com/loqalabs/loqa-skills/issues/8)

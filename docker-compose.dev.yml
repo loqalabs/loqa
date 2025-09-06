@@ -111,12 +111,12 @@ services:
     networks:
       - loqa-network
 
-  # Observer Timeline UI
-  observer:
+  # Commander Timeline UI
+  commander:
     build:
-      context: ../loqa-observer
+      context: ../loqa-commander
       dockerfile: Dockerfile
-    container_name: loqa-observer
+    container_name: loqa-commander
     ports:
       - "5173:80"
     environment:

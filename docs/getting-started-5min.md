@@ -103,7 +103,7 @@ go run ./cmd -hub localhost:50051
 docker-compose ps
 
 # Watch the logs
-docker-compose logs -f hub device-service observer
+docker-compose logs -f hub device-service commander
 ```
 
 **Check Timeline UI:**

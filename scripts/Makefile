@@ -33,7 +33,7 @@ start:
 	cd .. && docker-compose up -d
 	@echo "✅ Services started. Access at:"
 	@echo "   Hub API: http://localhost:3000"
-	@echo "   Observer Timeline: http://localhost:5173"
+	@echo "   Commander Timeline: http://localhost:5173"
 	@echo "   NATS: http://localhost:8222"
 
 start-dev:
@@ -41,7 +41,7 @@ start-dev:
 	cd .. && docker-compose -f docker-compose.dev.yml up -d
 	@echo "✅ Development services started. Access at:"
 	@echo "   Hub API: http://localhost:3000"
-	@echo "   Observer Timeline: http://localhost:5173"
+	@echo "   Commander Timeline: http://localhost:5173"
 	@echo "   NATS: http://localhost:8222"
 
 stop:
@@ -84,8 +84,8 @@ start-hub:
 start-device-service:
 	cd ../loqa-device-service && go run ./cmd
 
-start-observer:
-	cd ../loqa-observer && npm run dev
+start-commander:
+	cd ../loqa-commander && npm run dev
 
 start-relay:
 	cd ../loqa-relay/test-go && go run ./cmd
@@ -97,8 +97,8 @@ build-hub:
 build-device-service:
 	cd ../loqa-device-service && go build -o bin/device-service ./cmd
 
-build-observer:
-	cd ../loqa-observer && npm run build
+build-commander:
+	cd ../loqa-commander && npm run build
 
 build-relay:
 	cd ../loqa-relay/test-go && go build -o bin/test-relay ./cmd
