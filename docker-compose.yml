@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  loqa-observer:
+  loqa-commander:
     build:
       context: .
       dockerfile: Dockerfile

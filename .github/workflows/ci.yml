@@ -10,7 +10,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: loqalabs/loqa-observer
+  IMAGE_NAME: loqalabs/loqa-commander
 permissions:
   contents: read
   actions: read
@@ -37,7 +37,7 @@ jobs:
     uses: loqalabs/.github/.github/workflows/docker-build-and-push.yml@main
     with:
       registry: docker.io
-      image-name: loqalabs/loqa-observer
+      image-name: loqalabs/loqa-commander
     secrets:
       docker-username: ${{ secrets.DOCKER_USERNAME }}
       docker-token: ${{ secrets.DOCKER_TOKEN }}

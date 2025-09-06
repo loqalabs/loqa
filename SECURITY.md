@@ -8,7 +8,7 @@
 
 ## Reporting a Vulnerability
 
-We take the security of Loqa Observer seriously. If you believe you have found a security vulnerability, please report it to us as described below.
+We take the security of Loqa Commander seriously. If you believe you have found a security vulnerability, please report it to us as described below.
 
 ### How to Report a Security Issue
 
