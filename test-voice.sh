@@ -32,15 +32,8 @@ else
     cd loqa-relay && git pull && cd ..
 fi
 
-# Clone the proto repository if it doesn't exist (needed for dependencies)
-if [ ! -d "loqa-proto" ]; then
-    echo "📥 Cloning loqa-proto repository..."
-    git clone https://github.com/loqalabs/loqa-proto.git
-else
-    echo "✅ loqa-proto repository already exists"
-    echo "🔄 Updating repository..."
-    cd loqa-proto && git pull && cd ..
-fi
+# Proto dependencies are now handled via Go modules (v0.0.17+)
+# No need to clone loqa-proto repository locally
 
 # Navigate to test-go directory
 cd loqa-relay/test-go
