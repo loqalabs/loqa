@@ -1,11 +1,13 @@
 # 🟨 P3 – Optional / Post-MVP Features
 
+> **📊 Track Progress**: View all issues and milestones in the [**Loqa MVP Roadmap Project**](https://github.com/orgs/loqalabs/projects/1)  
+> **🎯 Future Milestones**: [v2.0 Enterprise - Dec 31, 2026](https://github.com/loqalabs/loqa/milestone/3)
+
 ---
 
 ### 🔍 Backend & Observability
 _This section focuses on enhancing deeper inspection tools and strengthening test infrastructure to improve backend reliability and observability._
 
-- [ ] CLI: `loqa export-logs --redact` support
 - [ ] Add encrypted transcript log format (per-event encryption)
 - [ ] Add signed audit trail support (tamper-evident logs)
 - [ ] Add local emergency wipe command / red button
@@ -21,7 +23,6 @@ _These tasks aim to increase flexibility by making the observer UI more modular 
 - [ ] Treat observer as optional dependency in Docker
 - [ ] Document `/api` as public interface (OpenAPI or Markdown)
 - [ ] Ensure all observer features work via HTTP only
-- [ ] Add `HEADLESS` mode flag to `loqa-hub`
 - [ ] Optional: Add reverse proxy (e.g., Caddy or Traefik) for clean UI endpoint
 
 ---
@@ -83,24 +84,54 @@ _This section outlines a privacy-preserving, cloud-assisted mobile sync feature 
 ---
 
 ### 🧭 Messaging & Positioning
-_These tasks focus on refining external messaging, public perception, and product framing to better communicate the platform’s value and positioning._
+_These tasks focus on refining external messaging, public perception, and product framing to better communicate the platform's value and positioning._
 
 - [ ] Highlight privacy differentiators vs Home Assistant Voice
 - [ ] Emphasize "HIPAA-conscious by design" in docs and landing
 - [ ] Add homepage tagline: "A voice assistant that does more than 'turn on the lights'"
 - [ ] Add privacy log policy to README: no voice storage, ephemeral logs, transcript redaction
-- [ ] Clarify “voice assistant” vs “voice platform”
+- [ ] Clarify "voice assistant" vs "voice platform"
 - [ ] Improve messaging across README, SPONSOR.md, homepage
 - [ ] Write short pitches tailored to developers, privacy users, smart home fans
 - [ ] UX test homepage messaging with real users
 
+### 🎯 Enhanced Positioning & Target Audiences
+_Expand messaging to reach additional high-value market segments._
+
+**🔗 GitHub Issues**: 
+- [www-loqalabs-com#8 - HIPAA-conscious messaging and healthcare positioning](https://github.com/loqalabs/www-loqalabs-com/issues/8)
+- [www-loqalabs-com#9 - Privacy comparison table and Privacy First documentation](https://github.com/loqalabs/www-loqalabs-com/issues/9)
+
+- [ ] **Healthcare professionals** messaging (HIPAA compliance angle)
+- [ ] **Enterprise privacy officers** positioning (compliance-ready platform)
+- [ ] **IoT developers** focus (extensible voice control platform)
+- [ ] **Smart home enthusiasts** beyond basic control
+- [ ] Add privacy comparison table vs major competitors
+- [ ] Create "Privacy First" documentation section
+- [ ] Add privacy audit checklist for skill developers
+- [ ] Strengthen competitive angles:
+  - [ ] "Voice assistant that doesn't phone home"
+  - [ ] "HIPAA-conscious by design"
+  - [ ] "Skill marketplace without vendor lock-in"
+  - [ ] "Your voice data stays in your house"
+
 ---
+
+### 🏢 Enterprise Readiness
+_Features for large-scale deployments and enterprise compliance requirements._
+
+- [ ] Multi-tenant skill isolation
+- [ ] Role-based access control for Observer UI
+- [ ] Backup/restore automation for hub data
+- [ ] Performance benchmarking tools
+- [ ] Audit trail export for compliance reporting
+- [ ] Enterprise SSO integration
+- [ ] Centralized policy management across multiple hubs
 
 ### 💡 Future Exploratory Ideas
 _This section collects longer-term, blue-sky ideas to explore once the core system has achieved stability and maturity._
 
 - [ ] Configurable hotword behavior and alternate triggers
-- [ ] Skill auto-update and rollback
 - [ ] Guest mode / temporary user profiles
 - [ ] Community-curated skill marketplace with optional monetization
 - [ ] Intent chaining (multi-command parsing)
@@ -117,7 +148,6 @@ _This section collects longer-term, blue-sky ideas to explore once the core syst
 - [ ] Time-aware skills and scheduling
 - [ ] Explainability UX: "Why did you do that?"
 - [ ] Mobile app as thin client
-- [ ] Fully headless mode support
 - [ ] Evaluate Docker Model Runner as alternative to Ollama
 
 ### 🔀 Advanced Multi-Relay Features
