@@ -1,18 +1,38 @@
-# 🟨 P3 – Optional / Post-MVP Features
+# 🟨 P3 – Post-Business MVP Features
 
 > **📊 Track Progress**: View all issues and milestones in the [**Loqa MVP Roadmap Project**](https://github.com/orgs/loqalabs/projects/1)  
 > **🎯 Future Milestones**: [v2.0 Enterprise - Dec 31, 2026](https://github.com/loqalabs/loqa/milestone/3)
 
+## 🛠️ Developer Experience **[MOVED FROM P2]**
+_Moved to P3 to prioritize business market success first, then return focus to OSS developer community_
+
+**🔗 GitHub Issues**: 
+- [loqa#12 - Developer Experience - CLI tools and skill development](https://github.com/loqalabs/loqa/issues/12) *(Epic)*
+- [loqa-skills#7 - Skill testing framework with mock STT/TTS](https://github.com/loqalabs/loqa-skills/issues/7)
+
+- [ ] Add `loqa skill init` command to scaffold new skills
+- [ ] Create skill testing framework with mock STT/TTS
+- [ ] Add hot-reload for skill development
+- [ ] Publish skill development containers/templates
+- [ ] Community skill marketplace with optional monetization
+- [ ] Advanced skill debugging and profiling tools
+- [ ] Skill SDK/Wizard for non-coders
+
+---
+
 ---
 
 ### 🔍 Backend & Observability
-_This section focuses on enhancing deeper inspection tools and strengthening test infrastructure to improve backend reliability and observability._
+_Advanced observability features for enterprise deployments. Basic compliance features moved to P1._
 
 - [ ] Add encrypted transcript log format (per-event encryption)
-- [ ] Add signed audit trail support (tamper-evident logs)
+- [ ] Add signed audit trail support (tamper-evident logs)  
 - [ ] Add local emergency wipe command / red button
 - [ ] Add integration tests for streaming STT pipeline
 - [ ] Add drill-down debugger mode for voice pipeline (NLU → Skill → Response)
+- [ ] **Enterprise**: Multi-tenant observability across business locations
+- [ ] **Enterprise**: Advanced performance analytics and capacity planning
+- [ ] **Enterprise**: Integration with business monitoring systems (Datadog, etc.)
 
 ---
 
@@ -39,12 +59,14 @@ _These post-MVP expansions focus on making the STT system more extensible, plugg
 ---
 
 ### 🔊 Text-to-Speech (TTS)
-_This group of tasks aims to improve voice quality and provide more expressive and flexible TTS options for skill authors and devices._
+_Post-business MVP TTS enhancements. Note: Kokoro-82M integration is now P1 priority._
 
-- [ ] Benchmark Piper vs Bark
+- [ ] Benchmark Kokoro-82M vs Piper vs Bark (Kokoro-82M integration moved to P1)
 - [ ] Allow skill authors to select `tts_mode: expressive | fast`
 - [ ] Add fallback voices for lower-end devices
 - [ ] Simulate simple emotion via pitch/speed modulation
+- [ ] Voice cloning for personalized business environments
+- [ ] Multi-language support for international business use
 
 ---
 
