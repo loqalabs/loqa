@@ -2,6 +2,24 @@
 
 Use this template when asking Claude to work on a specific GitHub issue.
 
+## Repository Structure Context
+
+The loqalabs project structure is:
+```
+loqalabs/                              # Container folder (not a git repo)
+├── loqa/                              # Main repo
+├── loqa-hub/                          # Hub service repo  
+├── loqa-observer/                     # Observer UI repo
+├── loqa-relay/                        # Relay client repo
+├── loqa-device-service/               # Device service repo
+├── loqa-proto/                        # Protocol definitions repo
+├── loqa-skills/                       # Skills system repo
+├── loqalabs-github-config/            # Special: .github org repo
+└── www-loqalabs-com/                  # Website repo
+```
+
+Each subfolder is an individual git repository. The folder names match their GitHub repo names except `loqalabs-github-config` which contains the `.github` org-level repository.
+
 ```
 I want you to work on [REPO]#[NUMBER] - [ISSUE TITLE]
 
