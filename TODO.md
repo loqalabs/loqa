@@ -16,7 +16,7 @@
   - [ ] If chaining fails, gracefully fallback to the first valid command
 
 ### 🖥️ Commander UI & API Surface
-**🔗 GitHub Issue**: [loqa-commander#14 - Timeline filtering and event categorization](https://github.com/loqalabs/loqa-commander/issues/14)
+**🔗 GitHub Issue**: [loqa-commander#18 - Timeline filtering and event categorization](https://github.com/loqalabs/loqa-commander/issues/18)
 
 - [x] Fix "Active Relays" count to reflect disconnections (e.g., when relay exits unexpectedly)
 - [ ] Add ability to filter timeline by success, failure, or low-confidence events
@@ -121,7 +121,7 @@
 - [ ] Ensure UI gracefully degrades when logs are ephemeral or redacted
 
 ### 🎛️ Skill Management UI
-**🔗 GitHub Issue**: [loqa-commander#13 - Skills Management UI - Dashboard for installed plugins](https://github.com/loqalabs/loqa-commander/issues/13)
+**🔗 GitHub Issue**: [loqa-commander#17 - Skills Management UI - Dashboard for installed plugins](https://github.com/loqalabs/loqa-commander/issues/17)
 
 - [ ] Create a "Skills" tab in `loqa-commander` with list of installed plugins
 - [ ] Show skill name, description, version, and enabled status
@@ -179,7 +179,7 @@
 - [ ] Publish skill development containers/templates
 
 ### 🖥️ Commander UI Evolution
-**🔗 GitHub Issue**: [loqa-commander#15 - Plugin-based Commander widgets system](https://github.com/loqalabs/loqa-commander/issues/15)
+**🔗 GitHub Issue**: [loqa-commander#19 - Plugin-based Commander widgets system](https://github.com/loqalabs/loqa-commander/issues/19)
 
 - [ ] Plugin-based Commander widgets (skills can add their own UI components)
 - [ ] Export Commander events to external monitoring tools
