@@ -5,6 +5,10 @@
 ### 🔍 Backend & Observability
 _This section focuses on enhancing deeper inspection tools and strengthening test infrastructure to improve backend reliability and observability._
 
+- [ ] CLI: `loqa export-logs --redact` support
+- [ ] Add encrypted transcript log format (per-event encryption)
+- [ ] Add signed audit trail support (tamper-evident logs)
+- [ ] Add local emergency wipe command / red button
 - [ ] Add integration tests for streaming STT pipeline
 - [ ] Add drill-down debugger mode for voice pipeline (NLU → Skill → Response)
 
@@ -13,6 +17,7 @@ _This section focuses on enhancing deeper inspection tools and strengthening tes
 ### 🖥️ Observer UI & API Surface
 _These tasks aim to increase flexibility by making the observer UI more modular and optionally deployable, improving API accessibility and usability._
 
+- [ ] Observer UI settings panel: toggle log retention, sanitization, redaction, etc.
 - [ ] Treat observer as optional dependency in Docker
 - [ ] Document `/api` as public interface (OpenAPI or Markdown)
 - [ ] Ensure all observer features work via HTTP only
@@ -45,6 +50,7 @@ _This group of tasks aims to improve voice quality and provide more expressive a
 ### 🧹 MVP Cleanup & Scope
 _These items serve as guardrails and structural decisions to maintain clarity and focus for the OSS MVP and prepare for future plugin sandboxing and licensing._
 
+- [ ] Observer UI: gracefully degrade when log retention = 0 or sanitization = true
 - [ ] Remove or toggle features not included in OSS MVP
 - [ ] Implement WASM or subprocess sandboxing for plugins
 - [ ] Hide premium features behind `config.license` flag
@@ -79,6 +85,10 @@ _This section outlines a privacy-preserving, cloud-assisted mobile sync feature 
 ### 🧭 Messaging & Positioning
 _These tasks focus on refining external messaging, public perception, and product framing to better communicate the platform’s value and positioning._
 
+- [ ] Highlight privacy differentiators vs Home Assistant Voice
+- [ ] Emphasize "HIPAA-conscious by design" in docs and landing
+- [ ] Add homepage tagline: "A voice assistant that does more than 'turn on the lights'"
+- [ ] Add privacy log policy to README: no voice storage, ephemeral logs, transcript redaction
 - [ ] Clarify “voice assistant” vs “voice platform”
 - [ ] Improve messaging across README, SPONSOR.md, homepage
 - [ ] Write short pitches tailored to developers, privacy users, smart home fans
@@ -94,7 +104,7 @@ _This section collects longer-term, blue-sky ideas to explore once the core syst
 - [ ] Guest mode / temporary user profiles
 - [ ] Community-curated skill marketplace with optional monetization
 - [ ] Intent chaining (multi-command parsing)
-- [ ] Replay / Simulation mode for event testing
+- [ ] Replay / Simulation mode for event testing (⚠️ must not use stored real voice data; only simulated or redacted input allowed)
 - [ ] Composable voice macros (e.g., "Good morning" routines)
 - [ ] Voice-based configuration (e.g., "Enable search mode")
 - [ ] On-device memory layer (e.g., reminders, preferences)
