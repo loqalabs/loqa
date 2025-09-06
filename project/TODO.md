@@ -205,3 +205,35 @@
 - [ ] **NEW**: Performance monitoring dashboard for business SLA compliance
 - [ ] **NEW**: Professional licensing and activation system
 - [ ] **NEW**: Multi-location management for business chains/practices
+
+### 🔄 Self-Healing Foundations **[NEW - SUPPORTS >99.5% UPTIME GOAL]**
+**🔗 GitHub Issue**: [To be created - MVP self-healing resilience implementation]
+
+**🎯 MVP Resilience Goal**: Basic automatic recovery without user intervention to support business reliability requirements
+
+**Smart Health & Recovery:**
+- [ ] **Enhanced health check system** with automatic remediation triggers
+- [ ] **Intelligent retry logic** with exponential backoff and jitter for all critical API calls
+- [ ] **Basic circuit breaker patterns** to prevent cascade failures in STT/LLM/NATS calls
+- [ ] **Service restart coordination** that preserves system state and user sessions
+
+**Graceful Degradation:**
+- [ ] **Fallback modes** for when non-critical components fail (e.g., continue without TTS if TTS fails)
+- [ ] **Reduced functionality modes** that maintain core voice→action pipeline during partial failures
+- [ ] **User communication** of degraded modes through Commander UI without alarming users
+
+**Business Resilience Features:**
+- [ ] **Connection persistence** for relay devices during Hub restarts
+- [ ] **Voice pipeline continuity** during service recovery operations  
+- [ ] **Professional status indicators** in Commander UI showing system health without technical complexity
+
+**📅 Timeline**: Must complete before Business MVP (supports >99.5% uptime requirement)
+**🔗 Dependencies**: 
+- Performance monitoring dashboard integration (`TODO.md:204`)
+- Remote monitoring and health checks (`TODO.md:200`)
+- Commander UI status indicators
+
+**📌 Related Work:**
+- Builds on existing Docker health checks and NATS retry logic
+- Integrates with professional backup/restore system for state preservation
+- Foundation for comprehensive self-healing architecture (see BACKLOG.md)
