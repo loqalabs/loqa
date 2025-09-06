@@ -101,7 +101,7 @@ When I provide this prompt, please follow this comprehensive process:
 11. **Document the shift**:
     - Update README files across repositories
     - Revise technical documentation
-    - Update loqa/CLAUDE.md with any new commands, architecture, or workflow changes
+    - Update loqa/config/CLAUDE.md with any new commands, architecture, or workflow changes
     - Create migration guides if needed
 
 12. **Commit strategy**:
