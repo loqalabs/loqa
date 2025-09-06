@@ -10,7 +10,6 @@
 
 ### 🖥️ Observer UI & API Surface
 - [x] Fix "Active Relays" count to reflect disconnections (e.g., when relay exits unexpectedly)
-- [ ] Ensure timeline audio playback works correctly (verify path, MIME type, player logic)
 - [ ] Add ability to filter timeline by success, failure, or low-confidence events
 - [x] Make event boxes more compact or collapsed by default
 
@@ -33,7 +32,7 @@
   - [ ] Add proper stream cleanup when relay devices are cancelled or disconnect
 
 ### 🔊 Text-to-Speech (TTS)
-- [ ] Play returned TTS phrase through speakers when using the test relay (not just print)
+- [ ] Play returned TTS phrase through speakers when using the test relay (must remain ephemeral and never stored to disk)
 
 ### 🧠 Skills & Plugin System
 - [ ] Add built-in "Set a timer" skill with local tracking and TTS countdown/complete response
@@ -42,6 +41,7 @@
   - [ ] Announce when timer expires via TTS playback
   - [ ] Store and cancel timers locally on the hub
 - [x] Add built-in "What time is it?" skill using hub local time
+- [ ] Ensure manifest includes field for `sensitive: true` for privacy-tagged skills
 
 ---
 
@@ -50,6 +50,9 @@
 ### 🖥️ Observer UI & API Surface
 - [ ] Add drill-down breakdown of slow events (e.g., STT, LLM parse, skill handling)
 - [ ] Add compact/toggle view mode for timeline events
+
+### 🖥️ Observer UI & API Surface (P1)
+- [ ] Ensure UI gracefully degrades when logs are ephemeral or redacted
 
 ### 🎛️ Skill Management UI
 - [ ] Create a “Skills” tab in `loqa-observer` with list of installed plugins
@@ -63,7 +66,7 @@
 
 ### 🗣️ Speech-to-Text (STT)
 - [ ] Expose confidence thresholds as user-configurable setting (via config or UI)
-- [ ] Emit partial transcription results in near-realtime (don't wait for full clip)
+- [ ] Emit partial transcription results in near-realtime (ephemeral only, must not be persisted or logged)
 - [ ] Add YAML-based STT config format
 
 ### 🧠 Skills & Plugin System
@@ -76,3 +79,11 @@
   - [ ] Add location context awareness (prefer relay in user's current room)
   - [ ] Store relay-to-room mappings in configuration
   - [ ] Add arbitration logging and metrics for debugging
+
+
+### 🔐 Privacy, Logging & Compliance
+- [ ] Do not store voice recordings by default (privacy-first default)
+- [ ] Store transcript and intent logs only ephemerally (in memory or temp)
+- [ ] Add sanitization layer to redact potential PHI from transcript logs
+- [ ] Add skill manifest field: `sensitive: true` to suppress logging
+- [ ] Add `LOG_TRANSCRIPTS`, `LOG_INTENTS_ONLY`, and `LOG_SANITIZE` environment flags
