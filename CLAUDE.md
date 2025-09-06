@@ -207,6 +207,15 @@ LOG_FORMAT=json
 - Health checks for service dependencies
 - Test relay service in `testing` profile (optional)
 
+## Workflow Templates
+
+The repository includes structured prompt templates for consistent development practices:
+
+- `ISSUE_WORK_PROMPT.md` - Template for working on GitHub issues with proper scope and approach guidance
+- `STRATEGIC_SHIFT_PROMPT.md` - Template for making major changes in technology, focus, or design philosophy
+
+These templates ensure comprehensive planning and consistent execution across all development work.
+
 ## Common Tasks
 
 ### Adding New Voice Commands
