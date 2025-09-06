@@ -59,7 +59,7 @@ For advanced users who want to work with individual repositories:
 git clone https://github.com/loqalabs/loqa-hub.git
 git clone https://github.com/loqalabs/loqa-device-service.git  
 git clone https://github.com/loqalabs/loqa-relay.git
-git clone https://github.com/loqalabs/loqa-proto.git
+# Note: loqa-proto is automatically handled via Go modules (v0.0.17+)
 
 # Documentation and skills
 git clone https://github.com/loqalabs/loqa.git
