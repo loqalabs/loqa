@@ -2,28 +2,11 @@
 
 Use this prompt when you need to make a major change in focus, technology, approach, or design philosophy for Loqa.
 
-## Repository Structure Context
-
-The loqalabs project structure is:
-```
-loqalabs/                              # Container folder (not a git repo)
-├── loqa/                              # Main repo
-├── loqa-hub/                          # Hub service repo  
-├── loqa-observer/                     # Observer UI repo
-├── loqa-relay/                        # Relay client repo
-├── loqa-device-service/               # Device service repo
-├── loqa-proto/                        # Protocol definitions repo
-├── loqa-skills/                       # Skills system repo
-├── loqalabs-github-config/            # Special: .github org repo
-└── www-loqalabs-com/                  # Website repo
-```
-
-Each subfolder is an individual git repository. The folder names match their GitHub repo names except `loqalabs-github-config` which contains the `.github` org-level repository.
-
 ---
 
 ## Prompt Template
 
+```
 I need to make a strategic shift in the Loqa project. Here are the details:
 
 **Type of shift:** [Choose one or describe custom]
@@ -158,6 +141,22 @@ The strategic shift is complete when:
 - [ ] Implementation roadmap is clear and actionable
 - [ ] All changes are committed and pushed (no AI attribution)
 - [ ] Success criteria are measurable and tracked
+
+## Repository Structure Context
+The loqalabs project structure is:
+loqalabs/                              # Container folder (not a git repo)
+├── loqa/                              # Main repo
+├── loqa-hub/                          # Hub service repo  
+├── loqa-observer/                     # Observer UI repo
+├── loqa-relay/                        # Relay client repo
+├── loqa-device-service/               # Device service repo
+├── loqa-proto/                        # Protocol definitions repo
+├── loqa-skills/                       # Skills system repo
+├── loqalabs-github-config/            # Special: .github org repo
+└── www-loqalabs-com/                  # Website repo
+
+Each subfolder is an individual git repository. The folder names match their GitHub repo names except `loqalabs-github-config` which contains the `.github` org-level repository.
+```
 
 ---
 
