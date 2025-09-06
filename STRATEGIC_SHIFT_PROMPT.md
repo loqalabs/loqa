@@ -36,10 +36,6 @@ I need to make a strategic shift in the Loqa project. Here are the details:
 
 **Success criteria:** [How we'll know the shift was successful]
 
----
-
-## Instructions for Claude
-
 When I provide this prompt, please follow this comprehensive process:
 
 ### Phase 1: Discovery & Analysis
