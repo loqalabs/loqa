@@ -36,13 +36,13 @@ _Advanced observability features for enterprise deployments. Basic compliance fe
 
 ---
 
-### 🖥️ Observer UI & API Surface
-_These tasks aim to increase flexibility by making the observer UI more modular and optionally deployable, improving API accessibility and usability._
+### 🖥️ Commander UI & API Surface
+_These tasks aim to increase flexibility by making the Commander UI more modular and optionally deployable, improving API accessibility and usability._
 
-- [ ] Observer UI settings panel: toggle log retention, sanitization, redaction, etc.
-- [ ] Treat observer as optional dependency in Docker
+- [ ] Commander UI settings panel: toggle log retention, sanitization, redaction, etc.
+- [ ] Treat Commander as optional dependency in Docker
 - [ ] Document `/api` as public interface (OpenAPI or Markdown)
-- [ ] Ensure all observer features work via HTTP only
+- [ ] Ensure all Commander features work via HTTP only
 - [ ] Optional: Add reverse proxy (e.g., Caddy or Traefik) for clean UI endpoint
 
 ---
@@ -73,7 +73,7 @@ _Post-business MVP TTS enhancements. Note: Kokoro-82M integration is now P1 prio
 ### 🧹 MVP Cleanup & Scope
 _These items serve as guardrails and structural decisions to maintain clarity and focus for the OSS MVP and prepare for future plugin sandboxing and licensing._
 
-- [ ] Observer UI: gracefully degrade when log retention = 0 or sanitization = true
+- [ ] Commander UI: gracefully degrade when log retention = 0 or sanitization = true
 - [ ] Remove or toggle features not included in OSS MVP
 - [ ] Implement WASM or subprocess sandboxing for plugins
 - [ ] Hide premium features behind `config.license` flag
@@ -102,7 +102,7 @@ _This section outlines a privacy-preserving, cloud-assisted mobile sync feature 
 - [ ] Add pairing state + public key registry to loqa-hub
 - [ ] Build minimal PWA or native mobile app to sync and view list
 - [ ] Gate feature behind `config.license` or `--paid` flag
-- [ ] Add Observer UI component to manage sync status and pairing
+- [ ] Add Commander UI component to manage sync status and pairing
 ---
 
 ### 🧭 Messaging & Positioning
@@ -143,7 +143,7 @@ _Expand messaging to reach additional high-value market segments._
 _Features for large-scale deployments and enterprise compliance requirements._
 
 - [ ] Multi-tenant skill isolation
-- [ ] Role-based access control for Observer UI
+- [ ] Role-based access control for Commander UI
 - [ ] Backup/restore automation for hub data
 - [ ] Performance benchmarking tools
 - [ ] Audit trail export for compliance reporting
@@ -165,7 +165,7 @@ _This section collects longer-term, blue-sky ideas to explore once the core syst
 - [ ] Simple on-device fine-tuning of LLMs
 - [ ] Skill SDK / Wizard for non-coders
 - [ ] Prompt remixing for varied responses
-- [ ] Observer as full config dashboard
+- [ ] Commander as full config dashboard
 - [ ] Swappable LLMs with privacy warnings
 - [ ] Time-aware skills and scheduling
 - [ ] Explainability UX: "Why did you do that?"

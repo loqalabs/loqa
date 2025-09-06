@@ -44,7 +44,7 @@ The loqalabs project structure is:
 loqalabs/                              # Container folder (not a git repo)
 ├── loqa/                              # Main repo
 ├── loqa-hub/                          # Hub service repo  
-├── loqa-observer/                     # Observer UI repo
+├── loqa-commander/                     # Commander UI repo
 ├── loqa-relay/                        # Relay client repo
 ├── loqa-device-service/               # Device service repo
 ├── loqa-proto/                        # Protocol definitions repo

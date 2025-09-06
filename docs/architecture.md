@@ -31,7 +31,7 @@ Loqa is built from the ground up as a **local-first**, event-driven voice assist
 - Handles execution for simulated or real devices (e.g., lights, music)
 - Publishes status and response events back to NATS
 
-### 📊 Observer Timeline UI
+### 📊 Commander Timeline UI
 - Vue.js web interface for real-time voice event visualization
 - Connects to Hub's `/api/voice-events` endpoint for live data
 - Shows chronological timeline of all voice interactions
@@ -48,7 +48,7 @@ graph TB
     H -->|Audio| W[📝 STT Service]
     H -->|Text| L[🤖 LLM Intent Parser]
     H -->|Event Data| DB[(🗄️ SQLite DB)]
-    H -->|REST API| UI[📊 Observer Timeline]
+    H -->|REST API| UI[📊 Commander Timeline]
     H -->|Intent| N[📡 NATS]
     N -->|Command| D[🏠 Device Service]
     D -->|Action| DEVICES[💡 Smart Devices]
@@ -98,7 +98,7 @@ graph TB
 |------------------|------|----------|---------|
 | Hub HTTP API     | 3000 | HTTP     | Voice events REST API |
 | Hub gRPC Audio   | 50051| gRPC     | Relay audio streaming |
-| Observer Timeline| 5173 | HTTP     | Web interface (dev mode) |
+| Commander Timeline| 5173 | HTTP     | Web interface (dev mode) |
 | NATS             | 4222 | NATS     | Message bus |
 | Ollama API       | 11434| HTTP     | LLM inference |
 
