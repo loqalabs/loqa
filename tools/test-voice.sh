@@ -43,7 +43,7 @@ echo "🔍 Checking if Loqa hub is running..."
 if ! curl -s http://localhost:3000/health > /dev/null 2>&1; then
     echo "❌ Loqa hub is not running at localhost:3000"
     echo "   Please run the main setup first:"
-    echo "   curl -fsSL \"https://raw.githubusercontent.com/loqalabs/loqa/main/setup.sh?\$(date +%s)\" | bash"
+    echo "   curl -fsSL \"https://raw.githubusercontent.com/loqalabs/loqa/main/tools/setup.sh?\$(date +%s)\" | bash"
     exit 1
 fi
 

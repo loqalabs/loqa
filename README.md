@@ -20,7 +20,7 @@
 **Get running in under 5 minutes with one command:**
 
 ```bash
-curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/setup.sh?$(date +%s)" | bash
+curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/tools/setup.sh?$(date +%s)" | bash
 ```
 
 Then open http://localhost:5173 to see the voice assistant UI
@@ -109,7 +109,7 @@ Then open http://localhost:5173 to see the voice assistant UI
 For users who just want to run Loqa quickly with pre-built images:
 
 ```bash
-curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/setup.sh?$(date +%s)" | bash
+curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/tools/setup.sh?$(date +%s)" | bash
 ```
 
 This downloads the docker-compose.yml and uses pre-built Docker images from our CI/CD pipeline - no compilation needed!
@@ -129,8 +129,8 @@ This clones all repositories and builds Docker images locally from source.
 
 ### 📋 Development Roadmap
 
-- **[TODO.md](./TODO.md)** - Priority 1 & 2 tasks: Must-fix issues and high-impact UX improvements
-- **[BACKLOG.md](./BACKLOG.md)** - Priority 3 features: Optional post-MVP enhancements and future ideas
+- **[TODO.md](./project/TODO.md)** - Priority 1 & 2 tasks: Must-fix issues and high-impact UX improvements
+- **[BACKLOG.md](./project/BACKLOG.md)** - Priority 3 features: Optional post-MVP enhancements and future ideas
 
 ### 🔧 Developer Resources
 

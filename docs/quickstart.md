@@ -28,7 +28,7 @@ For the fastest experience, follow our streamlined guide:
 ```bash
 git clone https://github.com/loqalabs/loqa-labs.git
 cd loqa-labs
-./setup.sh
+./tools/setup.sh
 ```
 
 This launches:

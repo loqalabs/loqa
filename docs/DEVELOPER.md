@@ -32,7 +32,7 @@ For developers who want to build from source and modify the code:
 
 ```bash
 git clone https://github.com/loqalabs/loqa.git
-cd loqa && ./scripts/setup-dev.sh
+cd loqa && ./tools/setup-dev.sh
 ```
 
 This automatically:
@@ -72,10 +72,10 @@ docker-compose up -d
 
 ### Development Commands
 
-For multi-repository development, use the Makefile in the `scripts/` directory:
+For multi-repository development, use the Makefile in the `tools/` directory:
 
 ```bash
-cd loqa/scripts/
+cd loqa/tools/
 
 make setup-dev # Development setup (build from source)
 make build     # Build all Docker images  
