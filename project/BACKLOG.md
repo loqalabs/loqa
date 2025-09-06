@@ -180,7 +180,7 @@ _Comprehensive security framework for skill distribution, execution, and trust m
 ### 🤖 Comprehensive Self-Healing Architecture
 _Advanced self-healing system implementing full monitoring, diagnosis, automated remediation, and learning capabilities for enterprise deployments._
 
-**🔗 GitHub Issue**: [To be created - Comprehensive self-healing architecture with AI-driven resilience]
+**🔗 GitHub Issue**: [loqa#26 - Comprehensive Self-Healing Architecture - AI-Driven Enterprise Resilience](https://github.com/loqalabs/loqa/issues/26)
 
 **🎯 Advanced Self-Healing Goals:**
 - **Predictive Resilience**: Detect and prevent failures before they impact users

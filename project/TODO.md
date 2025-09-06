@@ -207,7 +207,7 @@
 - [ ] **NEW**: Multi-location management for business chains/practices
 
 ### 🔄 Self-Healing Foundations **[NEW - SUPPORTS >99.5% UPTIME GOAL]**
-**🔗 GitHub Issue**: [To be created - MVP self-healing resilience implementation]
+**🔗 GitHub Issue**: [loqa#25 - Self-Healing Foundations for Business MVP - >99.5% Uptime Resilience](https://github.com/loqalabs/loqa/issues/25)
 
 **🎯 MVP Resilience Goal**: Basic automatic recovery without user intervention to support business reliability requirements
 
