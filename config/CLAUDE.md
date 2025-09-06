@@ -20,7 +20,7 @@ This is a multi-repository project with individual services:
 
 ## Development Commands
 
-### Primary Development (from loqa/scripts/)
+### Primary Development (from loqa/tools/)
 ```bash
 make setup      # Initial setup, clone repos, download models
 make build      # Build all Docker images  
@@ -126,7 +126,7 @@ The project uses a centralized docker-compose.yml in the `loqa/` repo root that 
 ```
 loqa/
 ├── docker-compose.yml          # Main orchestration file
-├── scripts/Makefile           # Development commands
+├── tools/Makefile           # Development commands
 └── ...
 
 loqa-hub/

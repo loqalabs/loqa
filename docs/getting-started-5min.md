@@ -31,7 +31,7 @@ That's it! This command:
 If you prefer to have the full repository locally:
 
 ```bash
-git clone https://github.com/loqalabs/loqa.git && cd loqa && ./setup.sh
+git clone https://github.com/loqalabs/loqa.git && cd loqa && ./tools/setup.sh
 ```
 
 This automatically:
