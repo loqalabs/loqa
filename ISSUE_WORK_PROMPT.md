@@ -35,6 +35,7 @@ I want you to work on [REPO]#[NUMBER] - [ISSUE TITLE]
 - [ ] Run lint/typecheck commands when implementation complete
 - [ ] Verify no breaking changes to existing functionality
 - [ ] Update cross-repository documentation if needed
+- [ ] Update loqa/CLAUDE.md if new commands, architecture, or workflows added
 ```
 ---
 
