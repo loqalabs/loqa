@@ -116,10 +116,10 @@ services:
     networks:
       - loqa-network
 
-  # Observer Timeline UI
-  observer:
-    image: loqalabs/loqa-observer:latest
-    container_name: loqa-observer
+  # Commander Administrative Dashboard
+  commander:
+    image: loqalabs/loqa-commander:latest
+    container_name: loqa-commander
     ports:
       - "5173:80"
     environment:

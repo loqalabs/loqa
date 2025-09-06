@@ -13,7 +13,7 @@ This is a multi-repository project with individual services:
 - `loqa/` - Main documentation and orchestration scripts
 - `loqa-hub/` - Central service (Go): gRPC API, STT/LLM pipeline, SQLite storage
 - `loqa-device-service/` - Device control service (Go): handles smart device commands
-- `loqa-observer/` - Vue.js web timeline UI for voice event visualization
+- `loqa-commander/` - Vue.js administrative dashboard for system management and monitoring
 - `loqa-relay/` - Audio capture client (Go): test implementation and future embedded firmware
 - `loqa-proto/` - gRPC protocol definitions and generated bindings
 - `loqa-skills/` - Modular skill plugin system with manifest-driven architecture
@@ -58,11 +58,11 @@ cd loqa-relay/test-go && go run ./cmd
 cd loqa-relay/test-go && go build -o bin/test-relay ./cmd
 cd loqa-relay/test-go && go test ./...
 
-# Observer UI
-cd loqa-observer && npm run dev     # Development server
-cd loqa-observer && npm run build   # Production build
-cd loqa-observer && npm run lint    # ESLint with --fix
-cd loqa-observer && npm run format  # Prettier formatting
+# Commander UI
+cd loqa-commander && npm run dev     # Development server
+cd loqa-commander && npm run build   # Production build
+cd loqa-commander && npm run lint    # ESLint with --fix
+cd loqa-commander && npm run format  # Prettier formatting
 
 # Skills Management
 cd loqa-hub && go run ./cmd/skills-cli --help     # Skills CLI help
@@ -97,7 +97,7 @@ cd loqa-hub/tests/integration && go test -v
 
 ### Core Services & Ports
 - **Hub** (`:3000` HTTP, `:50051` gRPC) - Central orchestrator with STT/LLM pipeline
-- **Observer UI** (`:5173`) - Vue.js timeline interface
+- **Commander UI** (`:5173`) - Vue.js administrative dashboard
 - **STT** (`:8000` REST) - OpenAI-compatible Speech-to-Text service
 - **NATS** (`:4222`, `:8222` monitoring) - Message bus
 - **Ollama** (`:11434`) - Local LLM (Llama 3.2)
@@ -139,7 +139,7 @@ loqa-device-service/
 ├── go.mod
 └── ...
 
-loqa-observer/
+loqa-commander/
 ├── Dockerfile                 # Observer UI build
 ├── package.json
 └── ...
@@ -243,7 +243,7 @@ These templates ensure comprehensive planning and consistent execution across al
 5. Test with clean database: `make clean && make start`
 
 ### Observer UI Features
-1. Add components in `loqa-observer/src/components/`
+1. Add components in `loqa-commander/src/components/`
 2. Update API calls in composables or stores
 3. Test with `npm run dev` and hub API at `:3000`
 
