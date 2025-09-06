@@ -7,11 +7,11 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center py-4">
           <div class="flex items-center space-x-4">
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">🦜 Loqa Observer</h1>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">🎛️ Loqa Commander</h1>
             <span
               class="px-2 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-200 text-xs font-medium rounded-full"
             >
-              Voice Command Timeline
+              Administrative Dashboard
             </span>
           </div>
 
@@ -23,14 +23,28 @@
                 class="nav-link"
                 :class="{ 'nav-link-active': $route.path === '/' }"
               >
-                Timeline
+                Dashboard
               </router-link>
               <router-link
-                to="/analytics"
+                to="/skills"
                 class="nav-link"
-                :class="{ 'nav-link-active': $route.path === '/analytics' }"
+                :class="{ 'nav-link-active': $route.path === '/skills' }"
               >
-                Analytics
+                Skills
+              </router-link>
+              <router-link
+                to="/settings"
+                class="nav-link"
+                :class="{ 'nav-link-active': $route.path === '/settings' }"
+              >
+                Settings
+              </router-link>
+              <router-link
+                to="/debug"
+                class="nav-link"
+                :class="{ 'nav-link-active': $route.path === '/debug' }"
+              >
+                Debug
               </router-link>
             </nav>
 

@@ -3,6 +3,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { createPinia } from 'pinia'
 
 import App from './App.vue'
+import Dashboard from './views/Dashboard.vue'
+import Skills from './views/Skills.vue'
+import Settings from './views/Settings.vue'
 import Timeline from './views/Timeline.vue'
 import Analytics from './views/Analytics.vue'
 
@@ -11,9 +14,32 @@ import './style.css'
 const routes = [
   {
     path: '/',
-    name: 'Timeline',
+    name: 'Dashboard',
+    component: Dashboard,
+    meta: { title: 'Dashboard' },
+  },
+  {
+    path: '/skills',
+    name: 'Skills',
+    component: Skills,
+    meta: { title: 'Skills Management' },
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: Settings,
+    meta: { title: 'Settings' },
+  },
+  {
+    path: '/debug',
+    name: 'Debug',
     component: Timeline,
-    meta: { title: 'Voice Command Timeline' },
+    meta: { title: 'Debug Timeline' },
+  },
+  // Legacy routes for compatibility
+  {
+    path: '/timeline',
+    redirect: '/debug'
   },
   {
     path: '/analytics',
@@ -29,7 +55,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  document.title = `${to.meta.title} - Loqa Observer`
+  document.title = `${to.meta.title} - Loqa Commander`
 })
 
 const pinia = createPinia()

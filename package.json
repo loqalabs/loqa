@@ -1,7 +1,7 @@
 {
-  "name": "loqa-observer",
+  "name": "loqa-commander",
   "version": "1.0.0",
-  "description": "Voice Command Timeline UI for Loqa system",
+  "description": "Administrative Dashboard for Loqa Voice Assistant System",
   "type": "module",
   "scripts": {
     "dev": "vite",

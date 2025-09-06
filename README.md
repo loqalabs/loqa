@@ -3,34 +3,35 @@
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL--3.0-blue?style=for-the-badge)](LICENSE)
 [![Made with ❤️ by Loqa Labs](https://img.shields.io/badge/Made%20with%20%E2%9D%A4%EF%B8%8F-by%20LoqaLabs-ffb6c1?style=for-the-badge)](https://loqalabs.com)
 
-# 🔍 Loqa Observer
+# 🎛️ Loqa Commander
 
-[![CI/CD Pipeline](https://github.com/loqalabs/loqa-observer/actions/workflows/ci.yml/badge.svg)](https://github.com/loqalabs/loqa-observer/actions/workflows/ci.yml)
+[![CI/CD Pipeline](https://github.com/loqalabs/loqa-commander/actions/workflows/ci.yml/badge.svg)](https://github.com/loqalabs/loqa-commander/actions/workflows/ci.yml)
 
-Voice Command Timeline UI for the Loqa voice assistant system.
+Administrative Dashboard for the Loqa voice assistant system.
 
 ## Overview
 
-Loqa Observer is a Vue.js web application that provides real-time visualization and inspection of voice interactions processed by the Loqa system. It offers a timeline view of voice events with detailed transcription, intent parsing, and confidence metrics.
+Loqa Commander is a Vue.js administrative dashboard that provides comprehensive management and monitoring of your Loqa voice assistant system. Designed for business professionals, it offers an intuitive interface for system configuration, skills management, user administration, and system monitoring with optional advanced debugging capabilities.
 
 ## Features
 
-- **Real-time Timeline**: Chronological view of voice interactions
-- **Skills Management**: Complete skill administration interface (Milestone 4a)
-- **Dark Mode Support**: Automatic system preference detection with manual toggle
-- **Mobile Responsive**: Optimized for desktop and mobile devices
-- **Event Details**: Drill-down modals with complete JSON payload
-- **Analytics Dashboard**: Performance metrics and insights (coming soon)
-- **Auto-refresh**: Polling-based updates every 5 seconds
+- **Administrative Dashboard**: System overview with health metrics and quick actions
+- **Skills Management**: Complete skill administration with enable/disable controls
+- **System Configuration**: User-friendly settings management interface
+- **Professional UI**: Business-appropriate design with dark/light mode support
+- **Mobile Responsive**: Tablet-friendly for mobile administrators
+- **User Management**: Basic user profiles and permission controls (coming soon)
+- **Advanced Debug Mode**: Detailed voice interaction timeline for technical users
+- **Performance Monitoring**: Real-time system metrics and health indicators
 
-### 🆕 Milestone 4a: Skills Management UI
+### 🏢 Business-Ready Administration
 
-- **Skills Dashboard**: Overview of installed skills with statistics
-- **Skill Configuration**: Detailed configuration interface with tabs
-- **Enable/Disable**: One-click skill activation controls
-- **Permission Management**: View and understand skill permissions
-- **Real-time Status**: Live skill health and error monitoring
-- **Configuration Editor**: Edit skill settings with validation
+- **Professional Interface**: Clean, business-appropriate design for non-technical users
+- **Quick System Control**: One-click enable/disable for skills and system components
+- **Health Monitoring**: Visual indicators for system status and performance
+- **Settings Management**: Configure system behavior through intuitive UI
+- **Backup Controls**: Manual backup and restore functionality
+- **Advanced Mode**: Preserve full debugging capabilities for technical users
 
 ## Tech Stack
 
@@ -56,21 +57,22 @@ npm install
 npm run dev
 ```
 
-The application will be available at `http://localhost:5173`.
+Loqa Commander will be available at `http://localhost:5173`.
 
 ### API Integration
 
-The app connects to the Loqa Hub API via proxy configuration in `vite.config.js`. All `/api/*` requests are forwarded to `http://localhost:3000`.
+Loqa Commander connects to the Loqa Hub API via proxy configuration in `vite.config.js`. All `/api/*` requests are forwarded to `http://localhost:3000`.
 
 ## Project Structure
 
 ```
 src/
 ├── components/           # Reusable Vue components
-│   └── SkillDetailModal.vue  # Skill configuration modal (Milestone 4a)
+│   └── SkillDetailModal.vue  # Skill configuration modal
 ├── views/               # Page-level components
-│   ├── Timeline.vue     # Voice events timeline
-│   └── Skills.vue       # Skills management interface (Milestone 4a)
+│   ├── Dashboard.vue    # Administrative dashboard (coming soon)
+│   ├── Timeline.vue     # Advanced debug timeline
+│   └── Skills.vue       # Skills management interface
 ├── stores/              # Pinia stores for state management
 ├── composables/         # Vue composables for shared logic
 ├── App.vue              # Root component
