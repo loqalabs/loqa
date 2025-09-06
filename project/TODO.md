@@ -199,6 +199,7 @@
 - [ ] **CRITICAL**: Professional backup/restore system for business continuity
 - [ ] **CRITICAL**: Remote monitoring and health checks for IT support
 - [ ] Skill auto-update and rollback (moved from P3 to reduce maintenance burden)
+  - *See also: Privacy-First Update System in BACKLOG.md for broader architectural considerations*
 - [ ] Voice training wizard for improved accuracy with professional terminology
 - [ ] Confidence-based response variations ("I think you said..." vs "I heard...")
 - [ ] **NEW**: Performance monitoring dashboard for business SLA compliance
