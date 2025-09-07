@@ -37,11 +37,19 @@
     "testing": "Include appropriate test coverage for changes"
   },
   "repository_context": {
-    "structure": "loqalabs/ contains multiple individual git repositories",
-    "cross_repo_workflow": {
-      "simple_changes": "Make directly to main branch of supporting repos",
-      "complex_changes": "Create matching feature branches across affected repos",
-      "merge_order": "Supporting repos first, primary repo last"
+    "service_role": "Main orchestration repository - contains project management, configuration, and deployment coordination",
+    "service_type": "Project coordination hub",
+    "manages_services": ["loqa-hub", "loqa-commander", "loqa-relay", "loqa-device-service", "loqa-proto", "loqa-skills", "www-loqalabs-com"],
+    "microservice_architecture": {
+      "structure": "Parent of loqalabs/ microservice ecosystem - manages and coordinates all microservices",
+      "peer_services_location": "../ (sibling directories contain individual microservices)",
+      "check_before_cloning": "Always check if ../SERVICE_NAME exists before attempting to clone repositories",
+      "coordination_role": "This repo coordinates deployments, configurations, and cross-service integrations",
+      "cross_service_changes": {
+        "simple_changes": "Make directly to main branch of supporting repos (proto, configs)",
+        "complex_changes": "Create matching feature branches across affected repos",
+        "merge_order": "Supporting repos first (proto, skills), core services (hub, relay), UI services last (commander, website)"
+      }
     }
   },
   "best_practices": [
