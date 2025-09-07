@@ -18,16 +18,28 @@ I want you to work on [REPO]#[NUMBER] - [ISSUE TITLE]
 - **Technical approach:** [Preferred method, or "propose options if multiple paths exist"]
 - **Issue complexity:** [Keep as single issue / Break down if >1 week / Ask me to decide]
 - **Dependencies:** [None known / Check for X,Y,Z / Stop and ask if you find blockers]
+- **Cross-repository impact:** [Single repo / Multiple repos with simple changes / Complex multi-repo coordination needed]
 - **Testing requirements:** [Unit tests required / Integration tests needed / Ask me about test coverage expectations]
 
 **Requirements:**
 - Follow the git workflow we established
-- Create feature branch with proper naming
+- Create feature branch with proper naming (see Cross-Repository Workflow below)
 - Reference issue numbers in commits
 - No AI attribution in commit messages
 - Update project status as you work
 - Check all repos for documentation that may need updating
 - Create PR when ready for review
+
+**Cross-Repository Workflow:**
+- **Simple supporting changes:** Make directly to `main` branch of supporting repos (docs, configs)
+- **Complex/experimental changes:** Create matching feature branches across all affected repos
+- **When to use feature branches everywhere:**
+  - Changes are experimental or might be rejected
+  - Feature is complex and might need coordinated rollback
+  - Changes are tightly coupled and need coordinated testing
+  - Multiple repositories have significant changes
+- **Merge order:** Supporting repos first (proto, shared libs) → Primary repo last
+- **Branch naming:** Use consistent names across repos (e.g., `feature/21-kokoro-tts-integration`)
 
 **Additional Notes:**
 [Any other specific considerations, constraints, or preferences]
@@ -78,6 +90,12 @@ Issue complexity: Keep as single issue - I want this done in one focused PR
 Dependencies: Check if this requires changes to loqa-relay first  
 Dependencies: Stop and ask if you find blockers - don't work around missing APIs
 
+### 🌐 Cross-Repository Impact:
+
+Cross-repository impact: Single repo - all changes contained within loqa-hub  
+Cross-repository impact: Multiple repos with simple changes - expect documentation and config updates  
+Cross-repository impact: Complex multi-repo coordination needed - protocol changes, coordinated feature branches required
+
 ### 🧪 Testing Requirements:
 
 Testing requirements: Unit tests required, integration tests with mock relays  
@@ -102,6 +120,7 @@ Scope & Approach Guidance:
 - **Technical approach:** Extend existing AudioService, don't create separate arbitration service
 - **Issue complexity:** Break down if >1 week - this might need sub-issues for different arbitration strategies
 - **Dependencies:** Check if this requires protocol changes in loqa-relay first
+- **Cross-repository impact:** Complex multi-repo coordination needed - likely requires protocol changes and coordinated testing
 - **Testing requirements:** Unit tests required, integration tests with multiple mock relay connections
 
 Requirements:
@@ -150,6 +169,7 @@ Scope boundaries: Well-defined, proceed without clarification
 Technical approach: Use obvious/standard approach  
 Issue complexity: Keep as single issue  
 Dependencies: None expected  
+Cross-repository impact: Single repo - all changes contained  
 Testing requirements: Basic unit tests sufficient
 
 ### 🤔 Exploratory/Research Issues:
@@ -158,6 +178,7 @@ Scope boundaries: Explore broadly, then ask me to narrow focus
 Technical approach: Research multiple options, present findings  
 Issue complexity: Investigation only, don't implement yet  
 Dependencies: Document what you find, don't resolve  
+Cross-repository impact: Unknown - document findings across all repos  
 Testing requirements: Not applicable for research
 
 ### 🔥 Urgent Bug Fixes:
@@ -166,6 +187,7 @@ Scope boundaries: Minimal fix only, don't refactor
 Technical approach: Fastest safe approach  
 Issue complexity: Keep as single focused fix  
 Dependencies: Work around if possible, note for later  
+Cross-repository impact: Prefer single repo fix, avoid cross-repo changes unless critical  
 Testing requirements: Regression test to prevent reoccurrence
 
 ---
