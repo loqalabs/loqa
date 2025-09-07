@@ -120,22 +120,6 @@ services:
       timeout: 10s
       retries: 3
 
-  # Device Control Service
-  device-service:
-    build:
-      context: ../loqa-device-service
-      dockerfile: Dockerfile
-    container_name: loqa-device-service
-    environment:
-      - NATS_URL=nats://nats:4222
-      - LOG_LEVEL=info
-      - LOG_FORMAT=json
-    depends_on:
-      nats:
-        condition: service_healthy
-    networks:
-      - loqa-network
-
   # Commander Timeline UI
   commander:
     build:

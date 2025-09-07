@@ -12,7 +12,6 @@ This is a multi-repository project with individual services:
 
 - `loqa/` - Main documentation and orchestration scripts
 - `loqa-hub/` - Central service (Go): gRPC API, STT/LLM pipeline, SQLite storage
-- `loqa-device-service/` - Device control service (Go): handles smart device commands
 - `loqa-commander/` - Vue.js administrative dashboard for system management and monitoring
 - `loqa-relay/` - Audio capture client (Go): test implementation and future embedded firmware
 - `loqa-proto/` - gRPC protocol definitions and generated bindings
@@ -47,11 +46,6 @@ docker-compose logs -f   # Follow service logs
 cd loqa-hub && go run ./cmd
 cd loqa-hub && go build -o bin/hub ./cmd
 cd loqa-hub && go test ./...
-
-# Device service  
-cd loqa-device-service && go run ./cmd
-cd loqa-device-service && go build -o bin/device-service ./cmd
-cd loqa-device-service && go test ./...
 
 # Test relay
 cd loqa-relay/test-go && go run ./cmd
@@ -140,11 +134,6 @@ loqa/
 
 loqa-hub/
 ├── Dockerfile                 # Hub service build
-├── go.mod
-└── ...
-
-loqa-device-service/
-├── Dockerfile                 # Device service build  
 ├── go.mod
 └── ...
 
