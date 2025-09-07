@@ -1,0 +1,165 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Go: Build All Services",
+            "type": "shell",
+            "command": "make",
+            "args": ["build"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/loqa-hub"
+            }
+        },
+        {
+            "label": "Go: Quality Check (Hub)",
+            "type": "shell",
+            "command": "make",
+            "args": ["quality-check"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/loqa-hub"
+            }
+        },
+        {
+            "label": "Go: Quality Check Strict (Hub)",
+            "type": "shell",
+            "command": "make",
+            "args": ["quality-check-strict"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/loqa-hub"
+            }
+        },
+        {
+            "label": "Go: Quality Check (Device Service)",
+            "type": "shell",
+            "command": "make",
+            "args": ["quality-check"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/loqa-device-service"
+            }
+        },
+        {
+            "label": "Go: Quality Check Strict (Device Service)",
+            "type": "shell",
+            "command": "make",
+            "args": ["quality-check-strict"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/loqa-device-service"
+            }
+        },
+        {
+            "label": "Go: Quality Check (Relay)",
+            "type": "shell",
+            "command": "make",
+            "args": ["quality-check"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/loqa-relay"
+            }
+        },
+        {
+            "label": "Vue: Quality Check (Commander)",
+            "type": "shell",
+            "command": "npm",
+            "args": ["run", "quality-check"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/loqa-commander"
+            }
+        },
+        {
+            "label": "Vue: Quality Check (Website)",
+            "type": "shell",
+            "command": "npm",
+            "args": ["run", "quality-check"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/www-loqalabs-com"
+            }
+        },
+        {
+            "label": "Docker: Build All Services",
+            "type": "shell",
+            "command": "docker-compose",
+            "args": ["build"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/loqa"
+            }
+        },
+        {
+            "label": "Docker: Start All Services",
+            "type": "shell",
+            "command": "docker-compose",
+            "args": ["up", "-d"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/loqa"
+            }
+        }
+    ]
+}

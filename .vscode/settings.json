@@ -1,0 +1,90 @@
+{
+    "cmake.ignoreCMakeListsMissing": true,
+    
+    // Go language settings
+    "go.formatTool": "gofmt",
+    "go.lintTool": "golangci-lint",
+    "go.lintFlags": [
+        "--config", ".golangci.yml",
+        "--fast"
+    ],
+    "go.vetOnSave": "package",
+    "go.buildOnSave": "off",
+    "go.lintOnSave": "package",
+    "go.coverOnSave": false,
+    "go.useCodeSnippetsOnFunctionSuggest": false,
+    "go.formatFlags": ["-s"],
+    
+    // Editor settings for auto-formatting on save
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit",
+        "source.fixAll": "explicit"
+    },
+    
+    // Language-specific formatting
+    "[go]": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        }
+    },
+    
+    "[javascript]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit"
+        }
+    },
+    
+    "[typescript]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit"
+        }
+    },
+    
+    "[vue]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit"
+        }
+    },
+    
+    "[json]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    
+    "[markdown]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.wordWrap": "on"
+    },
+    
+    // File associations
+    "files.associations": {
+        "*.proto": "proto3",
+        ".golangci.yml": "yaml",
+        ".claude-code.json": "jsonc"
+    },
+    
+    // Workspace-specific settings
+    "files.exclude": {
+        "**/node_modules": true,
+        "**/bin": true,
+        "**/*.log": true
+    },
+    
+    // Git settings
+    "git.autofetch": true,
+    "git.enableSmartCommit": true,
+    "git.confirmSync": false,
+    
+    // Terminal settings
+    "terminal.integrated.defaultProfile.osx": "zsh"
+}

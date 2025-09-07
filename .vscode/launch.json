@@ -1,0 +1,50 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Hub Service",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/loqa-hub/cmd/main.go",
+            "cwd": "${workspaceFolder}/loqa-hub",
+            "env": {
+                "LOG_LEVEL": "debug"
+            }
+        },
+        {
+            "name": "Debug Device Service",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/loqa-device-service/cmd/main.go",
+            "cwd": "${workspaceFolder}/loqa-device-service",
+            "env": {
+                "LOG_LEVEL": "debug"
+            }
+        },
+        {
+            "name": "Debug Relay Service",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/loqa-relay/test-go/cmd/main.go",
+            "cwd": "${workspaceFolder}/loqa-relay",
+            "env": {
+                "LOG_LEVEL": "debug"
+            }
+        },
+        {
+            "name": "Debug Skills CLI",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/loqa-hub/cmd/skills-cli/main.go",
+            "cwd": "${workspaceFolder}/loqa-hub",
+            "args": ["--action", "list"],
+            "env": {
+                "LOG_LEVEL": "debug"
+            }
+        }
+    ]
+}

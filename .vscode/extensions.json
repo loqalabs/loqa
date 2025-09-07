@@ -1,0 +1,33 @@
+{
+    "recommendations": [
+        // Go development
+        "golang.go",
+        
+        // JavaScript/TypeScript/Vue development
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "vue.volar",
+        "vue.vscode-typescript-vue-plugin",
+        
+        // Protocol Buffers
+        "zxh404.vscode-proto3",
+        
+        // Markdown
+        "yzhang.markdown-all-in-one",
+        
+        // YAML
+        "redhat.vscode-yaml",
+        
+        // Git
+        "eamodio.gitlens",
+        
+        // Docker
+        "ms-azuretools.vscode-docker",
+        
+        // General productivity
+        "ms-vscode.vscode-json",
+        "bradlc.vscode-tailwindcss",
+        "formulahendry.auto-rename-tag",
+        "christian-kohler.path-intellisense"
+    ]
+}
