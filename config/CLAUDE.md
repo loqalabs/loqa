@@ -182,6 +182,14 @@ Each service can be built individually from its own directory or collectively vi
 - Auto-refresh timeline (5-second intervals)
 - ESLint + Prettier for code quality
 
+### VSCode Development Environment
+- **Workspace Configuration**: Each repository includes `.vscode/` configurations
+- **Auto-formatting**: Enabled on save for Go, TypeScript, Vue, JSON, YAML, Protocol Buffers
+- **Extensions**: Service-specific recommendations (golang.go, Vue.volar, proto3, etc.)
+- **Tasks**: Quick access to build, test, quality-check, and service-specific commands
+- **Debug Configurations**: Pre-configured launch settings for each service type
+- **Linting Integration**: Real-time golangci-lint and ESLint feedback
+
 ### Testing Strategy
 - Unit tests in each service with `go test ./...`
 - Integration tests in `tests/integration/`
