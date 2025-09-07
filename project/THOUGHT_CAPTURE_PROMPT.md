@@ -43,6 +43,14 @@ I want to capture a thought/idea for future consideration:
 
 **Related work:** [Any existing issues, docs, or initiatives this connects to]
 
+### Completion Criteria:
+The thought capture is complete when:
+- [ ] Thought is clearly documented in appropriate location
+- [ ] Connected to related existing work
+- [ ] Tagged/categorized for easy retrieval
+- [ ] Review trigger or timeline is set
+- [ ] Context preserved for future understanding
+
 When I provide this prompt, please help me:
 
 ### Phase 1: Clarification & Context
@@ -93,14 +101,6 @@ When I provide this prompt, please help me:
 - ❌ Losing track of where thoughts were documented
 - ❌ Forgetting to set appropriate review triggers
 
-### Completion Criteria:
-The thought capture is complete when:
-- [ ] Thought is clearly documented in appropriate location
-- [ ] Connected to related existing work
-- [ ] Tagged/categorized for easy retrieval
-- [ ] Review trigger or timeline is set
-- [ ] Context preserved for future understanding
-
 ```
 
 ---
@@ -126,6 +126,64 @@ I want to capture a thought/idea for future consideration:
 - May need to understand regulatory requirements for medical device updates
 
 **Related work:** Connected to offline-first initiative in TODO.md, privacy architecture docs
+
+### Completion Criteria:
+The thought capture is complete when:
+- [x] Thought is clearly documented in appropriate location
+- [x] Connected to related existing work
+- [x] Tagged/categorized for easy retrieval
+- [x] Review trigger or timeline is set
+- [x] Context preserved for future understanding
+
+When I provide this prompt, please help me:
+
+### Phase 1: Clarification & Context
+1. **Ask clarifying questions** if needed to fully understand:
+   - The specific scope and nature of the thought
+   - Why it's important to capture now
+   - Any missing context that would help with categorization
+
+2. **Identify connections** to existing work:
+   - Search TODO.md, BACKLOG.md for related items
+   - Check for related GitHub issues across repositories
+   - Note any strategic documents that should reference this
+
+### Phase 2: Capture & Organization
+3. **Determine best capture location**:
+   - Add to TODO.md if it should influence current/next sprint planning
+   - Add to BACKLOG.md if it's longer-term but definite work
+   - Create GitHub issue if it needs tracking and collaboration
+   - Document in project notes if it's pure research/consideration
+
+4. **Structure the capture** with:
+   - Clear, searchable title/description
+   - Appropriate tags/labels for filtering
+   - Context about when/why to revisit
+   - Links to related work
+
+### Phase 3: Integration
+5. **Update related documents** if needed:
+   - Cross-reference in strategic documents
+   - Update project roadmap context if relevant
+   - Note in repository README if it affects architecture
+
+6. **Set review triggers** by:
+   - Adding to appropriate planning documents
+   - Setting up reminders tied to milestones
+   - Linking to decision points or external triggers
+
+### Best Practices to Follow:
+- ✅ Preserve the original thought without over-engineering
+- ✅ Make it easy to find and remember later
+- ✅ Include enough context for future-you to understand
+- ✅ Link to any reference materials or inspirations
+
+### Avoid:
+- ❌ Immediately turning thoughts into action items
+- ❌ Creating duplicate entries for similar ideas
+- ❌ Over-analyzing ideas that just need to be captured
+- ❌ Losing track of where thoughts were documented
+- ❌ Forgetting to set appropriate review triggers
 ```
 
 ---
