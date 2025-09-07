@@ -35,7 +35,6 @@ This launches:
 - NATS message bus
 - Ollama with Llama 3.2 model
 - Hub service (STT, LLM, command parsing)
-- Device service (simulated smart home devices)
 
 ---
 
@@ -78,12 +77,6 @@ export STT_URL="http://localhost:8000"
 export OLLAMA_URL="http://localhost:11434"
 export NATS_URL="nats://localhost:4222"
 go run ./cmd
-```
-
-### 3. Run the Device Service
-
-```bash
-NATS_URL="nats://localhost:4222" go run ./cmd/device-service
 ```
 
 ### 4. Launch the Test Relay

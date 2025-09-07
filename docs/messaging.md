@@ -101,8 +101,8 @@ loqa.system.metrics    -> Performance metrics
 1. **Relay** → `loqa.voice.input`: Audio data
 2. **Hub** → `loqa.voice.transcribed`: "turn on kitchen lights"  
 3. **Hub** → `loqa.voice.commands`: Parsed intent with entities
-4. **Device Service** ← `loqa.devices.commands.lights`: Light command
-5. **Device Service** → `loqa.devices.responses`: Success confirmation
+4. **Skills** ← `loqa.devices.commands.lights`: Light command
+5. **Skills** → `loqa.devices.responses`: Success confirmation
 
 ### Health Check Flow
 
@@ -128,7 +128,7 @@ Services should use durable subscriptions for reliability:
 ```go
 // Go example
 js.Subscribe("loqa.devices.commands.lights", handler, 
-    nats.Durable("device-service-lights"))
+    nats.Durable("homeassistant-skill-lights"))
 ```
 
 ## Debugging Messages

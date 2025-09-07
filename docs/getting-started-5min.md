@@ -35,7 +35,7 @@ git clone https://github.com/loqalabs/loqa.git && cd loqa && ./tools/setup.sh
 ```
 
 This automatically:
-- 🐳 Starts NATS, Ollama, Hub, Device services, and Timeline UI
+- 🐳 Starts NATS, Ollama, Hub service, and Timeline UI
 - 🤖 Downloads Llama 3.2 3B model
 - 📝 Sets up OpenAI-compatible STT for speech recognition
 - 🔊 Configures Kokoro-82M TTS for professional voice responses
@@ -105,7 +105,7 @@ go run ./cmd -hub localhost:50051
 docker-compose ps
 
 # Watch the logs
-docker-compose logs -f hub device-service commander
+docker-compose logs -f hub commander
 ```
 
 **Check Timeline UI:**
@@ -200,7 +200,6 @@ You now have a complete local-first voice assistant system running:
 - Relay client using your laptop's microphone/speakers
 - Hub service processing speech-to-text, intent parsing, and TTS generation
 - Kokoro-82M TTS service providing professional voice responses
-- Device service controlling smart home devices (simulated)
 - Timeline UI automatically running at http://localhost:5173
 
 **📊 Complete Observability:**

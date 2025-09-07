@@ -17,7 +17,7 @@
 **🎯 Strategic Shift**: Since this is a greenfield project, we should start with the latest versions of all technologies to avoid technical debt from day one. This applies until MVP is reached.
 
 **🚨 Critical Security Updates (Complete First):**
-- [ ] **Go 1.23.0 → 1.25.1**: All Go services (hub, device-service, relay, proto) **→ [Issue #27](https://github.com/loqalabs/loqa/issues/27)**
+- [ ] **Go 1.23.0 → 1.25.1**: All Go services (hub, relay, proto) **→ [Issue #27](https://github.com/loqalabs/loqa/issues/27)**
 - [ ] **Standardize gRPC versions**: Fix version inconsistencies across services **→ [Issue #28](https://github.com/loqalabs/loqa/issues/28)**
 
 **🔄 Major Framework Upgrades (Breaking Changes):**
@@ -255,14 +255,12 @@
 ### 🏠 Home Assistant Skill Enhancement **[NEW P2 PRIORITY]**
 **🔗 GitHub Issue**: [loqa-skills#10 - Enhanced HA Integration with Device State & Event Support](https://github.com/loqalabs/loqa-skills/issues/10)
 
-**📋 Context**: Replace loqa-device-service complexity with enhanced Home Assistant skill that provides bidirectional integration - both command execution and state/event monitoring.
 
 - [ ] **WebSocket Integration**: Add WebSocket connection to HA for real-time state changes
 - [ ] **Device State Queries**: Support voice queries like "What's the temperature?" and "Are the lights on?"  
 - [ ] **Event-Driven Announcements**: React to HA events (motion sensors, door open, etc.) with proactive voice announcements
 - [ ] **State Caching**: Maintain local cache of device states for quick queries
 - [ ] **MQTT Bridge Support**: Optional MQTT integration for additional HA event sources
-- [ ] **Sunset Device Service**: Remove loqa-device-service dependency and simplify architecture
 
 ### 🎛️ Production Readiness **[ELEVATED FOR BUSINESS DEPLOYMENT]**
 - [ ] **CRITICAL**: Add `HEADLESS` mode flag to `loqa-hub` for professional server deployment

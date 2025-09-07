@@ -181,8 +181,8 @@ nats pub loqa.devices.commands.lights '{
   "location": "test"
 }' --server=nats://localhost:4222
 
-# Check device service logs
-docker-compose logs device-service
+# Check skill logs and device integrations via Timeline UI
+# http://localhost:5173
 ```
 
 ## 🔧 Build & Development Issues
@@ -250,8 +250,8 @@ cd loqa-proto && ./generate.sh
 
 **Debug:**
 ```bash
-# Check device service status
-docker-compose logs device-service
+# Check skill integrations via Timeline UI
+# http://localhost:5173
 
 # List available devices
 # Look for "Device Status" in logs
@@ -281,9 +281,6 @@ nats pub loqa.devices.commands.lights '{
 ### Enable Debug Logging
 
 ```bash
-# Device service debug
-NATS_URL="nats://localhost:4222" LOG_LEVEL=debug ./bin/device-service
-
 # Hub service debug  
 export LOG_LEVEL=debug
 docker-compose up hub
@@ -311,7 +308,7 @@ curl http://localhost:11434/api/tags  # Ollama
 docker-compose logs -t
 
 # Follow specific service logs
-docker-compose logs -f hub device-service
+docker-compose logs -f hub
 
 # Search for errors
 docker-compose logs | grep -i error

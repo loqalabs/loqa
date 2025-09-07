@@ -96,7 +96,7 @@ _Comprehensive update mechanism design that preserves offline-first architecture
 
 **🎯 Core Requirements:**
 - [ ] **Docker-based updates** that don't require internet connectivity for isolated deployments
-- [ ] **System updates**: Hub, relay, commander, device-service versioning and coordination
+- [ ] **System updates**: Hub, relay, commander service versioning and coordination
 - [ ] **Skills updates**: Plugin/skill distribution without central dependency
 - [ ] **HIPAA compatibility**: Update mechanism that preserves audit trails and data isolation
 - [ ] **Rollback capability**: Safe update rollback for business continuity

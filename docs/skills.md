@@ -54,7 +54,7 @@ Eventually this will allow skills to be:
 
 ## 🧪 Building Your Own Skills
 
-Right now, skills live inside the `device-service` as separate Go packages.
+Right now, skills are implemented as Go plugins in the `loqa-skills` repository.
 
 To build a new one:
 

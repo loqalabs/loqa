@@ -58,7 +58,6 @@ clean:
 test:
 	@echo "🧪 Running tests..."
 	cd ../loqa-hub && go test ./...
-	cd ../loqa-device-service && go test ./...
 	cd ../loqa-relay/test-go && go test ./...
 
 proto:
@@ -81,9 +80,6 @@ logs:
 start-hub:
 	cd ../loqa-hub && go run ./cmd
 
-start-device-service:
-	cd ../loqa-device-service && go run ./cmd
-
 start-commander:
 	cd ../loqa-commander && npm run dev
 
@@ -93,9 +89,6 @@ start-relay:
 # Build individual services
 build-hub:
 	cd ../loqa-hub && go build -o bin/hub ./cmd
-
-build-device-service:
-	cd ../loqa-device-service && go build -o bin/device-service ./cmd
 
 build-commander:
 	cd ../loqa-commander && npm run build

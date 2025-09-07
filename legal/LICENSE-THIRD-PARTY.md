@@ -22,16 +22,6 @@ All third-party dependencies use permissive licenses (MIT, BSD-3-Clause, Apache 
 | `golang.org/x/*` | BSD-3-Clause | ✅ Compatible |
 | `google.golang.org/protobuf` | BSD-3-Clause | ✅ Compatible |
 
-### loqa-device-service
-
-| Dependency | License | Compatibility |
-|------------|---------|---------------|
-| `github.com/nats-io/nats.go` | Apache 2.0 | ✅ Compatible |
-| `github.com/klauspost/compress` | Apache 2.0/BSD/MIT | ✅ Compatible |
-| `github.com/nats-io/nkeys` | Apache 2.0 | ✅ Compatible |
-| `github.com/nats-io/nuid` | Apache 2.0 | ✅ Compatible |
-| `golang.org/x/*` | BSD-3-Clause | ✅ Compatible |
-
 ### loqa-relay
 
 | Dependency | License | Compatibility |

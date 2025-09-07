@@ -69,10 +69,6 @@ Run unit tests for all services:
 cd hub
 go test ./...
 
-# Device service tests  
-cd device-service
-go test ./...
-
 # Proto validation tests
 cd proto
 go test ./...
