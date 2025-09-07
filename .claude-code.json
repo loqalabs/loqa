@@ -49,7 +49,7 @@
   "repository_context": {
     "service_role": "Main orchestration repository - contains project management, configuration, and deployment coordination",
     "service_type": "Project coordination hub",
-    "manages_services": ["loqa-hub", "loqa-commander", "loqa-relay", "loqa-device-service", "loqa-proto", "loqa-skills", "www-loqalabs-com"],
+    "manages_services": ["loqa-hub", "loqa-commander", "loqa-relay", "loqa-proto", "loqa-skills", "www-loqalabs-com"],
     "microservice_architecture": {
       "structure": "Parent of loqalabs/ microservice ecosystem - manages and coordinates all microservices",
       "peer_services_location": "../ (sibling directories contain individual microservices)",
