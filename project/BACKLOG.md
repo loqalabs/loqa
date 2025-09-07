@@ -345,6 +345,21 @@ _Long-term hardware decisions building on Home Assistant Voice PE evaluation res
 - [ ] **Enterprise-grade materials** evaluation for business durability requirements
 - [ ] **Silent operation hardware** design for professional office environments
 
+### 🏗️ Architecture Evolution & Simplification
+_Strategic architectural decisions to reduce complexity and improve maintainability._
+
+**Device Service Sunset Decision:**
+- **✅ Decided**: Sunset loqa-device-service in favor of enhanced skill-based integrations
+- **Rationale**: Separate device service adds unnecessary complexity for MVP without clear user benefit
+- **Alternative**: Enhance Home Assistant skill with bidirectional integration ([loqa-skills#10](https://github.com/loqalabs/loqa-skills/issues/10))
+- **Benefits**: Simpler setup, lower latency, fewer moving parts, easier deployment
+
+**Future Integration Patterns:**
+- [ ] **Skill-based integrations**: Each platform (HA, Zigbee, etc.) gets dedicated skill
+- [ ] **Direct protocol integration**: Skills connect directly to their respective platforms
+- [ ] **Shared utilities**: Common device control utilities in skills framework
+- [ ] **Cross-skill communication**: Event bus for skills to share device state if needed
+
 ### 💡 Future Exploratory Ideas
 _This section collects longer-term, blue-sky ideas to explore once the core system has achieved stability and maturity._
 
