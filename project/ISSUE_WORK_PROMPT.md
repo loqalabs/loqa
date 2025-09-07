@@ -22,66 +22,26 @@ I want you to work on [REPO]#[NUMBER] - [ISSUE TITLE]
 - **Testing requirements:** [Unit tests required / Integration tests needed / Ask me about test coverage expectations]
 
 **Requirements:**
-- Follow the git workflow we established
-- Create feature branch with proper naming (see Cross-Repository Workflow below)
-- Reference issue numbers in commits
-- **NEVER use AI attribution in commit messages** (no "Generated with Claude Code" or Co-Authored-By lines)
 - Update project status as you work
-- **PROACTIVELY check and update ALL documentation** (don't wait to be asked)
 - Create PR when ready for review
 
 **Cross-Repository Workflow:**
-- **Simple supporting changes:** Make directly to `main` branch of supporting repos (docs, configs)
-- **Complex/experimental changes:** Create matching feature branches across all affected repos
 - **When to use feature branches everywhere:**
   - Changes are experimental or might be rejected
   - Feature is complex and might need coordinated rollback
   - Changes are tightly coupled and need coordinated testing
   - Multiple repositories have significant changes
-- **Merge order:** Supporting repos first (proto, shared libs) → Primary repo last
 - **Branch naming:** Use consistent names across repos (e.g., `feature/21-kokoro-tts-integration`)
 
-**📝 DOCUMENTATION UPDATE CHECKLIST - COMPLETE PROACTIVELY:**
-When implementing any feature, ALWAYS check and update these files:
-- [ ] Main repo README.md (features, capabilities, setup instructions)
-- [ ] Architecture documentation (new services, flows, technologies)
-- [ ] Configuration guides (new environment variables, settings)
-- [ ] Getting started guides (if user experience changes)
-- [ ] CLAUDE.md (new commands, services, ports, workflows)
-- [ ] Individual service README files (if functionality changes)
-- [ ] Docker compose comments (if new services added)
 
 **Additional Notes:**
 [Any other specific considerations, constraints, or preferences]
 
-**🚨 CRITICAL REMINDERS - DO THESE WITHOUT BEING ASKED:**
-- [ ] **NO AI attribution in any commit messages** (check every single commit)
-- [ ] **Update ALL affected documentation PROACTIVELY** (don't wait for requests)
-- [ ] **Update loqa/config/CLAUDE.md** if new commands, architecture, or workflows added
-- [ ] **Check README files** across all repositories for outdated information
-- [ ] **Update architecture documentation** for any service or flow changes
-- [ ] **Update configuration documentation** for new environment variables or settings
 
 **Follow-up Actions:**
 - [ ] Run lint/typecheck commands when implementation complete
-- [ ] Verify no breaking changes to existing functionality
 - [ ] Test end-to-end functionality before declaring complete
 
-## Repository Structure Context
-The loqalabs project structure is:
-
-loqalabs/                              # Container folder (not a git repo)
-├── loqa/                              # Main repo
-├── loqa-hub/                          # Hub service repo  
-├── loqa-commander/                     # Commander UI repo
-├── loqa-relay/                        # Relay client repo
-├── loqa-device-service/               # Device service repo
-├── loqa-proto/                        # Protocol definitions repo
-├── loqa-skills/                       # Skills system repo
-├── loqalabs-github-config/            # Special: .github org repo
-└── www-loqalabs-com/                  # Website repo
-
-Each subfolder is an individual git repository. The folder names match their GitHub repo names except `loqalabs-github-config` which contains the `.github` org-level repository.
 ```
 ---
 
@@ -141,10 +101,6 @@ Scope & Approach Guidance:
 - **Testing requirements:** Unit tests required, integration tests with multiple mock relay connections
 
 Requirements:
-- Follow the git workflow we established
-- Create feature branch with proper naming
-- Reference issue numbers in commits
-- No AI attribution in commit messages
 - Update project status as you work
 - Create PR when ready for review
 

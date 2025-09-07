@@ -107,51 +107,22 @@ When I provide this prompt, please follow this comprehensive process:
 12. **Commit strategy**:
     - Plan git workflow for major changes
     - Consider branching strategy for transition
-    - NO AI attribution in any commits
 
 ### Best Practices to Follow:
-- ✅ Use TodoWrite tool to track all shift-related tasks
-- ✅ Always read existing files before making changes
-- ✅ Preserve privacy-first design principles
 - ✅ Maintain HIPAA compliance requirements
-- ✅ Keep microservice architecture benefits
-- ✅ Update cross-repository references consistently
-- ✅ Test changes don't break existing functionality
-- ✅ Maintain backward compatibility where possible
 
 ### Avoid:
-- ❌ Making changes without understanding current state
-- ❌ Breaking existing functionality unnecessarily
-- ❌ Creating new files when editing existing ones works
-- ❌ AI attribution in commits
-- ❌ Rushing implementation without proper planning
-- ❌ Ignoring dependencies between repositories
+- ❌ Losing sight of core business objectives during transition
 
 ### Completion Criteria:
 The strategic shift is complete when:
 - [ ] All strategic documents are updated (TODO.md, BACKLOG.md)
 - [ ] GitHub Issues and Projects reflect new priorities
 - [ ] Repository structure supports new direction
-- [ ] Documentation is consistent with new approach
 - [ ] Branding/messaging aligned (if applicable)
 - [ ] Implementation roadmap is clear and actionable
-- [ ] All changes are committed and pushed (no AI attribution)
 - [ ] Success criteria are measurable and tracked
 
-## Repository Structure Context
-The loqalabs project structure is:
-loqalabs/                              # Container folder (not a git repo)
-├── loqa/                              # Main repo
-├── loqa-hub/                          # Hub service repo  
-├── loqa-commander/                     # Commander UI repo
-├── loqa-relay/                        # Relay client repo
-├── loqa-device-service/               # Device service repo
-├── loqa-proto/                        # Protocol definitions repo
-├── loqa-skills/                       # Skills system repo
-├── loqalabs-github-config/            # Special: .github org repo
-└── www-loqalabs-com/                  # Website repo
-
-Each subfolder is an individual git repository. The folder names match their GitHub repo names except `loqalabs-github-config` which contains the `.github` org-level repository.
 ```
 
 ---

@@ -83,8 +83,6 @@ When I provide this prompt, please help me:
 ### Best Practices to Follow:
 - ✅ Preserve the original thought without over-engineering
 - ✅ Make it easy to find and remember later
-- ✅ Connect to existing work streams where relevant
-- ✅ Use consistent tagging/categorization
 - ✅ Include enough context for future-you to understand
 - ✅ Link to any reference materials or inspirations
 
@@ -103,20 +101,6 @@ The thought capture is complete when:
 - [ ] Review trigger or timeline is set
 - [ ] Context preserved for future understanding
 
-## Repository Structure Context
-The loqalabs project structure is:
-loqalabs/                              # Container folder (not a git repo)
-├── loqa/                              # Main repo
-├── loqa-hub/                          # Hub service repo  
-├── loqa-commander/                     # Commander UI repo
-├── loqa-relay/                        # Relay client repo
-├── loqa-device-service/               # Device service repo
-├── loqa-proto/                        # Protocol definitions repo
-├── loqa-skills/                       # Skills system repo
-├── loqalabs-github-config/            # Special: .github org repo
-└── www-loqalabs-com/                  # Website repo
-
-Each subfolder is an individual git repository. The folder names match their GitHub repo names except `loqalabs-github-config` which contains the `.github` org-level repository.
 ```
 
 ---
