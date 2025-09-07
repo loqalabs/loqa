@@ -325,6 +325,26 @@ _Features for large-scale deployments and enterprise compliance requirements._
 - [ ] Enterprise SSO integration
 - [ ] Centralized policy management across multiple hubs
 
+### 🎙️ Hardware Architecture & Manufacturing Strategy
+_Long-term hardware decisions building on Home Assistant Voice PE evaluation results._
+
+**🔗 Dependencies**: 
+- [loqa#33 - HA Voice PE Stock Firmware Evaluation](https://github.com/loqalabs/loqa/issues/33)
+- [loqa#34 - HA Voice PE Custom Firmware Development](https://github.com/loqalabs/loqa/issues/34)
+- [loqa#35 - HA Voice PE Comparative Analysis & Business Feasibility](https://github.com/loqalabs/loqa/issues/35)
+
+**Hardware Partnership vs Custom Development:**
+- [ ] **Evaluate hardware partnership opportunities** based on HA Voice PE analysis
+- [ ] **Custom hardware development roadmap** if modification/partnership isn't viable
+- [ ] **Manufacturing scalability assessment** for direct hardware production
+- [ ] **Regulatory compliance strategy** for different hardware approaches (FCC/CE certification)
+
+**Advanced Relay Hardware Features:**
+- [ ] **Multi-microphone array optimization** for professional environments
+- [ ] **LED ring customization** for branding and professional appearance
+- [ ] **Enterprise-grade materials** evaluation for business durability requirements
+- [ ] **Silent operation hardware** design for professional office environments
+
 ### 💡 Future Exploratory Ideas
 _This section collects longer-term, blue-sky ideas to explore once the core system has achieved stability and maturity._
 

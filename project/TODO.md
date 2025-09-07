@@ -98,6 +98,31 @@
 - [x] Add built-in "What time is it?" skill using hub local time
 - [ ] Ensure manifest includes field for `sensitive: true` for privacy-tagged skills
 
+### 🎙️ Home Assistant Voice PE Hardware Evaluation **[NEW P1 PRIORITY]**
+**🔗 GitHub Issues**: 
+- [loqa#33 - HA Voice PE Stock Firmware Evaluation & UX Documentation](https://github.com/loqalabs/loqa/issues/33)
+- [loqa#34 - HA Voice PE Custom Firmware Development & Hardware Integration](https://github.com/loqalabs/loqa/issues/34)
+- [loqa#35 - HA Voice PE Comparative Analysis & Business Feasibility Assessment](https://github.com/loqalabs/loqa/issues/35)
+
+**📋 Context**: Evaluate Home Assistant Voice Preview Edition device as potential Loqa relay hardware to accelerate time-to-market vs custom hardware development. **Critical for MVP - need at least one production relay hardware option.**
+
+**Phase 1: Stock Firmware Evaluation**
+- [ ] **HA Voice PE Setup & Integration**: Install Home Assistant, configure test devices, set up Voice PE device
+- [ ] **UX Documentation**: Document user experience, strengths, and weaknesses through comprehensive testing scenarios
+- [ ] **Hardware Assessment**: Evaluate build quality, microphone array, speaker quality, LED ring, button responsiveness
+
+**Phase 2: Custom Firmware Development**
+- [ ] **Firmware Backup**: Create backup of original firmware (if modification requires replacement)
+- [ ] **Hardware Reverse Engineering**: Investigate flashing capabilities (USB vs disassembly), LED ring control, button integration
+- [ ] **Loqa Firmware Development**: Develop custom firmware integrating with Loqa gRPC protocol
+- [ ] **Hardware Integration Testing**: Verify LED ring control, button functionality, audio quality with custom firmware
+
+**Phase 3: Comparative Analysis & Business Decision**
+- [ ] **Performance Comparison**: Test custom firmware vs stock firmware across identical scenarios
+- [ ] **Feature Gap Analysis**: Identify areas where stock firmware excels and improve custom implementation
+- [ ] **Business Feasibility Assessment**: Cost analysis, manufacturing scalability, regulatory compliance for custom hardware path
+- [ ] **Go-to-Market Strategy**: Recommend hardware approach (custom firmware, hardware partnership, or full custom development)
+
 ### 📈 Business MVP Success Criteria
 **🔗 GitHub Issues**: 
 - [loqa#11 - MVP Success Criteria - Define and track measurable goals](https://github.com/loqalabs/loqa/issues/11)
