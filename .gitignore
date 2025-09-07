@@ -5,8 +5,9 @@ bin/
 build/
 dist/
 
-# IDE files (VSCode configs are shared)
+# IDE files
 .idea/
+.vscode/
 *.swp
 *.swo
 *~
