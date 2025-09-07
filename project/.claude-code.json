@@ -49,6 +49,7 @@
     "service_role": "TEMPLATE - This is the master template for all .claude-code.json files",
     "service_type": "Configuration template",
     "template_usage": "Copy and customize this file for each microservice with specific context",
+    "readme_section_template": "### Claude Code Configuration\n\nThis repository includes a `.claude-code.json` configuration file that provides Claude Code with project-specific context:\n\n- **Service Role**: [Describe this service's role in the microservice architecture]\n- **Testing Requirements**: [Service-specific testing strategy and requirements]\n- **Architecture Awareness**: [Dependencies and service relationships]\n- **Cross-Service Coordination**: [How this service coordinates with others]\n\nSee the main project documentation at [`loqa/config/CLAUDE.md`](https://github.com/loqalabs/loqa/blob/main/config/CLAUDE.md) for complete details.",
     "microservice_architecture": {
       "structure": "Part of loqalabs/ microservice ecosystem - each subfolder is an independent git repository",
       "peer_services_location": "../ (one folder up from current repo)",

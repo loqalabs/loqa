@@ -48,12 +48,19 @@ You don’t need to be an expert in AI or embedded systems to help. Here are jus
 3. Make your changes  
    Format Go code with `gofmt` and ensure clean commits
 
-4. Write clean commit messages  
+4. Development with Claude Code  
+   Each repository includes a `.claude-code.json` configuration file that provides context-aware assistance:
+   - Automatically enforces project coding standards and testing requirements
+   - Understands microservice architecture and dependencies  
+   - Provides service-specific development guidance
+   - See `config/CLAUDE.md` for complete documentation
+
+5. Write clean commit messages  
    - Use clear, descriptive commit messages
    - Avoid AI tool attribution in commit messages (automatically enforced by CI)
    - Focus on the "what" and "why" of the change
 
-5. Submit a PR  
+6. Submit a PR  
    - Use a clear title and description
    - Reference related issues if applicable
    - Be kind and constructive in your comments

@@ -88,6 +88,10 @@ cd loqa-hub/tests/e2e && go test -v
 # Integration tests
 cd loqa-hub/tests/integration && go test -v
 
+# Multi-command parsing tests
+cd loqa-hub/internal/llm && go test -v -run TestMultiCommand
+cd loqa-hub/internal/llm && go test -v -run TestCommandQueue
+
 # Test tools
 ./loqa-hub/tools/run-test-relay.sh    # Start test audio client
 ./loqa-hub/tools/test-wake-word.sh   # Wake word detection test
@@ -107,11 +111,13 @@ cd loqa-hub/tests/integration && go test -v
 ### Voice Processing Flow
 1. Audio captured by relay → gRPC to Hub
 2. Hub transcribes via OpenAI-compatible STT service REST API → text parsed locally
-3. Intent routed through Skills System → appropriate skill handles command
-4. Hub generates voice response via OpenAI-compatible TTS service → audio sent back to relay
-5. Skill processes request (e.g., Home Assistant API calls) → returns structured response
-6. Events stored in SQLite with skill tracking & metadata → visualized in Commander Timeline
-7. Device commands published to NATS → Device Service controls hardware
+3. **Multi-command parsing**: LLM detects compound utterances ("turn on lights and play music")
+4. **Command queue execution**: Sequential processing with rollback capabilities for failed chains
+5. Intent routed through Skills System → appropriate skill handles command
+6. Hub generates voice response via OpenAI-compatible TTS service → audio sent back to relay
+7. Skill processes request (e.g., Home Assistant API calls) → returns structured response
+8. Events stored in SQLite with skill tracking & metadata → visualized in Commander Timeline
+9. Device commands published to NATS → Device Service controls hardware
 
 ### Key Technologies
 - **Backend**: Go 1.24+, gRPC, NATS messaging, SQLite with WAL mode
@@ -228,6 +234,61 @@ The repository includes structured prompt templates for consistent development p
 - `STRATEGIC_SHIFT_PROMPT.md` - Template for making major changes in technology, focus, or design philosophy
 
 These templates ensure comprehensive planning and consistent execution across all development work.
+
+## Claude Code Configuration
+
+Each repository in the Loqa ecosystem includes a `.claude-code.json` configuration file that provides Claude Code with project-specific context and development rules.
+
+### Configuration Structure
+
+```json
+{
+  "rules": [
+    "NEVER use AI attribution in commit messages",
+    "Always read existing files before making changes",
+    "Use TodoWrite tool to track progress on complex tasks",
+    // ... additional project-wide rules
+  ],
+  "workflow_principles": {
+    "testing": {
+      "coverage_requirements": "Maintain high test coverage for all code changes",
+      "unit_tests": "Write unit tests for all new functions and methods",
+      "integration_tests": "Add integration tests for service interactions",
+      // ... comprehensive testing requirements
+    }
+  },
+  "repository_context": {
+    "service_role": "Description of this service's role in the microservice architecture",
+    "dependencies": ["loqa-proto", "other-services"],
+    "microservice_architecture": {
+      "peer_services_location": "../ (check for existing services before cloning)"
+    }
+  }
+}
+```
+
+### Repository-Specific Configurations
+
+- **Root Workspace** (`/loqalabs/.claude-code.json`) - Provides ecosystem-wide context when working from the root directory
+- **Each Service Repository** - Contains service-specific context, dependencies, and testing requirements
+- **Master Template** (`/loqa/project/.claude-code.json`) - Template for creating new service configurations
+
+### Key Features
+
+- **Microservice Awareness**: Each service understands its role and dependencies in the architecture
+- **Cross-Service Coordination**: Rules for working across multiple repositories with proper merge order
+- **Comprehensive Testing Requirements**: Service-specific testing strategies (unit, integration, E2E, etc.)
+- **Development Standards**: Consistent coding practices, documentation requirements, and workflow rules
+- **Intelligent Repository Management**: Checks for existing peer services before cloning
+
+### Usage
+
+Claude Code automatically reads these configuration files when working in any repository, providing context-aware assistance that understands:
+
+- The microservice architecture and service relationships
+- Proper testing strategies for each type of service
+- Cross-repository coordination workflows
+- Project-specific development standards and best practices
 
 ## Common Tasks
 
