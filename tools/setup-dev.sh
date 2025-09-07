@@ -24,11 +24,11 @@ echo "✅ Docker and Docker Compose found"
 # Clone all repositories if they don't exist
 REPOS=(
     "loqa-hub"
-    "loqa-device-service" 
     "loqa-relay"
     "loqa-proto"
     "loqa-skills"
     "loqa-commander"
+    # Note: loqa-device-service archived Sept 2025 - functionality moved to skills
 )
 
 echo "📦 Cloning Loqa repositories..."

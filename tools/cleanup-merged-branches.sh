@@ -13,7 +13,7 @@ REPO_PATHS=(
     "/Users/anna/Projects/loqalabs/loqa"
     "/Users/anna/Projects/loqalabs/loqa-hub" 
     "/Users/anna/Projects/loqalabs/loqa-commander"
-    "/Users/anna/Projects/loqalabs/loqa-device-service"
+    # "/Users/anna/Projects/loqalabs/loqa-device-service" # Archived Sept 2025
     "/Users/anna/Projects/loqalabs/loqa-relay"
     "/Users/anna/Projects/loqalabs/loqa-proto"
     "/Users/anna/Projects/loqalabs/loqa-skills"

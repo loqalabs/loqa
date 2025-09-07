@@ -13,7 +13,7 @@ REPOS=(
     "loqa"
     "loqa-hub" 
     "loqa-commander"
-    "loqa-device-service"
+    # "loqa-device-service" # Archived Sept 2025
     "loqa-relay"
     "loqa-proto"
     "loqa-skills"

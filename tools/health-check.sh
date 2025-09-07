@@ -71,7 +71,7 @@ echo "------------------------------"
 services_ok=0
 if docker-compose ps &> /dev/null; then
     check_docker_service "nats" && ((services_ok++))
-    check_docker_service "device-service" && ((services_ok++))
+    # check_docker_service "device-service" # Archived Sept 2025 && ((services_ok++))
     if docker-compose ps --format json 2>/dev/null | jq -r ".Name" | grep -q "hub" 2>/dev/null; then
         check_docker_service "hub" && ((services_ok++))
     else
