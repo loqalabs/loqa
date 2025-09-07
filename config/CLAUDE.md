@@ -96,9 +96,10 @@ cd loqa-hub/tests/integration && go test -v
 ## Architecture
 
 ### Core Services & Ports
-- **Hub** (`:3000` HTTP, `:50051` gRPC) - Central orchestrator with STT/LLM pipeline
+- **Hub** (`:3000` HTTP, `:50051` gRPC) - Central orchestrator with STT/TTS/LLM pipeline
 - **Commander UI** (`:5173`) - Vue.js administrative dashboard
 - **STT** (`:8000` REST) - OpenAI-compatible Speech-to-Text service
+- **TTS** (`:8880` REST) - OpenAI-compatible Text-to-Speech service (Kokoro-82M)
 - **NATS** (`:4222`, `:8222` monitoring) - Message bus
 - **Ollama** (`:11434`) - Local LLM (Llama 3.2)
 - **Device Service** - Listens on NATS for device commands
@@ -107,14 +108,16 @@ cd loqa-hub/tests/integration && go test -v
 1. Audio captured by relay → gRPC to Hub
 2. Hub transcribes via OpenAI-compatible STT service REST API → text parsed locally
 3. Intent routed through Skills System → appropriate skill handles command
-4. Skill processes request (e.g., Home Assistant API calls) → returns structured response
-5. Events stored in SQLite with skill tracking & metadata → visualized in Commander Timeline
-6. Device commands published to NATS → Device Service controls hardware
+4. Hub generates voice response via OpenAI-compatible TTS service → audio sent back to relay
+5. Skill processes request (e.g., Home Assistant API calls) → returns structured response
+6. Events stored in SQLite with skill tracking & metadata → visualized in Commander Timeline
+7. Device commands published to NATS → Device Service controls hardware
 
 ### Key Technologies
 - **Backend**: Go 1.24+, gRPC, NATS messaging, SQLite with WAL mode
-- **AI**: OpenAI-compatible STT services, Ollama + Llama 3.2 (LLM)
+- **AI**: OpenAI-compatible STT/TTS services, Ollama + Llama 3.2 (LLM)
 - **STT Architecture**: Modular `Transcriber` interface with OpenAI-compatible REST backend
+- **TTS Architecture**: Modular `TextToSpeech` interface with OpenAI-compatible REST backend (Kokoro-82M)
 - **Skills System**: Go plugins, manifest-driven architecture, sandboxing
 - **Frontend**: Vue.js 3, Vite, Tailwind CSS, Pinia
 - **Infrastructure**: Docker Compose, Protocol Buffers
@@ -185,6 +188,16 @@ Each service can be built individually from its own directory or collectively vi
 ```bash
 # STT Configuration
 STT_URL=http://stt:8000                 # OpenAI-compatible STT service URL
+
+# TTS Configuration
+TTS_URL=http://tts:8880/v1              # OpenAI-compatible TTS service URL
+TTS_VOICE=af_bella                      # Voice ID (provider-specific)
+TTS_SPEED=1.0                           # Speech speed multiplier (0.5-2.0)
+TTS_FORMAT=mp3                          # Audio format (mp3, wav, opus, flac)
+TTS_NORMALIZE=true                      # Enable audio normalization
+TTS_MAX_CONCURRENT=10                   # Max concurrent TTS requests
+TTS_TIMEOUT=10s                         # Request timeout
+TTS_FALLBACK_ENABLED=true               # Enable graceful fallback
 
 # Service URLs
 OLLAMA_URL=http://ollama:11434
