@@ -58,6 +58,23 @@ services:
       timeout: 10s
       retries: 3
 
+  # TTS Service (CPU version for development)
+  tts:
+    image: ghcr.io/remsky/kokoro-fastapi-cpu:latest
+    container_name: loqa-tts-kokoro-dev
+    ports:
+      - "8880:8880"
+    volumes:
+      - tts-cache:/app/cache
+    networks:
+      - loqa-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8880/v1/audio/voices"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
+
   # Loqa Hub - Central orchestrator
   hub:
     build:
@@ -69,6 +86,14 @@ services:
       - "50051:50051"
     environment:
       - STT_URL=http://stt:8000
+      - KOKORO_TTS_URL=http://tts:8880/v1
+      - KOKORO_TTS_VOICE=af_bella
+      - KOKORO_TTS_SPEED=1.0
+      - KOKORO_TTS_FORMAT=mp3
+      - KOKORO_TTS_NORMALIZE=true
+      - KOKORO_TTS_MAX_CONCURRENT=5  # Lower for dev
+      - KOKORO_TTS_TIMEOUT=10s
+      - KOKORO_TTS_FALLBACK_ENABLED=true
       - OLLAMA_URL=http://ollama:11434
       - OLLAMA_MODEL=llama3.2:3b
       - NATS_URL=nats://nats:4222
@@ -152,6 +177,8 @@ volumes:
   hub-data:
     driver: local
   stt-cache:
+    driver: local
+  tts-cache:
     driver: local
 
 networks:

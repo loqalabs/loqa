@@ -60,6 +60,62 @@ services:
       retries: 3
       start_period: 30s
 
+  # Text-to-Speech Service (Kokoro-82M)
+  tts:
+    image: ghcr.io/remsky/kokoro-fastapi-gpu:latest
+    container_name: loqa-tts-kokoro
+    ports:
+      - "8880:8880"
+    environment:
+      - CUDA_VISIBLE_DEVICES=0  # Use first GPU if available
+    volumes:
+      - tts-cache:/app/cache
+    networks:
+      - loqa-network
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8880/v1/audio/voices"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s  # TTS models take longer to load
+    profiles:
+      - gpu  # Only start with GPU profile
+
+  # CPU-only TTS fallback (for development without GPU)
+  tts-cpu:
+    image: ghcr.io/remsky/kokoro-fastapi-cpu:latest
+    container_name: loqa-tts-kokoro-cpu
+    ports:
+      - "8880:8880"
+    volumes:
+      - tts-cache:/app/cache
+    networks:
+      - loqa-network
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8880/v1/audio/voices"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
+    profiles:
+      - cpu-dev  # For development without GPU
+
   # Loqa Hub - Central orchestrator
   hub:
     image: loqalabs/loqa-hub:latest
@@ -76,6 +132,14 @@ services:
     restart: unless-stopped
     environment:
       - STT_URL=http://stt:8000
+      - KOKORO_TTS_URL=http://tts:8880/v1
+      - KOKORO_TTS_VOICE=af_bella
+      - KOKORO_TTS_SPEED=1.0
+      - KOKORO_TTS_FORMAT=mp3
+      - KOKORO_TTS_NORMALIZE=true
+      - KOKORO_TTS_MAX_CONCURRENT=10
+      - KOKORO_TTS_TIMEOUT=10s
+      - KOKORO_TTS_FALLBACK_ENABLED=true
       - OLLAMA_URL=http://ollama:11434
       - OLLAMA_MODEL=llama3.2:3b
       - NATS_URL=nats://nats:4222
@@ -160,6 +224,9 @@ volumes:
   stt-cache:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_stt-cache
+  tts-cache:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_tts-cache
 
 networks:
   loqa-network:

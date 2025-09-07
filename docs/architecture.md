@@ -17,6 +17,7 @@ Loqa is built from the ground up as a **local-first**, event-driven voice assist
 - Central logic for speech-to-text, intent parsing, and event routing
 - Uses OpenAI-compatible STT service for offline transcription
 - Sends text to Ollama (Llama 3.2) for command parsing
+- **NEW**: Integrates Kokoro-82M TTS for professional voice responses
 - Records all voice events in SQLite database for observability
 - Exposes REST API for event access and provides real-time data
 - Publishes parsed commands to NATS message bus
@@ -25,6 +26,14 @@ Loqa is built from the ground up as a **local-first**, event-driven voice assist
 - High-performance local message bus
 - Powers pub/sub communication between services
 - Used for voice input, command dispatching, and device state
+
+### 🔊 TTS Service (Kokoro-82M)
+- **NEW**: Professional text-to-speech using Kokoro-82M (82M parameters)
+- Provides natural, expressive voices suitable for business environments
+- OpenAI-compatible API with sub-0.3s synthesis times
+- Supports 10+ concurrent voice streams for multi-user environments
+- Optimized for Mac Mini M4 with <3s end-to-end response times
+- Available in GPU and CPU variants for different deployment needs
 
 ### 🏠 Device Service
 - Listens for device-specific commands
@@ -47,6 +56,9 @@ graph TB
     P[🎤 Relay Device] -->|gRPC Audio| H[🧠 Hub Service]
     H -->|Audio| W[📝 STT Service]
     H -->|Text| L[🤖 LLM Intent Parser]
+    H -->|Response Text| T[🔊 TTS Service]
+    T -->|Audio| H
+    H -->|gRPC Response| P
     H -->|Event Data| DB[(🗄️ SQLite DB)]
     H -->|REST API| UI[📊 Commander Timeline]
     H -->|Intent| N[📡 NATS]
