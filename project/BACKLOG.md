@@ -40,6 +40,7 @@ _Advanced observability features for enterprise deployments. Basic compliance fe
 _These tasks aim to increase flexibility by making the Commander UI more modular and optionally deployable, improving API accessibility and usability._
 
 - [ ] Commander UI settings panel: toggle log retention, sanitization, redaction, etc.
+  - *See also: Personality types (lines 352-358) for personality configuration in settings panel*
 - [ ] Treat Commander as optional dependency in Docker
 - [ ] Document `/api` as public interface (OpenAPI or Markdown)
 - [ ] Ensure all Commander features work via HTTP only
@@ -65,6 +66,7 @@ _Post-business MVP TTS enhancements. Note: Kokoro-82M integration is now P1 prio
 - [ ] Allow skill authors to select `tts_mode: expressive | fast`
 - [ ] Add fallback voices for lower-end devices
 - [ ] Simulate simple emotion via pitch/speed modulation
+  - *See also: Empathetic AI responses (lines 345-350) for content-level emotional intelligence*
 - [ ] Voice cloning for personalized business environments
 - [ ] Multi-language support for international business use
 
@@ -335,13 +337,29 @@ _This section collects longer-term, blue-sky ideas to explore once the core syst
 - [ ] Voice-based configuration (e.g., "Enable search mode")
 - [ ] On-device memory layer (e.g., reminders, preferences)
 - [ ] Local speaker recognition for personalization
+  - *See also: Personality types (lines 352-358) for user-specific personality preferences*
 - [ ] Simple on-device fine-tuning of LLMs
 - [ ] Skill SDK / Wizard for non-coders
 - [ ] Prompt remixing for varied responses
+  - *See also: Personality types (lines 352-358) for personality-aware response patterns*
 - [ ] Commander as full config dashboard
+  - *See also: Personality types (lines 352-358) for personality configuration interface*
 - [ ] Swappable LLMs with privacy warnings
 - [ ] Time-aware skills and scheduling
 - [ ] Explainability UX: "Why did you do that?"
+- [ ] **Empathetic AI responses for abstract/emotional requests**
+  - [ ] Handle abstract concepts and emotional states ("I'm feeling sad", "I need motivation")  
+  - [ ] Intelligent response selection: helpful advice vs actionable suggestions (play soothing music)
+  - [ ] Context-aware emotional intelligence with learned user preferences
+  - [ ] Integration with existing skills for follow-through actions (music, lighting, reminders)
+  - *Related: TTS emotion simulation (line 67), personalization (lines 336-337), prompt remixing (line 340)*
+- [ ] **Configurable personality types and response patterns**
+  - [ ] Pre-defined personality profiles: "Tell it like it is", "Empathetic", "Encouraging", "Skeptical", "Practical", "Playful", "Sarcastic", "Innovative"
+  - [ ] User-selectable personality modes with consistent response styling across all interactions
+  - [ ] Personality-aware prompt engineering for LLM responses and skill interactions
+  - [ ] Integration with Commander UI settings panel for easy personality switching
+  - [ ] Per-user personality preferences with speaker recognition integration
+  - *Related: Prompt remixing (line 341), personalization (line 338), Commander config dashboard (line 342), empathetic AI (lines 345-350)*
 - [ ] Mobile app as thin client
 - [ ] Evaluate Docker Model Runner as alternative to Ollama
 

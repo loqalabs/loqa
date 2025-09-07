@@ -5,6 +5,34 @@
 > **🎯 Target Market**: Small business professionals (lawyers, doctors, therapists) requiring privacy-first voice AI
 > **💻 Reference Platform**: Mac Mini M4 (16GB) - Complete system under $1000
 
+### 🔧 Tech Stack Modernization & Dependency Updates **[NEW P1 PRIORITY]**
+**🔗 GitHub Issues**: 
+- [loqa#27 - Upgrade Go 1.23.0 → 1.25.1 across all services](https://github.com/loqalabs/loqa/issues/27)
+- [loqa#28 - Standardize gRPC & Protobuf versions across all services](https://github.com/loqalabs/loqa/issues/28)
+- [loqa#29 - ESLint 8 → 9 Migration (Breaking Changes)](https://github.com/loqalabs/loqa/issues/29)
+- [loqa#30 - Tailwind CSS 3 → 4 Migration (Breaking Changes)](https://github.com/loqalabs/loqa/issues/30)
+- [loqa#31 - Pinia 2 → 3 Migration (Breaking Changes)](https://github.com/loqalabs/loqa/issues/31)
+- [loqa#32 - Vue.js Ecosystem Updates (Recommended)](https://github.com/loqalabs/loqa/issues/32)
+
+**🎯 Strategic Shift**: Since this is a greenfield project, we should start with the latest versions of all technologies to avoid technical debt from day one. This applies until MVP is reached.
+
+**🚨 Critical Security Updates (Complete First):**
+- [ ] **Go 1.23.0 → 1.25.1**: All Go services (hub, device-service, relay, proto) **→ [Issue #27](https://github.com/loqalabs/loqa/issues/27)**
+- [ ] **Standardize gRPC versions**: Fix version inconsistencies across services **→ [Issue #28](https://github.com/loqalabs/loqa/issues/28)**
+
+**🔄 Major Framework Upgrades (Breaking Changes):**
+- [ ] **ESLint 8 → 9 Migration** (loqa-commander, www-loqalabs-com) **→ [Issue #29](https://github.com/loqalabs/loqa/issues/29)**
+- [ ] **Tailwind CSS 3 → 4 Migration** (loqa-commander, www-loqalabs-com) **→ [Issue #30](https://github.com/loqalabs/loqa/issues/30)**
+- [ ] **Pinia 2 → 3 Migration** (loqa-commander) **→ [Issue #31](https://github.com/loqalabs/loqa/issues/31)**
+
+**🔧 Framework Updates (Recommended):**
+- [ ] **Vue.js ecosystem updates** (Vue, Vue Router, TypeScript, Prettier) **→ [Issue #32](https://github.com/loqalabs/loqa/issues/32)**
+
+**📋 Exception Handling:**
+- [ ] If a technology cannot be upgraded due to dependency constraints → Create tracking issue
+- [ ] If upgrade requires significant refactoring → Create issue for post-MVP
+- [ ] All major upgrades must pass quality checks and performance validation
+
 ### 🧠 Intent Parsing & Command Execution
 **🔗 GitHub Issue**: [loqa-hub#18 - Multi-command intent parsing and chaining](https://github.com/loqalabs/loqa-hub/issues/18)
 
@@ -34,6 +62,11 @@
 - [ ] Normalize common misspellings of "Loqa" (e.g., "Luca") in post-STT
 - [ ] Define and enforce default confidence threshold for rejecting low-quality transcriptions
 - [ ] Fallback: Ask user to repeat command if confidence is too low
+- [ ] **UX Enhancement**: Implement "did you mean?" patterns for low-confidence commands
+  - [ ] When confidence is below threshold but above minimum, suggest most likely intent
+  - [ ] Use confidence gradient: "I heard..." vs "I think you said..." vs "Did you mean..."
+  - [ ] Avoid default "I'm not sure what you want me to do" - always attempt interpretation
+  - [ ] **Context**: Essential for professional UX differentiation from Siri/Alexa frustrations
 
 ### 🔀 Multi-Relay Collision Detection
 **🔗 GitHub Issue**: [loqa-hub#19 - Multi-relay collision detection and arbitration](https://github.com/loqalabs/loqa-hub/issues/19)
@@ -202,6 +235,7 @@
   - *See also: Privacy-First Update System in BACKLOG.md for broader architectural considerations*
 - [ ] Voice training wizard for improved accuracy with professional terminology
 - [ ] Confidence-based response variations ("I think you said..." vs "I heard...")
+  - *See detailed "did you mean?" UX patterns in STT section (lines 65-69)*
 - [ ] **NEW**: Performance monitoring dashboard for business SLA compliance
 - [ ] **NEW**: Professional licensing and activation system
 - [ ] **NEW**: Multi-location management for business chains/practices
