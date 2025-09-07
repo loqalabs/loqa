@@ -27,11 +27,11 @@ Loqa is built from the ground up as a **local-first**, event-driven voice assist
 - Powers pub/sub communication between services
 - Used for voice input, command dispatching, and device state
 
-### 🔊 TTS Service (Kokoro-82M)
-- **NEW**: Professional text-to-speech using Kokoro-82M (82M parameters)
-- Provides natural, expressive voices suitable for business environments
-- OpenAI-compatible API with sub-0.3s synthesis times
-- Supports 10+ concurrent voice streams for multi-user environments
+### 🔊 TTS Service (OpenAI-Compatible)
+- **NEW**: Professional text-to-speech using OpenAI-compatible API
+- Current implementation: Kokoro-82M (82M parameters) for natural, expressive voices
+- Provides enterprise-grade voice synthesis suitable for business environments
+- Sub-0.3s synthesis times with 10+ concurrent voice streams support
 - Optimized for Mac Mini M4 with <3s end-to-end response times
 - Available in GPU and CPU variants for different deployment needs
 
@@ -92,6 +92,7 @@ graph TB
 | Area         | Technology              |
 |--------------|--------------------------|
 | Voice STT    | OpenAI-compatible REST   |
+| Voice TTS    | OpenAI-compatible REST (Kokoro-82M) |
 | LLM          | Ollama + Llama 3.2       |
 | Messaging    | NATS                     |
 | Database     | SQLite with WAL mode     |

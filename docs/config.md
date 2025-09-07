@@ -9,14 +9,14 @@ Configuration options and environment variables for Loqa services.
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `STT_URL` | OpenAI-compatible STT service URL | `http://stt:8000` |
-| `KOKORO_TTS_URL` | Kokoro TTS service base URL | `http://tts:8880/v1` |
-| `KOKORO_TTS_VOICE` | TTS voice ID (af_bella, etc.) | `af_bella` |
-| `KOKORO_TTS_SPEED` | Speech speed multiplier (0.5-2.0) | `1.0` |
-| `KOKORO_TTS_FORMAT` | Audio format (mp3, wav, opus, flac) | `mp3` |
-| `KOKORO_TTS_NORMALIZE` | Enable audio normalization | `true` |
-| `KOKORO_TTS_MAX_CONCURRENT` | Max concurrent TTS requests | `10` |
-| `KOKORO_TTS_TIMEOUT` | Request timeout | `10s` |
-| `KOKORO_TTS_FALLBACK_ENABLED` | Enable graceful fallback | `true` |
+| `TTS_URL` | TTS service base URL (OpenAI-compatible) | `http://tts:8880/v1` |
+| `TTS_VOICE` | Voice ID (provider-specific) | `af_bella` |
+| `TTS_SPEED` | Speech speed multiplier (0.5-2.0) | `1.0` |
+| `TTS_FORMAT` | Audio format (mp3, wav, opus, flac) | `mp3` |
+| `TTS_NORMALIZE` | Enable audio normalization | `true` |
+| `TTS_MAX_CONCURRENT` | Max concurrent TTS requests | `10` |
+| `TTS_TIMEOUT` | Request timeout | `10s` |
+| `TTS_FALLBACK_ENABLED` | Enable graceful fallback | `true` |
 | `OLLAMA_URL` | Ollama API endpoint | `http://localhost:11434` |
 | `NATS_URL` | NATS server connection string | `nats://localhost:4222` |
 | `GRPC_PORT` | gRPC server port for audio | `50051` |
@@ -51,14 +51,14 @@ services:
   hub:
     environment:
       - STT_URL=http://stt:8000
-      - KOKORO_TTS_URL=http://tts:8880/v1
-      - KOKORO_TTS_VOICE=af_bella
-      - KOKORO_TTS_SPEED=1.0
-      - KOKORO_TTS_FORMAT=mp3
-      - KOKORO_TTS_NORMALIZE=true
-      - KOKORO_TTS_MAX_CONCURRENT=10
-      - KOKORO_TTS_TIMEOUT=10s
-      - KOKORO_TTS_FALLBACK_ENABLED=true
+      - TTS_URL=http://tts:8880/v1
+      - TTS_VOICE=af_bella
+      - TTS_SPEED=1.0
+      - TTS_FORMAT=mp3
+      - TTS_NORMALIZE=true
+      - TTS_MAX_CONCURRENT=10
+      - TTS_TIMEOUT=10s
+      - TTS_FALLBACK_ENABLED=true
       - OLLAMA_URL=http://ollama:11434
       - NATS_URL=nats://nats:4222
 ```
@@ -97,12 +97,17 @@ Ollama models for intent parsing:
 
 ### TTS Models
 
-Kokoro-82M TTS system provides professional voice synthesis:
+The TTS system uses OpenAI-compatible API with professional voice synthesis. Current implementation uses Kokoro-82M:
+
+**Available Voices** (provider-specific):
 - **af_bella** - Default female voice, clear and expressive
-- **af_sarah** - Alternative female voice option
+- **af_sarah** - Alternative female voice option  
 - **am_adam** - Male voice (if available in your deployment)
+
+**Configuration Options**:
 - **Speed Control**: 0.5x to 2.0x playback speed
 - **Format Options**: MP3 (default), WAV, OPUS, FLAC
+- **Normalization**: Audio level normalization (recommended: enabled)
 
 ## Performance Tuning
 
@@ -124,7 +129,7 @@ Recommended minimum requirements:
 
 **TTS Optimization:**
 - Use GPU variant (`ghcr.io/remsky/kokoro-fastapi-gpu`) for best performance
-- Adjust `KOKORO_TTS_MAX_CONCURRENT` based on your CPU/GPU capacity
-- Set `KOKORO_TTS_FORMAT=mp3` for best compression vs quality
-- Use `KOKORO_TTS_SPEED=1.2` for slightly faster speech if needed
-- Enable `KOKORO_TTS_FALLBACK_ENABLED=true` for graceful degradation
+- Adjust `TTS_MAX_CONCURRENT` based on your CPU/GPU capacity
+- Set `TTS_FORMAT=mp3` for best compression vs quality
+- Use `TTS_SPEED=1.2` for slightly faster speech if needed
+- Enable `TTS_FALLBACK_ENABLED=true` for graceful degradation

@@ -86,14 +86,14 @@ services:
       - "50051:50051"
     environment:
       - STT_URL=http://stt:8000
-      - KOKORO_TTS_URL=http://tts:8880/v1
-      - KOKORO_TTS_VOICE=af_bella
-      - KOKORO_TTS_SPEED=1.0
-      - KOKORO_TTS_FORMAT=mp3
-      - KOKORO_TTS_NORMALIZE=true
-      - KOKORO_TTS_MAX_CONCURRENT=5  # Lower for dev
-      - KOKORO_TTS_TIMEOUT=10s
-      - KOKORO_TTS_FALLBACK_ENABLED=true
+      - TTS_URL=http://tts:8880/v1
+      - TTS_VOICE=af_bella
+      - TTS_SPEED=1.0
+      - TTS_FORMAT=mp3
+      - TTS_NORMALIZE=true
+      - TTS_MAX_CONCURRENT=5  # Lower for dev
+      - TTS_TIMEOUT=10s
+      - TTS_FALLBACK_ENABLED=true
       - OLLAMA_URL=http://ollama:11434
       - OLLAMA_MODEL=llama3.2:3b
       - NATS_URL=nats://nats:4222

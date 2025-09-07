@@ -35,7 +35,7 @@ Then open http://localhost:5173 to see the voice assistant UI
 
 - 🎤 **Wake word detection** - Just say "Hey Loqa"
 - 🧠 **Natural language** - Talk normally, not like a robot
-- 🔊 **Professional voice responses** - Natural TTS with Kokoro-82M (sub-0.3s synthesis)
+- 🔊 **Professional voice responses** - Natural TTS via OpenAI-compatible API (Kokoro-82M implementation)
 - 🏠 **Smart home control** - Lights, music, devices (simulated for now)
 - 📊 **Voice Command Timeline** - Visual web interface to see every interaction
 - 🔒 **100% private** - Everything stays on your network
@@ -96,10 +96,10 @@ Then open http://localhost:5173 to see the voice assistant UI
 - ✅ **Auto-refresh** - Timeline updates automatically every 5 seconds to show new voice events
 
 **Milestone 4: Professional TTS Integration (NEW):**
-- ✅ **Kokoro-82M TTS** - Professional text-to-speech with 82M parameters for natural voices
+- ✅ **OpenAI-compatible TTS** - Standard API interface with professional voice synthesis (Kokoro-82M)
 - ✅ **Sub-0.3s Synthesis** - Ultra-fast voice generation optimized for real-time interactions
 - ✅ **Multi-voice Support** - 10+ concurrent voice streams for professional environments
-- ✅ **OpenAI-compatible API** - Standard TTS interface with fallback support
+- ✅ **Provider Flexibility** - Generic TTS interface supporting multiple backends
 - ✅ **GPU/CPU Variants** - Flexible deployment options for different hardware configurations
 
 **All repositories now feature:**
