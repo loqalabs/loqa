@@ -166,20 +166,6 @@ services:
       timeout: 10s
       retries: 3
 
-  # Device Control Service
-  device-service:
-    image: loqalabs/loqa-device-service:latest
-    container_name: loqa-device-service
-    environment:
-      - NATS_URL=nats://nats:4222
-      - LOG_LEVEL=info
-      - LOG_FORMAT=json
-    depends_on:
-      nats:
-        condition: service_healthy
-    networks:
-      - loqa-network
-
   # Commander Administrative Dashboard
   commander:
     image: loqalabs/loqa-commander:latest
