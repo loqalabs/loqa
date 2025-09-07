@@ -38,6 +38,7 @@ This automatically:
 - 🐳 Starts NATS, Ollama, Hub, Device services, and Timeline UI
 - 🤖 Downloads Llama 3.2 3B model
 - 📝 Sets up OpenAI-compatible STT for speech recognition
+- 🔊 Configures Kokoro-82M TTS for professional voice responses
 - 💡 Configures simulated smart devices
 - 📊 Launches web interface at http://localhost:5173
 
@@ -92,8 +93,9 @@ go run ./cmd -hub localhost:50051
 1. 🎤 See "Voice detected!" in the terminal when you speak
 2. 📝 Watch speech-to-text conversion in real-time
 3. 🤖 See LLM parse your intent and extract commands
-4. 💡 Observe device actions in the service logs
-5. 📊 **Watch events appear instantly in the Timeline UI at http://localhost:5173**
+4. 🔊 **Hear professional TTS voice responses** confirming your commands
+5. 💡 Observe device actions in the service logs
+6. 📊 **Watch events appear instantly in the Timeline UI at http://localhost:5173**
 
 ## 🔍 Verify It's Working (1 minute)
 
@@ -129,11 +131,12 @@ nats pub loqa.devices.commands.lights '{
 
 ## 🎯 What You Just Experienced
 
-**Complete Voice-to-Visualization Pipeline:**
+**Complete Voice-to-Response Pipeline:**
 - 🗣️ **Voice Input** → Relay captures audio via microphone
 - 📡 **gRPC Streaming** → Audio sent to Hub service  
 - 📝 **Speech-to-Text** → OpenAI-compatible STT service converts to text
 - 🧠 **Intent Parsing** → Ollama LLM extracts commands
+- 🔊 **Voice Response** → Kokoro-82M TTS generates natural voice confirmation
 - 💾 **Event Storage** → Hub records structured event data in SQLite
 - 📨 **Message Routing** → NATS delivers to device service
 - 🏠 **Device Control** → Smart home devices respond
@@ -143,7 +146,7 @@ nats pub loqa.devices.commands.lights '{
 - ✅ No cloud services involved
 - ✅ No data leaves your network
 - ✅ Full offline functionality
-- ✅ Sub-2-second response times
+- ✅ Sub-2-second response times with professional TTS
 - ✅ Complete observability of all voice interactions
 
 ## 🛠️ Next Steps
@@ -195,7 +198,8 @@ You now have a complete local-first voice assistant system running:
 
 **🎤 Voice Processing Stack:**
 - Relay client using your laptop's microphone/speakers
-- Hub service processing speech-to-text and intent parsing
+- Hub service processing speech-to-text, intent parsing, and TTS generation
+- Kokoro-82M TTS service providing professional voice responses
 - Device service controlling smart home devices (simulated)
 - Timeline UI automatically running at http://localhost:5173
 

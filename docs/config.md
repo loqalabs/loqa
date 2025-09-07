@@ -9,6 +9,14 @@ Configuration options and environment variables for Loqa services.
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `STT_URL` | OpenAI-compatible STT service URL | `http://stt:8000` |
+| `KOKORO_TTS_URL` | Kokoro TTS service base URL | `http://tts:8880/v1` |
+| `KOKORO_TTS_VOICE` | TTS voice ID (af_bella, etc.) | `af_bella` |
+| `KOKORO_TTS_SPEED` | Speech speed multiplier (0.5-2.0) | `1.0` |
+| `KOKORO_TTS_FORMAT` | Audio format (mp3, wav, opus, flac) | `mp3` |
+| `KOKORO_TTS_NORMALIZE` | Enable audio normalization | `true` |
+| `KOKORO_TTS_MAX_CONCURRENT` | Max concurrent TTS requests | `10` |
+| `KOKORO_TTS_TIMEOUT` | Request timeout | `10s` |
+| `KOKORO_TTS_FALLBACK_ENABLED` | Enable graceful fallback | `true` |
 | `OLLAMA_URL` | Ollama API endpoint | `http://localhost:11434` |
 | `NATS_URL` | NATS server connection string | `nats://localhost:4222` |
 | `GRPC_PORT` | gRPC server port for audio | `50051` |
@@ -43,6 +51,14 @@ services:
   hub:
     environment:
       - STT_URL=http://stt:8000
+      - KOKORO_TTS_URL=http://tts:8880/v1
+      - KOKORO_TTS_VOICE=af_bella
+      - KOKORO_TTS_SPEED=1.0
+      - KOKORO_TTS_FORMAT=mp3
+      - KOKORO_TTS_NORMALIZE=true
+      - KOKORO_TTS_MAX_CONCURRENT=10
+      - KOKORO_TTS_TIMEOUT=10s
+      - KOKORO_TTS_FALLBACK_ENABLED=true
       - OLLAMA_URL=http://ollama:11434
       - NATS_URL=nats://nats:4222
 ```
@@ -79,18 +95,36 @@ Ollama models for intent parsing:
 - `llama3.2:1b` - Faster, lower resource usage
 - `llama3.2:8b` - Better understanding, more resources
 
+### TTS Models
+
+Kokoro-82M TTS system provides professional voice synthesis:
+- **af_bella** - Default female voice, clear and expressive
+- **af_sarah** - Alternative female voice option
+- **am_adam** - Male voice (if available in your deployment)
+- **Speed Control**: 0.5x to 2.0x playback speed
+- **Format Options**: MP3 (default), WAV, OPUS, FLAC
+
 ## Performance Tuning
 
 ### Resource Allocation
 
 Recommended minimum requirements:
-- **CPU**: 4+ cores
-- **RAM**: 8GB+ (more for larger models)
-- **Storage**: 10GB+ for models and logs
+- **CPU**: 4+ cores (6+ recommended for TTS)
+- **RAM**: 8GB+ (12GB+ recommended with TTS)
+- **GPU**: Optional but recommended for TTS (2GB+ VRAM)
+- **Storage**: 15GB+ for models and logs (TTS models are ~1-2GB)
 
 ### Optimization Tips
 
+**General:**
 - Use smaller Whisper models for real-time performance
 - Adjust `WAKE_WORD_SENSITIVITY` based on environment noise
 - Configure log levels to `warn` or `error` in production
 - Use SSD storage for model loading performance
+
+**TTS Optimization:**
+- Use GPU variant (`ghcr.io/remsky/kokoro-fastapi-gpu`) for best performance
+- Adjust `KOKORO_TTS_MAX_CONCURRENT` based on your CPU/GPU capacity
+- Set `KOKORO_TTS_FORMAT=mp3` for best compression vs quality
+- Use `KOKORO_TTS_SPEED=1.2` for slightly faster speech if needed
+- Enable `KOKORO_TTS_FALLBACK_ENABLED=true` for graceful degradation

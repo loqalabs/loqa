@@ -35,6 +35,7 @@ Then open http://localhost:5173 to see the voice assistant UI
 
 - 🎤 **Wake word detection** - Just say "Hey Loqa"
 - 🧠 **Natural language** - Talk normally, not like a robot
+- 🔊 **Professional voice responses** - Natural TTS with Kokoro-82M (sub-0.3s synthesis)
 - 🏠 **Smart home control** - Lights, music, devices (simulated for now)
 - 📊 **Voice Command Timeline** - Visual web interface to see every interaction
 - 🔒 **100% private** - Everything stays on your network
@@ -45,10 +46,11 @@ Then open http://localhost:5173 to see the voice assistant UI
 ## 🧱 How It Works
 
 1. **Speak** → Microphone captures your voice
-2. **Process** → Local AI understands what you want  
-3. **Act** → Your devices respond instantly
-4. **Visualize** → See all interactions in real-time web timeline
-5. **Privacy** → Nothing ever leaves your house
+2. **Process** → Local AI understands what you want
+3. **Respond** → Professional TTS voices confirm your commands
+4. **Act** → Your devices respond instantly
+5. **Visualize** → See all interactions in real-time web timeline
+6. **Privacy** → Nothing ever leaves your house
 
 👉 **[See the Full Architecture](./docs/architecture.md)** with diagrams and technical details
 
@@ -92,6 +94,13 @@ Then open http://localhost:5173 to see the voice assistant UI
 - ✅ **Detailed Event Inspection** - Drill-down modals with complete JSON payloads for debugging
 - ✅ **Dark Mode Support** - Modern, responsive interface that adapts to your preferences
 - ✅ **Auto-refresh** - Timeline updates automatically every 5 seconds to show new voice events
+
+**Milestone 4: Professional TTS Integration (NEW):**
+- ✅ **Kokoro-82M TTS** - Professional text-to-speech with 82M parameters for natural voices
+- ✅ **Sub-0.3s Synthesis** - Ultra-fast voice generation optimized for real-time interactions
+- ✅ **Multi-voice Support** - 10+ concurrent voice streams for professional environments
+- ✅ **OpenAI-compatible API** - Standard TTS interface with fallback support
+- ✅ **GPU/CPU Variants** - Flexible deployment options for different hardware configurations
 
 **All repositories now feature:**
 - Automated CI/CD pipelines with status badges
