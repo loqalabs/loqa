@@ -2,6 +2,21 @@
 
 Use this prompt when you need to make a major change in focus, technology, approach, or design philosophy for Loqa.
 
+## 🚨 CRITICAL WORKFLOW REQUIREMENTS
+
+**BEFORE IMPLEMENTING ANY STRATEGIC SHIFT:**
+- [ ] **NEVER push directly to main branch** - Always create feature branches
+- [ ] **ALWAYS create PRs** for review, even for strategic changes  
+- [ ] **ALL quality checks must PASS** - No exceptions for linting, tests, builds
+- [ ] **End-to-end verification is REQUIRED** - Never assume functionality works
+- [ ] **When blocked, ASK** - Never make assumptions or work around errors
+
+**STRATEGIC CHANGES REQUIRE EXTRA CARE:**
+- [ ] **Multi-repo coordination is CRITICAL** - Strategic shifts often affect multiple services
+- [ ] **Feature branches across ALL affected repos** - Coordinate changes carefully
+- [ ] **Document the impact** - Update all relevant documentation and guides
+- [ ] **Test extensively** - Strategic changes can have unexpected side effects
+
 ---
 
 ## Prompt Template

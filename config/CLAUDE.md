@@ -2,6 +2,33 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 🚨 CRITICAL WORKFLOW REQUIREMENTS
+
+### **NEVER PUSH DIRECTLY TO MAIN BRANCH**
+- **ALWAYS create feature branches** for changes: `git checkout -b feature/issue-name`
+- **ALWAYS create PRs** for review, even for simple changes
+- **NEVER assume bypass messages mean permission** - they are warnings, not approval
+
+### **MULTI-REPOSITORY COORDINATION**
+- **This is the orchestration repository** for a multi-repo architecture
+- **Individual services are in parallel directories**: `../loqa-hub/`, `../loqa-relay/`, etc.
+- **Changes to orchestration affect ALL services** - test thoroughly
+- **Docker Compose changes impact entire system** - verify all services
+
+### **MANDATORY QUALITY GATES (NON-NEGOTIABLE)**
+```bash
+# ALL must pass before declaring work complete:
+docker-compose build   # All service builds must succeed
+docker-compose up -d   # Full system must start successfully
+make test             # Cross-service integration tests
+make quality-check    # All orchestration validation
+```
+
+### **WHEN IN DOUBT - ASK**
+- **NEVER make assumptions** about orchestration requirements
+- **ASK for clarification** when encountering service coordination issues
+- **CONFIRM the approach** before making cross-service changes
+
 ## Project Overview
 
 Loqa is a local-first voice assistant platform built with a microservice architecture. It consists of multiple Go services and a Vue.js web interface, orchestrated with Docker Compose. The system processes voice commands locally without cloud dependencies.

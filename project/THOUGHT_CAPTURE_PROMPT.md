@@ -2,6 +2,8 @@
 
 Use this prompt when you have an idea, concern, or thought that doesn't need immediate action but shouldn't be forgotten.
 
+> **Note**: When thoughts lead to implementation, remember to follow the **critical workflow requirements** from our other prompt templates - always use feature branches, create PRs, and ensure all quality checks pass.
+
 ---
 
 ## Prompt Template

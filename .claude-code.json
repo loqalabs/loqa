@@ -1,5 +1,12 @@
 {
   "rules": [
+    "🚨 BLOCKING: NEVER push directly to main branch - ALWAYS create feature branches",
+    "🚨 BLOCKING: ALWAYS create PRs for review - even for simple changes",
+    "🚨 BLOCKING: ALL orchestration changes must be tested - docker-compose up must work",
+    "🚨 BLOCKING: Cross-service integration must be verified - make test must pass",
+    "🚨 BLOCKING: When blocked, ASK - never assume or work around errors",
+    "🚨 ORCHESTRATION: This repo coordinates ALL services - changes affect entire system",
+    "🚨 MULTI-REPO: Individual services are in ../service-name/ directories - understand dependencies",
     "NEVER use AI attribution in commit messages (no 'Generated with Claude Code' or Co-Authored-By lines)",
     "Always read existing files before making changes",
     "Prefer editing existing files over creating new ones when possible",

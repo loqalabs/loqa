@@ -1,5 +1,10 @@
 {
   "rules": [
+    "🚨 BLOCKING: NEVER push directly to main branch - ALWAYS create feature branches",
+    "🚨 BLOCKING: ALWAYS create PRs for review - even for strategic/project changes",
+    "🚨 BLOCKING: When blocked, ASK - never assume or work around errors",
+    "🚨 PROJECT: This directory contains project management templates and strategic docs",
+    "🚨 IMPACT: Changes here affect how entire project is managed - test thoroughly",
     "NEVER use AI attribution in commit messages (no 'Generated with Claude Code' or Co-Authored-By lines)",
     "Always read existing files before making changes",
     "Prefer editing existing files over creating new ones when possible",

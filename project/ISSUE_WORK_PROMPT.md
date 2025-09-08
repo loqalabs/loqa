@@ -2,6 +2,19 @@
 
 Use this template when asking Claude to work on a specific GitHub issue.
 
+## 🚨 CRITICAL WORKFLOW REQUIREMENTS
+
+**BEFORE YOU START:**
+- [ ] **NEVER push directly to main branch** - Always create feature branches
+- [ ] **ALWAYS create PRs** for review, even for simple changes  
+- [ ] **ALL quality checks must PASS** - No exceptions for linting, tests, builds
+- [ ] **End-to-end verification is REQUIRED** - Never assume functionality works
+- [ ] **When blocked, ASK** - Never make assumptions or work around errors
+
+**MULTI-REPOSITORY REMINDER:**
+- [ ] This is a **multi-repo architecture** - each service is a separate Git repository
+- [ ] **Coordinate changes** across repositories when needed
+- [ ] **Follow dependency order**: loqa-proto → loqa-skills → loqa-hub → loqa-relay → loqa-commander
 
 ```
 I want you to work on [REPO]#[NUMBER] - [ISSUE TITLE]
@@ -23,24 +36,28 @@ I want you to work on [REPO]#[NUMBER] - [ISSUE TITLE]
 
 **Requirements:**
 - Update project status as you work
-- Create PR when ready for review
+- **ALWAYS create feature branches** - Never push to main
+- **ALWAYS create PRs** when ready for review
+- **ALL quality checks must pass** before declaring complete
 
 **Cross-Repository Workflow:**
-- **When to use feature branches everywhere:**
+- **MANDATORY: Feature branches for ALL changes** - No exceptions
   - Changes are experimental or might be rejected
   - Feature is complex and might need coordinated rollback
   - Changes are tightly coupled and need coordinated testing
   - Multiple repositories have significant changes
 - **Branch naming:** Use consistent names across repos (e.g., `feature/21-kokoro-tts-integration`)
 
-
 **Additional Notes:**
 [Any other specific considerations, constraints, or preferences]
 
-
-**Follow-up Actions:**
-- [ ] Run lint/typecheck commands when implementation complete
-- [ ] Test end-to-end functionality before declaring complete
+**Follow-up Actions (NON-NEGOTIABLE):**
+- [ ] **ALL quality checks must PASS** - make quality-check, go test ./..., etc.
+- [ ] **Docker builds must SUCCEED** - docker build . must work
+- [ ] **End-to-end functionality must be VERIFIED** - never assume it works
+- [ ] **Create feature branch** - git checkout -b feature/issue-name
+- [ ] **Create PR with proper description** - gh pr create with detailed body
+- [ ] **Wait for review and approval** before merging
 
 ```
 ---
