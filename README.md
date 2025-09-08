@@ -5,13 +5,15 @@
 
 ![Loqa Social Preview](https://github.com/user-attachments/assets/99016e57-ace5-4140-a4f3-c49262f83253)
 
-# 🦜 Loqa – A Local-First Voice Assistant
+# 🦜 Loqa – A Rebellion Against the Cloud
 
 [![CI/CD Pipeline](https://github.com/loqalabs/loqa/actions/workflows/ci.yml/badge.svg)](https://github.com/loqalabs/loqa/actions/workflows/ci.yml)
 
-**Loqa** is a privacy-respecting voice assistant that runs entirely on your own devices. No cloud, no Big Tech, no data mining — just fast, private voice control that you actually own.
+**Your voice. Your rules.**
 
-> 🎯 Think "personal Alexa" that never leaves your house.
+Loqa is an open-source, privacy-first voice platform for developers, makers, and tinkerers who believe voice interfaces should be as local and controllable as any keyboard or shell script. Run it where Big Tech can't listen.
+
+> **Privacy isn't a feature — it's the architecture.**
 
 ---
 
@@ -31,26 +33,25 @@ Then open http://localhost:5173 to see the voice assistant UI
 
 ---
 
-## ✨ What You Get
+## ✨ What Makes Loqa Different
 
-- 🎤 **Wake word detection** - Just say "Hey Loqa"
-- 🧠 **Natural language** - Talk normally, not like a robot
-- 🔊 **Professional voice responses** - Natural TTS via OpenAI-compatible API (Kokoro-82M implementation)
-- 🏠 **Smart home control** - Lights, music, devices (simulated for now)
-- 📊 **Voice Command Timeline** - Visual web interface to see every interaction
-- 🔒 **100% private** - Everything stays on your network
-- 🛠️ **Fully hackable** - Build your own skills and commands
+- 🧠 **State-of-the-art, not state-of-the-shelf** - WhisperX, streaming STT/LLM pipelines, experimental sandboxing. We're exploring what's next, not rebuilding Alexa
+- 🧩 **Composable, not monolith** - Swap Piper for Dia or Moshi. Replace OpenAI's Whisper with Meta's SeamlessM4T. Use symbolic reasoning engines instead of Ollama. Every component is modular
+- 🔒 **Privacy-first, always** - Nothing leaves your network unless you explicitly opt in. No metrics collection, no voice recording, no cloud surveillance
+- 🌍 **Run from anywhere** - Your Raspberry Pi, air-gapped homelab, or offline cabin. Built for mobility and location independence  
+- 🛠️ **Hackable APIs and plugin SDK** - Write skills in Python, shell scripts, or WASM modules. Built for homelab and Raspberry Pi setups
+- 💡 **Community-powered innovation** - We'd rather be the Blender of voice than the Salesforce. Think weird, prototype freely, take Loqa in unexpected directions
 
 ---
 
-## 🧱 How It Works
+## 🧱 How Loqa Liberates Voice AI
 
-1. **Speak** → Microphone captures your voice
-2. **Process** → Local AI understands what you want
-3. **Respond** → Professional TTS voices confirm your commands
-4. **Act** → Your devices respond instantly
-5. **Visualize** → See all interactions in real-time web timeline
-6. **Privacy** → Nothing ever leaves your house
+1. **Your Voice** → Processed locally with cutting-edge models
+2. **Your AI** → Experimental features and novel approaches
+3. **Your Control** → Complete transparency and user autonomy
+4. **Your Creativity** → Build experiences impossible elsewhere
+5. **Your Privacy** → Data never leaves your control
+6. **Your Innovation** → Contribute to the future of voice AI
 
 👉 **[See the Full Architecture](./docs/architecture.md)** with diagrams and technical details
 
@@ -163,11 +164,16 @@ Building something with Loqa? Start here:
 
 ---
 
-## 🌟 Why Loqa?
+## 🌟 Why Loqa Exists
 
-We believe voice assistants should be **powerful, private, and personal** — without surrendering your data to Big Tech surveillance.
+Loqa isn't just another voice assistant — it's a **rebellion against the cloud**.
 
-> Local-first. Values-first. Your voice, your choice.
+**For Developers**: Experiment with bleeding-edge voice AI without corporate gatekeepers  
+**For Makers**: Build voice experiences that respect your values and creativity  
+**For Privacy Advocates**: Prove that cutting-edge AI doesn't require surveillance capitalism  
+**For Communities**: Own your voice technology instead of being owned by it
+
+**Business second, autonomy first.** The OSS core will always be powerful, expressive, and self-sufficient.
 
 **[Contributing](./CONTRIBUTING.md)** • **[Code of Conduct](./CODE_OF_CONDUCT.md)** • **[AGPLv3 License](./LICENSE)**
 
