@@ -2,11 +2,12 @@
 
 Use this template when asking Claude to work on a specific GitHub issue.
 
+```
 ## 🚨 CRITICAL WORKFLOW REQUIREMENTS
 
 **BEFORE YOU START:**
 - [ ] **NEVER push directly to main branch** - Always create feature branches
-- [ ] **ALWAYS create PRs** for review, even for simple changes  
+- [ ] **ALWAYS create PRs** for review, even for simple changes
 - [ ] **ALL quality checks must PASS** - No exceptions for linting, tests, builds
 - [ ] **End-to-end verification is REQUIRED** - Never assume functionality works
 - [ ] **When blocked, ASK** - Never make assumptions or work around errors
@@ -16,7 +17,6 @@ Use this template when asking Claude to work on a specific GitHub issue.
 - [ ] **Coordinate changes** across repositories when needed
 - [ ] **Follow dependency order**: loqa-proto → loqa-skills → loqa-hub → loqa-relay → loqa-commander
 
-```
 I want you to work on [REPO]#[NUMBER] - [ISSUE TITLE]
 
 **Issue Link:** [GitHub Issue URL]
@@ -60,6 +60,7 @@ I want you to work on [REPO]#[NUMBER] - [ISSUE TITLE]
 - [ ] **Wait for review and approval** before merging
 
 ```
+
 ---
 
 ## 📋 Specific Examples for Each Area:

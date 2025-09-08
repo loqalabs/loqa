@@ -2,11 +2,16 @@
 
 Use this prompt when you need to make a major change in focus, technology, approach, or design philosophy for Loqa.
 
+---
+
+## Prompt Template
+
+```
 ## 🚨 CRITICAL WORKFLOW REQUIREMENTS
 
 **BEFORE IMPLEMENTING ANY STRATEGIC SHIFT:**
 - [ ] **NEVER push directly to main branch** - Always create feature branches
-- [ ] **ALWAYS create PRs** for review, even for strategic changes  
+- [ ] **ALWAYS create PRs** for review, even for strategic changes
 - [ ] **ALL quality checks must PASS** - No exceptions for linting, tests, builds
 - [ ] **End-to-end verification is REQUIRED** - Never assume functionality works
 - [ ] **When blocked, ASK** - Never make assumptions or work around errors
@@ -17,11 +22,6 @@ Use this prompt when you need to make a major change in focus, technology, appro
 - [ ] **Document the impact** - Update all relevant documentation and guides
 - [ ] **Test extensively** - Strategic changes can have unexpected side effects
 
----
-
-## Prompt Template
-
-```
 I need to make a strategic shift in the Loqa project. Here are the details:
 
 **Type of shift:** [Choose one or describe custom]
