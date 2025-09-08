@@ -5,92 +5,7 @@
 > **🎯 Target Community**: Developers, privacy enthusiasts, and self-hosting advocates who value autonomy and creative freedom
 > **💻 Reference Platform**: Any modern machine (Docker/self-hosted) - Privacy-first by default
 
-### 🌟 Community Building & OSS Ecosystem Development **[CRITICAL P1 - START IMMEDIATELY]**
-**🔗 GitHub Issues**:
-- [loqa#37 - Developer Community Outreach & Engagement](https://github.com/loqalabs/loqa/issues/37)
-- [loqa#38 - OSS Documentation & Contribution Framework](https://github.com/loqalabs/loqa/issues/38)
-- [loqa#39 - Privacy-First Positioning & Open Innovation Messaging](https://github.com/loqalabs/loqa/issues/39)
-
-**📋 Context**: OSS community engagement has highest impact on innovation velocity and market validation. Focus on developers, makers, and privacy advocates who value creative freedom and autonomy.
-
-**Developer Community Engagement:**
-- [ ] **Launch developer community outreach** (Reddit r/selfhosted, Hacker News, dev Twitter)
-- [ ] **Create compelling OSS narrative** highlighting innovation-first approach and creative freedom
-- [ ] **Establish feedback loops** with privacy enthusiasts and self-hosting communities
-- [ ] **Document novel technical approaches** that differentiate from existing assistants
-- [ ] **Showcase experimental features** and invite community contributions
-
-**OSS Foundation & Documentation:**
-- [ ] **Create comprehensive self-hosting guide** with Docker, installation automation
-- [ ] **Develop contributor onboarding** with clear development workflows
-- [ ] **Implement community feedback system** for feature requests and innovation ideas
-- [ ] **Document extensibility patterns** for skills, integrations, and customization
-- [ ] **Create example configurations** for different use cases and hardware setups
-
-**Innovation & Differentiation:**
-- [ ] **Highlight unique technical approaches** vs. Alexa/Siri/Home Assistant clones
-- [ ] **Showcase emerging technology integration** (speech-to-speech, novel STT/TTS)
-- [ ] **Position as experimentation platform** for voice AI research and development
-- [ ] **Establish thought leadership** in local-first, privacy-preserving voice AI
-- [ ] **Connect with AI research community** for cutting-edge model integration
-
-### ⚡ Innovation-First Performance & Emerging Tech **[CRITICAL P1 - TECHNICAL LEADERSHIP]**
-**🔗 GitHub Issues**:
-- [loqa#40 - Experimental Performance Optimization & Benchmarking](https://github.com/loqalabs/loqa/issues/40)
-- [loqa#41 - Cutting-Edge Speech-to-Speech Model Integration](https://github.com/loqalabs/loqa/issues/41)
-- [loqa#42 - Novel Streaming Inference & Real-time Processing](https://github.com/loqalabs/loqa/issues/42)
-
-**📋 Context**: Prioritize innovation over convention. Explore emerging technologies that make Loqa a platform for experimentation, not just another voice assistant clone.
-
-**Performance Baseline & Monitoring:**
-- [ ] **Document current voice pipeline performance** across Mac Mini M4 and other hardware configurations
-- [ ] **Implement automated performance regression testing** in CI/CD pipeline with alerts
-- [ ] **Create real-time performance monitoring dashboard** with component-level metrics
-- [ ] **Establish professional SLA targets** based on customer requirements (target: sub-2s response)
-- [ ] **Benchmark against competitive solutions** where possible for market positioning
-
-**Advanced AI Model Integration:**
-- [ ] **Evaluate speech-to-speech models** (Ultravox v0.5, Google Moshi) for direct audio processing
-- [ ] **Implement streaming LLM inference** for improved perceived performance and user engagement
-- [ ] **Add WebRTC support evaluation** for real-time audio streaming optimization
-- [ ] **Benchmark latest STT models** (AssemblyAI Slam-1, Deepgram Nova-2) vs current Whisper
-- [ ] **A/B test performance improvements** with pilot customers for validation
-
-**Resource Optimization:**
-- [ ] **Optimize concurrent processing** and resource utilization patterns for Mac Mini M4
-- [ ] **Implement intelligent request prioritization** and queuing strategies
-- [ ] **Add performance profiling tools** for ongoing optimization and troubleshooting
-
-### 🔒 Privacy-by-Design Architecture **[CRITICAL P1 - AUTONOMY & FREEDOM]**
-**🔗 GitHub Issues**:
-- [loqa#43 - Privacy-First Architecture & Local Processing](https://github.com/loqalabs/loqa/issues/43)
-- [loqa#44 - Optional Privacy Modes & Data Sovereignty](https://github.com/loqalabs/loqa/issues/44)
-- [loqa#45 - Self-Hosted Security & Encryption Options](https://github.com/loqalabs/loqa/issues/45)
-
-**📋 Context**: Privacy is a core value, not a compliance checkbox. Build privacy-preserving features that empower users to control their data completely.
-
-**Local-First Privacy Foundation:**
-- [ ] **Implement RAM-only voice processing by default** - no persistent audio storage
-- [ ] **Add configurable data retention policies** (ephemeral by default, optional logging)
-- [ ] **Create privacy transparency features** showing exactly what data exists and where
-- [ ] **Develop privacy impact documentation** for self-hosting and data sovereignty
-- [ ] **Add multiple privacy modes** (paranoid, balanced, convenient) based on user values
-
-**Technical Implementation:**
-- [ ] **Eliminate audio hash storage by default** for maximum privacy **→ [Issue #36](https://github.com/loqalabs/loqa/issues/36)**
-- [ ] **Implement optional end-to-end encryption** for users who want additional protection
-- [ ] **Add granular data controls** in Commander UI for complete user autonomy
-- [ ] **Create secure backup/restore options** that preserve privacy principles
-- [ ] **Implement optional transcript sanitization** layers for sensitive environments
-
-**User Empowerment:**
-- [ ] **Document privacy guarantees and limitations** with complete transparency
-- [ ] **Provide privacy self-assessment tools** for different threat models
-- [ ] **Create privacy-focused skill development guidelines** for community contributors
-- [ ] **Develop privacy advocacy materials** for broader voice AI ecosystem
-- [ ] **Establish privacy research collaboration** with academic and activist communities
-
-### 🔧 Tech Stack Modernization & Dependency Updates **[ELEVATED P1 PRIORITY]**
+### 🔧 Tech Stack Modernization & Dependency Updates **[PRIORITY 1 - FOUNDATION FIRST]**
 **🔗 GitHub Issues**: 
 - [loqa#27 - Upgrade Go 1.23.0 → 1.25.1 across all services](https://github.com/loqalabs/loqa/issues/27)
 - [loqa#28 - Standardize gRPC & Protobuf versions across all services](https://github.com/loqalabs/loqa/issues/28)
@@ -118,63 +33,26 @@
 - [ ] If upgrade requires significant refactoring → Create issue for post-MVP
 - [ ] All major upgrades must pass quality checks and performance validation
 
-### 🧠 Intent Parsing & Command Execution
-**🔗 GitHub Issue**: [loqa-hub#18 - Multi-command intent parsing and chaining](https://github.com/loqalabs/loqa-hub/issues/18)
+### 🔄 Basic Self-Healing Foundations **[PRIORITY 2 - RELIABILITY FOUNDATION]**
+**🔗 GitHub Issue**: [loqa#25 - Self-Healing Foundations for Business MVP - >99.5% Uptime Resilience](https://github.com/loqalabs/loqa/issues/25)
 
-- [ ] Support multi-command chaining in parsed intent pipeline
-  - [ ] Parse compound utterances (e.g., "Turn off the lights and play music")
-  - [ ] Route sub-intents to appropriate skills in sequence
-  - [ ] Ensure skill responses can be executed in order without overlap or conflict
-  - [ ] Combine or sequence TTS responses for multiple results
-  - [ ] If chaining fails, gracefully fallback to the first valid command
+**📋 Context**: Moved from P2 to P1 as >99.5% uptime is critical business requirement for professional deployment.
 
-### 🖥️ Commander UI & API Surface
-**🔗 GitHub Issue**: [loqa-commander#18 - Timeline filtering and event categorization](https://github.com/loqalabs/loqa-commander/issues/18)
+**Essential Reliability Features:**
+- [ ] **Enhanced health check system** with automatic service restart capabilities
+- [ ] **Intelligent retry logic** with exponential backoff for STT/LLM/NATS failures
+- [ ] **Basic circuit breaker patterns** to prevent cascade failures
+- [ ] **Graceful degradation modes** (continue core functionality when non-critical components fail)
+- [ ] **Service restart coordination** that preserves system state and user sessions
+- [ ] **Professional status indicators** in Commander UI without technical complexity
 
-- [ ] Add ability to filter timeline by success, failure, or low-confidence events
-- [ ] **Simplified Professional UI**: Create non-technical interface for business administrators
-- [ ] **Professional Status Indicators**: System health display without technical complexity
-
-### 🗣️ Speech-to-Text (STT) **[PROFESSIONAL UX FOCUS]**
-**🔗 GitHub Issue**: [loqa-hub#20 - STT confidence thresholds and wake word normalization](https://github.com/loqalabs/loqa-hub/issues/20)
-
-- [ ] Strip wake word ("Hey Loqa") before passing to intent parser
-- [ ] Normalize common misspellings of "Loqa" (e.g., "Luca") in post-STT
-- [ ] Define and enforce default confidence threshold for rejecting low-quality transcriptions
-- [ ] **Professional UX Enhancement**: Implement "did you mean?" patterns for low-confidence commands
-  - [ ] Use confidence gradient: "I heard..." vs "I think you said..." vs "Did you mean..."
-  - [ ] Avoid default "I'm not sure what you want me to do" - always attempt interpretation
-  - [ ] **Context**: Essential for professional UX differentiation from consumer assistants
-
-
-### 🔊 Text-to-Speech (TTS)
-**🔗 GitHub Issue**: [loqa-hub#21 - Integrate Kokoro-82M TTS for professional natural voices](https://github.com/loqalabs/loqa-hub/issues/21)
-
-- [ ] **PRIORITY**: Integrate Kokoro-82M TTS system for natural, expressive voices
-  - [ ] Replace/augment current TTS with Kokoro-82M (82M parameters, sub-0.3s processing)
-  - [ ] Support 10+ simultaneous voice streams for multi-user environments
-  - [ ] Optimize for Mac Mini M4 performance
-  - [ ] Ensure voices sound natural and professional for business environments
-- [ ] Play returned TTS phrase through speakers when using the test relay (must remain ephemeral and never stored to disk)
-
-### 🧠 Skills & Plugin System **[PROFESSIONAL FOCUS]**
-**🔗 GitHub Issue**: [loqa-skills#9 - Built-in Timer Skill with local tracking](https://github.com/loqalabs/loqa-skills/issues/9)
-
-- [ ] Add built-in "Set a timer" skill with local tracking and TTS countdown/complete response
-  - [ ] Support professional durations ("set a 15-minute patient consultation timer")
-  - [ ] Announce when timer expires via TTS playback
-  - [ ] Store and cancel timers locally on the hub
-- [ ] **CRITICAL**: Ensure manifest includes field for `sensitive: true` for privacy-tagged skills
-- [ ] Add basic professional skills: "help", "version", "what can you do?"
-- [ ] **Professional Skills Foundation**: Medical terminology, legal dictation basics
-
-### 🎙️ Home Assistant Voice PE Hardware Evaluation **[NEW P1 PRIORITY]**
+### 🎙️ Home Assistant Voice PE Hardware Evaluation **[PRIORITY 3 - PHYSICAL TESTING FOUNDATION]**
 **🔗 GitHub Issues**: 
 - [loqa#33 - HA Voice PE Stock Firmware Evaluation & UX Documentation](https://github.com/loqalabs/loqa/issues/33)
 - [loqa#34 - HA Voice PE Custom Firmware Development & Hardware Integration](https://github.com/loqalabs/loqa/issues/34)
 - [loqa#35 - HA Voice PE Comparative Analysis & Business Feasibility Assessment](https://github.com/loqalabs/loqa/issues/35)
 
-**📋 Context**: Evaluate Home Assistant Voice Preview Edition device as potential Loqa relay hardware to accelerate time-to-market vs custom hardware development. **Critical for MVP - need at least one production relay hardware option.**
+**📋 Context**: Having physical hardware for testing is critical for validating voice pipeline features, wake word detection, audio quality, and real-world performance. **Priority elevated - physical testing foundation needed before developing voice components.**
 
 **Phase 1: Stock Firmware Evaluation**
 - [ ] **HA Voice PE Setup & Integration**: Install Home Assistant, configure test devices, set up Voice PE device
@@ -193,11 +71,143 @@
 - [ ] **Business Feasibility Assessment**: Cost analysis, manufacturing scalability, regulatory compliance for custom hardware path
 - [ ] **Go-to-Market Strategy**: Recommend hardware approach (custom firmware, hardware partnership, or full custom development)
 
-### 📊 OSS MVP Success Criteria & Innovation Metrics **[ENHANCED WITH COMMUNITY FOCUS]**
+### 🔒 Privacy-by-Design Architecture **[PRIORITY 4 - CORE DIFFERENTIATOR]**
+**🔗 GitHub Issues**:
+- [loqa#13 - Privacy-by-Design Architecture & User Autonomy](https://github.com/loqalabs/loqa/issues/13)
+
+**📋 Context**: Privacy is a core value, not a compliance checkbox. Build privacy-preserving features that empower users to control their data completely.
+
+**Local-First Privacy Foundation:**
+- [ ] **Implement RAM-only voice processing by default** - no persistent audio storage
+- [ ] **Add configurable data retention policies** (ephemeral by default, optional logging)
+- [ ] **Create privacy transparency features** showing exactly what data exists and where
+- [ ] **Develop privacy impact documentation** for self-hosting and data sovereignty
+- [ ] **Add multiple privacy modes** (paranoid, balanced, convenient) based on user values
+
+**Technical Implementation:**
+- [ ] **Eliminate audio hash storage by default** for maximum privacy **→ [Issue #36](https://github.com/loqalabs/loqa/issues/36)**
+- [ ] **Implement optional end-to-end encryption** for users who want additional protection
+- [ ] **Add granular data controls** in Commander UI for complete user autonomy
+- [ ] **Create secure backup/restore options** that preserve privacy principles
+- [ ] **Implement optional transcript sanitization** layers for sensitive environments
+
+**User Empowerment:**
+- [ ] **Document privacy guarantees and limitations** with complete transparency
+- [ ] **Provide privacy self-assessment tools** for different threat models
+- [ ] **Create privacy-focused skill development guidelines** for community contributors
+- [ ] **Develop privacy advocacy materials** for broader voice AI ecosystem
+- [ ] **Establish privacy research collaboration** with academic and activist communities
+
+### 🗣️ Speech-to-Text (STT) **[PRIORITY 5 - VOICE PIPELINE CORE]**
+**🔗 GitHub Issue**: [loqa-hub#20 - STT confidence thresholds and wake word normalization](https://github.com/loqalabs/loqa-hub/issues/20)
+
+- [ ] Strip wake word ("Hey Loqa") before passing to intent parser
+- [ ] Normalize common misspellings of "Loqa" (e.g., "Luca") in post-STT
+- [ ] Define and enforce default confidence threshold for rejecting low-quality transcriptions
+- [ ] **Professional UX Enhancement**: Implement "did you mean?" patterns for low-confidence commands
+  - [ ] Use confidence gradient: "I heard..." vs "I think you said..." vs "Did you mean..."
+  - [ ] Avoid default "I'm not sure what you want me to do" - always attempt interpretation
+  - [ ] **Context**: Essential for professional UX differentiation from consumer assistants
+
+### 🔊 Text-to-Speech (TTS) **[PRIORITY 6 - VOICE PIPELINE CORE]**
+**🔗 GitHub Issue**: [loqa-hub#21 - Integrate Kokoro-82M TTS for professional natural voices](https://github.com/loqalabs/loqa-hub/issues/21)
+
+- [ ] **PRIORITY**: Integrate Kokoro-82M TTS system for natural, expressive voices
+  - [ ] Replace/augment current TTS with Kokoro-82M (82M parameters, sub-0.3s processing)
+  - [ ] Support 10+ simultaneous voice streams for multi-user environments
+  - [ ] Optimize for Mac Mini M4 performance
+  - [ ] Ensure voices sound natural and professional for business environments
+- [ ] Play returned TTS phrase through speakers when using the test relay (must remain ephemeral and never stored to disk)
+
+### 🧠 Intent Parsing & Command Execution **[PRIORITY 7 - LOGIC PIPELINE]**
+**🔗 GitHub Issue**: [loqa-hub#18 - Multi-command intent parsing and chaining](https://github.com/loqalabs/loqa-hub/issues/18)
+
+- [ ] Support multi-command chaining in parsed intent pipeline
+  - [ ] Parse compound utterances (e.g., "Turn off the lights and play music")
+  - [ ] Route sub-intents to appropriate skills in sequence
+  - [ ] Ensure skill responses can be executed in order without overlap or conflict
+  - [ ] Combine or sequence TTS responses for multiple results
+  - [ ] If chaining fails, gracefully fallback to the first valid command
+
+### 🧠 Skills & Plugin System **[PRIORITY 8 - EXTENSIBILITY FOUNDATION]**
+**🔗 GitHub Issue**: [loqa-skills#9 - Built-in Timer Skill with local tracking](https://github.com/loqalabs/loqa-skills/issues/9)
+
+- [ ] Add built-in "Set a timer" skill with local tracking and TTS countdown/complete response
+  - [ ] Support professional durations ("set a 15-minute patient consultation timer")
+  - [ ] Announce when timer expires via TTS playback
+  - [ ] Store and cancel timers locally on the hub
+- [ ] **CRITICAL**: Ensure manifest includes field for `sensitive: true` for privacy-tagged skills
+- [ ] Add basic professional skills: "help", "version", "what can you do?"
+- [ ] **Professional Skills Foundation**: Medical terminology, legal dictation basics
+
+### 🖥️ Commander UI & API Surface **[PRIORITY 9 - USER INTERFACE]**
+**🔗 GitHub Issue**: [loqa-commander#18 - Timeline filtering and event categorization](https://github.com/loqalabs/loqa-commander/issues/18)
+
+- [ ] Add ability to filter timeline by success, failure, or low-confidence events
+- [ ] **Simplified Professional UI**: Create non-technical interface for business administrators
+- [ ] **Professional Status Indicators**: System health display without technical complexity
+
+### ⚡ Innovation-First Performance & Emerging Tech **[PRIORITY 10 - OPTIMIZATION]**
+**🔗 GitHub Issues**:
+- [loqa#40 - Developer-First Installation & Setup Experience](https://github.com/loqalabs/loqa/issues/40)
+- [loqa#37 - Speech-to-Speech Model Integration for Sub-200ms Responses](https://github.com/loqalabs/loqa/issues/37)
+- [loqa#38 - Real-Time Streaming LLM Implementation](https://github.com/loqalabs/loqa/issues/38)
+
+**📋 Context**: Prioritize innovation over convention. Explore emerging technologies that make Loqa a platform for experimentation, not just another voice assistant clone.
+
+**Performance Baseline & Monitoring:**
+- [ ] **Document current voice pipeline performance** across Mac Mini M4 and other hardware configurations
+- [ ] **Implement automated performance regression testing** in CI/CD pipeline with alerts
+- [ ] **Create real-time performance monitoring dashboard** with component-level metrics
+- [ ] **Establish professional SLA targets** based on customer requirements (target: sub-2s response)
+- [ ] **Benchmark against competitive solutions** where possible for market positioning
+
+**Advanced AI Model Integration:**
+- [ ] **Evaluate speech-to-speech models** (Ultravox v0.5, Google Moshi) for direct audio processing
+- [ ] **Implement streaming LLM inference** for improved perceived performance and user engagement
+- [ ] **Add WebRTC support evaluation** for real-time audio streaming optimization
+- [ ] **Benchmark latest STT models** (AssemblyAI Slam-1, Deepgram Nova-2) vs current Whisper
+- [ ] **A/B test performance improvements** with pilot customers for validation
+
+**Resource Optimization:**
+- [ ] **Optimize concurrent processing** and resource utilization patterns for Mac Mini M4
+- [ ] **Implement intelligent request prioritization** and queuing strategies
+- [ ] **Add performance profiling tools** for ongoing optimization and troubleshooting
+
+
+### 🌟 Community Building & OSS Ecosystem Development **[PRIORITY 11 - COMMUNITY GROWTH]**
+**🔗 GitHub Issues**:
+- [loqa#41 - OSS Community Outreach & Developer Engagement Strategy](https://github.com/loqalabs/loqa/issues/41)
+- [loqa#39 - GitHub Sponsors Setup & Community Funding](https://github.com/loqalabs/loqa/issues/39)
+- [loqa#15 - Developer Community Features & Self-Hosting Optimization](https://github.com/loqalabs/loqa/issues/15)
+
+**📋 Context**: OSS community engagement has highest impact on innovation velocity and market validation. Focus on developers, makers, and privacy advocates who value creative freedom and autonomy.
+
+**Developer Community Engagement:**
+- [ ] **Launch developer community outreach** (Reddit r/selfhosted, Hacker News, dev Twitter)
+- [ ] **Create compelling OSS narrative** highlighting innovation-first approach and creative freedom
+- [ ] **Establish feedback loops** with privacy enthusiasts and self-hosting communities
+- [ ] **Document novel technical approaches** that differentiate from existing assistants
+- [ ] **Showcase experimental features** and invite community contributions
+
+**OSS Foundation & Documentation:**
+- [ ] **Create comprehensive self-hosting guide** with Docker, installation automation
+- [ ] **Develop contributor onboarding** with clear development workflows
+- [ ] **Implement community feedback system** for feature requests and innovation ideas
+- [ ] **Document extensibility patterns** for skills, integrations, and customization
+- [ ] **Create example configurations** for different use cases and hardware setups
+
+**Innovation & Differentiation:**
+- [ ] **Highlight unique technical approaches** vs. Alexa/Siri/Home Assistant clones
+- [ ] **Showcase emerging technology integration** (speech-to-speech, novel STT/TTS)
+- [ ] **Position as experimentation platform** for voice AI research and development
+- [ ] **Establish thought leadership** in local-first, privacy-preserving voice AI
+- [ ] **Connect with AI research community** for cutting-edge model integration
+
+### 📊 OSS MVP Success Criteria & Innovation Metrics **[PRIORITY 12 - SUCCESS FRAMEWORK]**
 **🔗 GitHub Issues**: 
-- [loqa#11 - OSS MVP Success Criteria - Define and track meaningful goals](https://github.com/loqalabs/loqa/issues/11)
-- [loqa#16 - OSS Innovation Metrics & Technical Validation](https://github.com/loqalabs/loqa/issues/16)
-- [loqa#46 - Community Engagement & Developer Success KPIs](https://github.com/loqalabs/loqa/issues/46)
+- [loqa#11 - MVP Success Criteria - Define and track measurable goals](https://github.com/loqalabs/loqa/issues/11)
+- [loqa#16 - OSS MVP Success Metrics & Community Growth Validation](https://github.com/loqalabs/loqa/issues/16)
 
 **🌟 Community Success Metrics (PRIMARY):**
 - [ ] **Developer Engagement**: Active community of 100+ developers with regular contributions
@@ -230,19 +240,6 @@
 - [ ] **Q1 2025**: HIPAA compliance certified, professional installer ready
 - [ ] **Q2 2025**: Business MVP feature complete with positive pilot feedback
 - [ ] **Q3 2025**: 25+ paying customers, channel partnerships established
-
-### 🔄 Basic Self-Healing Foundations **[MOVED TO P1 - BUSINESS RELIABILITY]**
-**🔗 GitHub Issue**: [loqa#25 - Self-Healing Foundations for Business MVP - >99.5% Uptime Resilience](https://github.com/loqalabs/loqa/issues/25)
-
-**📋 Context**: Moved from P2 to P1 as >99.5% uptime is critical business requirement for professional deployment.
-
-**Essential Reliability Features:**
-- [ ] **Enhanced health check system** with automatic service restart capabilities
-- [ ] **Intelligent retry logic** with exponential backoff for STT/LLM/NATS failures
-- [ ] **Basic circuit breaker patterns** to prevent cascade failures
-- [ ] **Graceful degradation modes** (continue core functionality when non-critical components fail)
-- [ ] **Service restart coordination** that preserves system state and user sessions
-- [ ] **Professional status indicators** in Commander UI without technical complexity
 
 ---
 
