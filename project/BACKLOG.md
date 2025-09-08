@@ -3,8 +3,8 @@
 > **📊 Track Progress**: View all issues and milestones in the [**Loqa MVP Roadmap Project**](https://github.com/orgs/loqalabs/projects/1)  
 > **🎯 Future Milestones**: [v2.0 Enterprise - Dec 31, 2026](https://github.com/loqalabs/loqa/milestone/3)
 
-## 🛠️ Developer Experience **[MOVED FROM P2]**
-_Moved to P3 to prioritize business market success first, then return focus to OSS developer community_
+## 🛠️ Advanced Developer Experience **[ENHANCED FOR OSS]**
+_Advanced tooling for power users and contributors - core developer experience is P1_
 
 **🔗 GitHub Issues**: 
 - [loqa#12 - Developer Experience - CLI tools and skill development](https://github.com/loqalabs/loqa/issues/12) *(Epic)*
@@ -257,73 +257,73 @@ _Advanced self-healing system implementing full monitoring, diagnosis, automated
 
 ---
 
-### 🪪 Feature Tiering & Licensing
-_This section adds structured feature tiers to clearly distinguish between free open-source capabilities and licensed premium functionality._
+### 🪪 Optional Premium Features & Monetization
+_Optional paid features that enhance the core OSS experience without limiting basic functionality._
 
-- [ ] Create `FEATURE_TIERS.md` (OSS / Licensed / Coming Soon)
-- [ ] Tag source with `// OSS_ONLY` or `// LICENSED_FEATURE`
-- [ ] CLI: Add `loqa features` command to print current tier
+- [ ] Create `MONETIZATION.md` (Core OSS / Optional Premium / Community Sponsored)
+- [ ] Tag source with `// CORE_OSS` or `// OPTIONAL_PREMIUM`
+- [ ] CLI: Add `loqa premium` command to show available enhancements
 
 ---
 
-### 🧺 Shopping List Sync (Paid Feature)
-_This section outlines a privacy-preserving, cloud-assisted mobile sync feature for shopping lists — designed as a showcase paid-tier skill._
+### 🧺 Cloud Sync & Mobile Integration (Optional Premium)
+_Privacy-preserving, encrypted sync features as an optional enhancement to the local-first core._
 
-- [ ] Create shopping-list skill with local SQLite persistence
-- [ ] Add gRPC and HTTP API endpoints for list manipulation
-- [ ] Define encrypted sync blob format (JSON + age or AES-GCM)
-- [ ] Build ephemeral QR-based pairing system (Hub ↔ Mobile)
-- [ ] Implement Loqa Relay microservice (stateless E2EE message routing)
-- [ ] Add pairing state + public key registry to loqa-hub
-- [ ] Build minimal PWA or native mobile app to sync and view list
-- [ ] Gate feature behind `config.license` or `--paid` flag
-- [ ] Add Commander UI component to manage sync status and pairing
+- [ ] Create encrypted cross-device sync skill with local SQLite persistence
+- [ ] Add secure gRPC and HTTP API endpoints for data synchronization
+- [ ] Define end-to-end encrypted sync format (user-controlled keys)
+- [ ] Build privacy-preserving QR-based pairing system (Hub ↔ Mobile)
+- [ ] Implement optional Loqa Cloud Relay (zero-knowledge message routing)
+- [ ] Add user-controlled key management and pairing registry
+- [ ] Build minimal PWA or native mobile app for encrypted sync
+- [ ] Gate behind optional `--premium-sync` flag (not license requirement)
+- [ ] Add Commander UI for sync management with full transparency
 ---
 
-### 🧭 Messaging & Positioning
-_These tasks focus on refining external messaging, public perception, and product framing to better communicate the platform's value and positioning._
+### 🧭 OSS-First Messaging & Positioning
+_Focus on developer autonomy, creative freedom, and privacy as core values rather than compliance requirements._
 
-- [ ] Highlight privacy differentiators vs Home Assistant Voice
-- [ ] Emphasize "HIPAA-conscious by design" in docs and landing
-- [ ] Add homepage tagline: "A voice assistant that does more than 'turn on the lights'"
-- [ ] Add privacy log policy to README: no voice storage, ephemeral logs, transcript redaction
-- [ ] Clarify "voice assistant" vs "voice platform"
-- [ ] Improve messaging across README, SPONSOR.md, homepage
-- [ ] Write short pitches tailored to developers, privacy users, smart home fans
-- [ ] UX test homepage messaging with real users
+- [ ] Highlight creative freedom vs constrained cloud assistants (Alexa, Google)
+- [ ] Emphasize "Privacy by choice, not compliance" in all messaging
+- [ ] Add homepage tagline: "A voice assistant that respects your autonomy and unleashes creativity"
+- [ ] Add privacy philosophy to README: local-first, user-controlled, transparent by design
+- [ ] Position as "voice platform for makers" vs "voice assistant for consumers"
+- [ ] Improve messaging for developers, makers, self-hosters, privacy advocates
+- [ ] Write compelling OSS narrative around innovation vs imitation
+- [ ] Community-test messaging with target developer audiences
 
-### 🎯 Enhanced Positioning & Target Audiences
-_Expand messaging to reach additional high-value market segments._
+### 🎯 Community-Driven Positioning & Target Audiences
+_Expand messaging to reach diverse maker and developer communities._
 
 **🔗 GitHub Issues**: 
-- [www-loqalabs-com#8 - HIPAA-conscious messaging and healthcare positioning](https://github.com/loqalabs/www-loqalabs-com/issues/8)
-- [www-loqalabs-com#9 - Privacy comparison table and Privacy First documentation](https://github.com/loqalabs/www-loqalabs-com/issues/9)
+- [www-loqalabs-com#8 - Developer-centric messaging and maker community positioning](https://github.com/loqalabs/www-loqalabs-com/issues/8)
+- [www-loqalabs-com#9 - Privacy-by-design philosophy and community documentation](https://github.com/loqalabs/www-loqalabs-com/issues/9)
 
-- [ ] **Healthcare professionals** messaging (HIPAA compliance angle)
-- [ ] **Enterprise privacy officers** positioning (compliance-ready platform)
-- [ ] **IoT developers** focus (extensible voice control platform)
-- [ ] **Smart home enthusiasts** beyond basic control
-- [ ] Add privacy comparison table vs major competitors
-- [ ] Create "Privacy First" documentation section
-- [ ] Add privacy audit checklist for skill developers
-- [ ] Strengthen competitive angles:
-  - [ ] "Voice assistant that doesn't phone home"
-  - [ ] "HIPAA-conscious by design"
-  - [ ] "Skill marketplace without vendor lock-in"
-  - [ ] "Your voice data stays in your house"
+- [ ] **Maker community** messaging (creative freedom and experimentation)
+- [ ] **Privacy advocates** positioning (autonomy-first platform)
+- [ ] **IoT developers** focus (extensible, hackable voice control platform)
+- [ ] **Self-hosting enthusiasts** beyond basic home automation
+- [ ] Add innovation comparison table vs existing voice assistants
+- [ ] Create "Autonomy First" documentation section
+- [ ] Add creative freedom checklist for skill developers
+- [ ] Strengthen differentiation angles:
+  - [ ] "Voice assistant that unleashes creativity, not constraints"
+  - [ ] "Privacy by choice, not compliance"
+  - [ ] "Open ecosystem without vendor lock-in"
+  - [ ] "Your voice, your rules, your innovation"
 
 ---
 
-### 🏢 Enterprise Readiness
-_Features for large-scale deployments and enterprise compliance requirements._
+### 🏢 Advanced Self-Hosting & Community Scale
+_Features for power users, communities, and organizations who value autonomy._
 
-- [ ] Multi-tenant skill isolation
-- [ ] Role-based access control for Commander UI
-- [ ] Backup/restore automation for hub data
-- [ ] Performance benchmarking tools
-- [ ] Audit trail export for compliance reporting
-- [ ] Enterprise SSO integration
-- [ ] Centralized policy management across multiple hubs
+- [ ] Multi-instance skill isolation and sandboxing
+- [ ] Granular privacy controls for Commander UI
+- [ ] Encrypted backup/restore with user key control
+- [ ] Performance benchmarking and optimization tools
+- [ ] Privacy-preserving usage analytics (opt-in only)
+- [ ] Decentralized authentication options (no SSO dependency)
+- [ ] Community-driven configuration sharing and templates
 
 ### 🎙️ Hardware Architecture & Manufacturing Strategy
 _Long-term hardware decisions building on Home Assistant Voice PE evaluation results._

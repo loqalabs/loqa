@@ -1,11 +1,96 @@
-## 🟥 P1 – Must-Fix Before Business MVP
+## 🟥 P1 – Must-Fix Before OSS MVP
 
-> **📊 Track Progress**: View all issues and milestones in the [**Loqa MVP Roadmap Project**](https://github.com/orgs/loqalabs/projects/1)  
-> **🎯 Business MVP Milestone**: [Due Dec 31, 2025](https://github.com/loqalabs/loqa/milestone/1)
-> **🎯 Target Market**: Small business professionals (lawyers, doctors, therapists) requiring privacy-first voice AI
-> **💻 Reference Platform**: Mac Mini M4 (16GB) - Complete system under $1000
+> **📊 Track Progress**: View all issues and milestones in the [**Loqa OSS MVP Project**](https://github.com/orgs/loqalabs/projects/1)  
+> **🎯 OSS MVP Milestone**: [Due Dec 31, 2025](https://github.com/loqalabs/loqa/milestone/1)
+> **🎯 Target Community**: Developers, privacy enthusiasts, and self-hosting advocates who value autonomy and creative freedom
+> **💻 Reference Platform**: Any modern machine (Docker/self-hosted) - Privacy-first by default
 
-### 🔧 Tech Stack Modernization & Dependency Updates **[NEW P1 PRIORITY]**
+### 🌟 Community Building & OSS Ecosystem Development **[CRITICAL P1 - START IMMEDIATELY]**
+**🔗 GitHub Issues**:
+- [loqa#37 - Developer Community Outreach & Engagement](https://github.com/loqalabs/loqa/issues/37)
+- [loqa#38 - OSS Documentation & Contribution Framework](https://github.com/loqalabs/loqa/issues/38)
+- [loqa#39 - Privacy-First Positioning & Open Innovation Messaging](https://github.com/loqalabs/loqa/issues/39)
+
+**📋 Context**: OSS community engagement has highest impact on innovation velocity and market validation. Focus on developers, makers, and privacy advocates who value creative freedom and autonomy.
+
+**Developer Community Engagement:**
+- [ ] **Launch developer community outreach** (Reddit r/selfhosted, Hacker News, dev Twitter)
+- [ ] **Create compelling OSS narrative** highlighting innovation-first approach and creative freedom
+- [ ] **Establish feedback loops** with privacy enthusiasts and self-hosting communities
+- [ ] **Document novel technical approaches** that differentiate from existing assistants
+- [ ] **Showcase experimental features** and invite community contributions
+
+**OSS Foundation & Documentation:**
+- [ ] **Create comprehensive self-hosting guide** with Docker, installation automation
+- [ ] **Develop contributor onboarding** with clear development workflows
+- [ ] **Implement community feedback system** for feature requests and innovation ideas
+- [ ] **Document extensibility patterns** for skills, integrations, and customization
+- [ ] **Create example configurations** for different use cases and hardware setups
+
+**Innovation & Differentiation:**
+- [ ] **Highlight unique technical approaches** vs. Alexa/Siri/Home Assistant clones
+- [ ] **Showcase emerging technology integration** (speech-to-speech, novel STT/TTS)
+- [ ] **Position as experimentation platform** for voice AI research and development
+- [ ] **Establish thought leadership** in local-first, privacy-preserving voice AI
+- [ ] **Connect with AI research community** for cutting-edge model integration
+
+### ⚡ Innovation-First Performance & Emerging Tech **[CRITICAL P1 - TECHNICAL LEADERSHIP]**
+**🔗 GitHub Issues**:
+- [loqa#40 - Experimental Performance Optimization & Benchmarking](https://github.com/loqalabs/loqa/issues/40)
+- [loqa#41 - Cutting-Edge Speech-to-Speech Model Integration](https://github.com/loqalabs/loqa/issues/41)
+- [loqa#42 - Novel Streaming Inference & Real-time Processing](https://github.com/loqalabs/loqa/issues/42)
+
+**📋 Context**: Prioritize innovation over convention. Explore emerging technologies that make Loqa a platform for experimentation, not just another voice assistant clone.
+
+**Performance Baseline & Monitoring:**
+- [ ] **Document current voice pipeline performance** across Mac Mini M4 and other hardware configurations
+- [ ] **Implement automated performance regression testing** in CI/CD pipeline with alerts
+- [ ] **Create real-time performance monitoring dashboard** with component-level metrics
+- [ ] **Establish professional SLA targets** based on customer requirements (target: sub-2s response)
+- [ ] **Benchmark against competitive solutions** where possible for market positioning
+
+**Advanced AI Model Integration:**
+- [ ] **Evaluate speech-to-speech models** (Ultravox v0.5, Google Moshi) for direct audio processing
+- [ ] **Implement streaming LLM inference** for improved perceived performance and user engagement
+- [ ] **Add WebRTC support evaluation** for real-time audio streaming optimization
+- [ ] **Benchmark latest STT models** (AssemblyAI Slam-1, Deepgram Nova-2) vs current Whisper
+- [ ] **A/B test performance improvements** with pilot customers for validation
+
+**Resource Optimization:**
+- [ ] **Optimize concurrent processing** and resource utilization patterns for Mac Mini M4
+- [ ] **Implement intelligent request prioritization** and queuing strategies
+- [ ] **Add performance profiling tools** for ongoing optimization and troubleshooting
+
+### 🔒 Privacy-by-Design Architecture **[CRITICAL P1 - AUTONOMY & FREEDOM]**
+**🔗 GitHub Issues**:
+- [loqa#43 - Privacy-First Architecture & Local Processing](https://github.com/loqalabs/loqa/issues/43)
+- [loqa#44 - Optional Privacy Modes & Data Sovereignty](https://github.com/loqalabs/loqa/issues/44)
+- [loqa#45 - Self-Hosted Security & Encryption Options](https://github.com/loqalabs/loqa/issues/45)
+
+**📋 Context**: Privacy is a core value, not a compliance checkbox. Build privacy-preserving features that empower users to control their data completely.
+
+**Local-First Privacy Foundation:**
+- [ ] **Implement RAM-only voice processing by default** - no persistent audio storage
+- [ ] **Add configurable data retention policies** (ephemeral by default, optional logging)
+- [ ] **Create privacy transparency features** showing exactly what data exists and where
+- [ ] **Develop privacy impact documentation** for self-hosting and data sovereignty
+- [ ] **Add multiple privacy modes** (paranoid, balanced, convenient) based on user values
+
+**Technical Implementation:**
+- [ ] **Eliminate audio hash storage by default** for maximum privacy **→ [Issue #36](https://github.com/loqalabs/loqa/issues/36)**
+- [ ] **Implement optional end-to-end encryption** for users who want additional protection
+- [ ] **Add granular data controls** in Commander UI for complete user autonomy
+- [ ] **Create secure backup/restore options** that preserve privacy principles
+- [ ] **Implement optional transcript sanitization** layers for sensitive environments
+
+**User Empowerment:**
+- [ ] **Document privacy guarantees and limitations** with complete transparency
+- [ ] **Provide privacy self-assessment tools** for different threat models
+- [ ] **Create privacy-focused skill development guidelines** for community contributors
+- [ ] **Develop privacy advocacy materials** for broader voice AI ecosystem
+- [ ] **Establish privacy research collaboration** with academic and activist communities
+
+### 🔧 Tech Stack Modernization & Dependency Updates **[ELEVATED P1 PRIORITY]**
 **🔗 GitHub Issues**: 
 - [loqa#27 - Upgrade Go 1.23.0 → 1.25.1 across all services](https://github.com/loqalabs/loqa/issues/27)
 - [loqa#28 - Standardize gRPC & Protobuf versions across all services](https://github.com/loqalabs/loqa/issues/28)
@@ -46,36 +131,21 @@
 ### 🖥️ Commander UI & API Surface
 **🔗 GitHub Issue**: [loqa-commander#18 - Timeline filtering and event categorization](https://github.com/loqalabs/loqa-commander/issues/18)
 
-- [x] Fix "Active Relays" count to reflect disconnections (e.g., when relay exits unexpectedly)
 - [ ] Add ability to filter timeline by success, failure, or low-confidence events
-- [x] Make event boxes more compact or collapsed by default
+- [ ] **Simplified Professional UI**: Create non-technical interface for business administrators
+- [ ] **Professional Status Indicators**: System health display without technical complexity
 
-### 🗣️ Speech-to-Text (STT)
+### 🗣️ Speech-to-Text (STT) **[PROFESSIONAL UX FOCUS]**
 **🔗 GitHub Issue**: [loqa-hub#20 - STT confidence thresholds and wake word normalization](https://github.com/loqalabs/loqa-hub/issues/20)
 
-- [x] Remove Whisper.cpp fallback
-  - [x] Remove whisper.cpp code from STT pipeline
-  - [x] Remove whisper model download logic
-  - [x] Clean up WHISPER_MODEL_PATH
-  - [x] Remove whisper-models volume from Docker
 - [ ] Strip wake word ("Hey Loqa") before passing to intent parser
 - [ ] Normalize common misspellings of "Loqa" (e.g., "Luca") in post-STT
 - [ ] Define and enforce default confidence threshold for rejecting low-quality transcriptions
-- [ ] Fallback: Ask user to repeat command if confidence is too low
-- [ ] **UX Enhancement**: Implement "did you mean?" patterns for low-confidence commands
-  - [ ] When confidence is below threshold but above minimum, suggest most likely intent
+- [ ] **Professional UX Enhancement**: Implement "did you mean?" patterns for low-confidence commands
   - [ ] Use confidence gradient: "I heard..." vs "I think you said..." vs "Did you mean..."
   - [ ] Avoid default "I'm not sure what you want me to do" - always attempt interpretation
-  - [ ] **Context**: Essential for professional UX differentiation from Siri/Alexa frustrations
+  - [ ] **Context**: Essential for professional UX differentiation from consumer assistants
 
-### 🔀 Multi-Relay Collision Detection
-**🔗 GitHub Issue**: [loqa-hub#19 - Multi-relay collision detection and arbitration](https://github.com/loqalabs/loqa-hub/issues/19)
-
-- [ ] Implement basic collision detection for multiple relay wake word activation
-  - [ ] Add ActiveStream tracking in AudioService with relay_id mapping
-  - [ ] Implement simple "last relay to connect wins" arbitration logic
-  - [ ] Send cancellation responses to losing relay devices via gRPC stream
-  - [ ] Add proper stream cleanup when relay devices are cancelled or disconnect
 
 ### 🔊 Text-to-Speech (TTS)
 **🔗 GitHub Issue**: [loqa-hub#21 - Integrate Kokoro-82M TTS for professional natural voices](https://github.com/loqalabs/loqa-hub/issues/21)
@@ -87,16 +157,16 @@
   - [ ] Ensure voices sound natural and professional for business environments
 - [ ] Play returned TTS phrase through speakers when using the test relay (must remain ephemeral and never stored to disk)
 
-### 🧠 Skills & Plugin System
+### 🧠 Skills & Plugin System **[PROFESSIONAL FOCUS]**
 **🔗 GitHub Issue**: [loqa-skills#9 - Built-in Timer Skill with local tracking](https://github.com/loqalabs/loqa-skills/issues/9)
 
 - [ ] Add built-in "Set a timer" skill with local tracking and TTS countdown/complete response
-  - [ ] Support durations like "set a timer for 5 minutes"
-  - [ ] Handle multiple timers if possible (e.g., "set a tea timer for 3 minutes and an oven timer for 10 minutes")
+  - [ ] Support professional durations ("set a 15-minute patient consultation timer")
   - [ ] Announce when timer expires via TTS playback
   - [ ] Store and cancel timers locally on the hub
-- [x] Add built-in "What time is it?" skill using hub local time
-- [ ] Ensure manifest includes field for `sensitive: true` for privacy-tagged skills
+- [ ] **CRITICAL**: Ensure manifest includes field for `sensitive: true` for privacy-tagged skills
+- [ ] Add basic professional skills: "help", "version", "what can you do?"
+- [ ] **Professional Skills Foundation**: Medical terminology, legal dictation basics
 
 ### 🎙️ Home Assistant Voice PE Hardware Evaluation **[NEW P1 PRIORITY]**
 **🔗 GitHub Issues**: 
@@ -123,25 +193,112 @@
 - [ ] **Business Feasibility Assessment**: Cost analysis, manufacturing scalability, regulatory compliance for custom hardware path
 - [ ] **Go-to-Market Strategy**: Recommend hardware approach (custom firmware, hardware partnership, or full custom development)
 
-### 📈 Business MVP Success Criteria
+### 📊 OSS MVP Success Criteria & Innovation Metrics **[ENHANCED WITH COMMUNITY FOCUS]**
 **🔗 GitHub Issues**: 
-- [loqa#11 - MVP Success Criteria - Define and track measurable goals](https://github.com/loqalabs/loqa/issues/11)
-- [loqa#16 - Business MVP Success Metrics & Hardware Validation](https://github.com/loqalabs/loqa/issues/16)
+- [loqa#11 - OSS MVP Success Criteria - Define and track meaningful goals](https://github.com/loqalabs/loqa/issues/11)
+- [loqa#16 - OSS Innovation Metrics & Technical Validation](https://github.com/loqalabs/loqa/issues/16)
+- [loqa#46 - Community Engagement & Developer Success KPIs](https://github.com/loqalabs/loqa/issues/46)
 
-**🎯 Technical Performance:**
-- [ ] 3-second end-to-end voice response time (reduced from 5s for professional use)
-- [ ] 95% wake word detection accuracy  
-- [ ] Support for 10+ simultaneous relays
-- [ ] Zero voice data persistence by default
-- [ ] Sub-100MB memory footprint per service
-- [ ] **NEW**: Optimized performance on Mac Mini M4 (16GB)
+**🌟 Community Success Metrics (PRIMARY):**
+- [ ] **Developer Engagement**: Active community of 100+ developers with regular contributions
+- [ ] **Innovation Showcase**: Demonstrate 3+ novel approaches that differentiate from existing assistants
+- [ ] **Self-Hosting Adoption**: 500+ successful self-hosted installations with feedback
+- [ ] **Contribution Quality**: Regular external PRs with meaningful improvements and features
+- [ ] **Technical Leadership**: Recognition in privacy/AI communities for innovative approaches
+- [ ] **Creative Freedom**: Enable developers to build things impossible with cloud assistants
+- [ ] **Community Stories**: Document compelling use cases that showcase autonomy and creativity
 
-**🏢 Business Requirements:**
-- [ ] **NEW**: Professional setup time <30 minutes from unboxing to first command
-- [ ] **NEW**: System uptime >99.5% for business reliability  
-- [ ] **NEW**: HIPAA compliance audit readiness
-- [ ] **NEW**: Natural, professional-quality TTS voices (no robotic speech)
-- [ ] **NEW**: Silent operation suitable for professional offices
+**🎯 Technical Performance Targets:**
+- [ ] **Voice Response Time**: <2 seconds average (target: <1.5s) on Mac Mini M4 hardware
+- [ ] **Component Latency**: STT <300ms, LLM <500ms, TTS <200ms, Network <100ms
+- [ ] **Wake Word Accuracy**: >95% detection in professional office environments
+- [ ] **Concurrent Users**: Support 5+ concurrent users without performance degradation
+- [ ] **System Reliability**: >99.5% uptime during business hours
+- [ ] **Memory Efficiency**: <500MB total system footprint on Mac Mini M4
+- [ ] **Professional Audio Quality**: Natural TTS voices suitable for business environments
+
+**🏢 Business Deployment Requirements:**
+- [ ] **Professional Setup**: <30 minutes from unboxing to first successful command
+- [ ] **HIPAA Compliance**: Full audit readiness with documentation and controls
+- [ ] **Silent Operation**: Suitable for professional offices without noise disruption
+- [ ] **Non-Technical Users**: Simplified Commander UI for business administrators
+- [ ] **Professional Support**: Business-grade support response times and procedures
+- [ ] **Integration Ready**: API compatibility with practice management systems
+
+**📈 Success Timeline Targets:**
+- [ ] **Q4 2024**: Customer interviews complete, pilot program launched
+- [ ] **Q1 2025**: HIPAA compliance certified, professional installer ready
+- [ ] **Q2 2025**: Business MVP feature complete with positive pilot feedback
+- [ ] **Q3 2025**: 25+ paying customers, channel partnerships established
+
+### 🔄 Basic Self-Healing Foundations **[MOVED TO P1 - BUSINESS RELIABILITY]**
+**🔗 GitHub Issue**: [loqa#25 - Self-Healing Foundations for Business MVP - >99.5% Uptime Resilience](https://github.com/loqalabs/loqa/issues/25)
+
+**📋 Context**: Moved from P2 to P1 as >99.5% uptime is critical business requirement for professional deployment.
+
+**Essential Reliability Features:**
+- [ ] **Enhanced health check system** with automatic service restart capabilities
+- [ ] **Intelligent retry logic** with exponential backoff for STT/LLM/NATS failures
+- [ ] **Basic circuit breaker patterns** to prevent cascade failures
+- [ ] **Graceful degradation modes** (continue core functionality when non-critical components fail)
+- [ ] **Service restart coordination** that preserves system state and user sessions
+- [ ] **Professional status indicators** in Commander UI without technical complexity
+
+---
+
+## 📅 Quarterly Implementation Roadmap
+
+### Q4 2024 (October - December): OSS Foundation & Innovation
+**🎯 Milestone**: OSS MVP Foundation Complete
+
+**October 2024:**
+- [ ] Complete Go 1.25+ upgrade and ESLint 8→9 migration
+- [ ] Launch developer community outreach (Reddit, HN, dev Twitter)
+- [ ] Implement streaming LLM responses for improved UX
+- [ ] Document experimental performance approaches and benchmarks
+
+**November 2024:**
+- [ ] Complete HA Voice PE evaluation as development/testing hardware
+- [ ] Launch OSS community with comprehensive self-hosting documentation
+- [ ] Begin privacy-by-design architecture implementation
+- [ ] Evaluate cutting-edge speech-to-speech models (Ultravox v0.5)
+
+**December 2024:**
+- [ ] OSS MVP feature complete with innovation showcases
+- [ ] Privacy-first implementation 80% complete (RAM-only by default)
+- [ ] Community feedback collection and innovation roadmap
+- [ ] Developer-friendly installation and contribution system ready
+
+### Q1 2025 (January - March): Community Growth & Innovation Leadership
+**🎯 Milestone**: OSS Innovation Platform Ready
+
+**January 2025:**
+- [ ] Complete privacy-by-design architecture with transparency
+- [ ] Developer-friendly installation automation and tutorials
+- [ ] Community success stories documented and promoted
+- [ ] Performance innovation (novel approaches achieving <1s response)
+
+**February 2025:**
+- [ ] Comprehensive developer documentation and contribution guides
+- [ ] AI research community engagement and collaboration
+- [ ] Advanced AI model integration (S2S, emerging techniques)
+- [ ] Community metrics and innovation tracking implemented
+
+**March 2025:**
+- [ ] OSS thought leadership established in voice AI space
+- [ ] Privacy advocacy materials and ecosystem positioning
+- [ ] Multi-platform deployment options (not just Mac Mini)
+- [ ] Optional monetization paths identified and documented
+
+### Q2 2025 (April - June): OSS MVP Launch & Monetization
+**🎯 Milestone**: OSS Success with Optional Business Model
+
+**Target Outcomes:**
+- [ ] 1000+ active self-hosted installations with community growth
+- [ ] $10K+ Monthly Recurring Revenue from optional paid features
+- [ ] Privacy leadership demonstrated to developer and maker communities
+- [ ] Multiple installation/deployment options for diverse use cases
+- [ ] Clear path to sustainable OSS development with optional revenue streams
 
 ---
 
@@ -149,6 +306,7 @@
 
 > **📊 Track Progress**: View all issues in the [**Loqa MVP Roadmap Project**](https://github.com/orgs/loqalabs/projects/1)  
 > **🎯 v1.0 Business Platform**: [Due June 30, 2026](https://github.com/loqalabs/loqa/milestone/2)
+> **📋 Focus**: Features for scaling beyond initial market validation and expanding professional capabilities
 
 ### 💼 System-in-a-Box Implementation **[NEW P2 PRIORITY]**
 **🔗 GitHub Issue**: [loqa#14 - Mac Mini M4 System-in-a-Box Implementation](https://github.com/loqalabs/loqa/issues/14)
@@ -217,6 +375,12 @@
 - [ ] **CRITICAL**: Do not store voice recordings by default (privacy-first default)
 - [ ] **CRITICAL**: Store transcript and intent logs only ephemerally (in memory or temp)
 - [ ] **CRITICAL**: Add sanitization layer to redact potential PHI from transcript logs
+- [ ] **CRITICAL**: Eliminate audio hash storage for RAM-only voice processing compliance **→ [Issue #36](https://github.com/loqalabs/loqa/issues/36)**
+  - [ ] Remove `audio_hash` field from voice_events database schema
+  - [ ] Update VoiceEvent struct to make audio hash calculation optional
+  - [ ] Implement configurable voice event retention policies (ephemeral by default)
+  - [ ] Add `VOICE_DATA_RETENTION` environment flag (0 = RAM-only, >0 = retention hours)
+  - [ ] Update audio service to skip hash calculation in privacy-first mode
 - [ ] Add skill manifest field: `sensitive: true` to suppress logging for medical/legal skills
 - [ ] Add `LOG_TRANSCRIPTS`, `LOG_INTENTS_ONLY`, and `LOG_SANITIZE` environment flags
 - [ ] CLI: `loqa export-logs --redact` support for compliance auditing
