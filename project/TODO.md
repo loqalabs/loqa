@@ -17,7 +17,7 @@
 **🎯 Strategic Shift**: Since this is a greenfield project, we should start with the latest versions of all technologies to avoid technical debt from day one. This applies until MVP is reached.
 
 **🚨 Critical Security Updates (Complete First):**
-- [ ] **Go 1.23.0 → 1.25.1**: All Go services (hub, relay, proto) **→ [Issue #27](https://github.com/loqalabs/loqa/issues/27)**
+- [x] **Go 1.23.0 → 1.25.1**: All Go services (hub, relay, proto) **→ [Issue #27](https://github.com/loqalabs/loqa/issues/27)** ✅ **COMPLETED**
 - [ ] **Standardize gRPC versions**: Fix version inconsistencies across services **→ [Issue #28](https://github.com/loqalabs/loqa/issues/28)**
 
 **🔄 Major Framework Upgrades (Breaking Changes):**
