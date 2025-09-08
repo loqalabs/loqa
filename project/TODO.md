@@ -18,7 +18,32 @@
 
 **🚨 Critical Security Updates (Complete First):**
 - [x] **Go 1.23.0 → 1.25.1**: All Go services (hub, relay, proto) **→ [Issue #27](https://github.com/loqalabs/loqa/issues/27)** ✅ **COMPLETED**
-- [ ] **Standardize gRPC versions**: Fix version inconsistencies across services **→ [Issue #28](https://github.com/loqalabs/loqa/issues/28)**
+- [x] **Standardize gRPC versions**: Fix version inconsistencies across services **→ [Issue #28](https://github.com/loqalabs/loqa/issues/28)** ✅ **COMPLETED**
+
+**🚀 Protocol Development Workflow Improvements:**
+- [x] **Phase 1 - Development Mode Toggle**: Implemented local proto testing without GitHub releases ✅ **COMPLETED**
+- [ ] **Phase 2 - Automated Proto Releases**: Implement automated proto releases on main branch pushes
+- [ ] **Phase 2 - Proto Validation CI**: Add proto validation CI that tests against consuming services  
+- [ ] **Phase 2 - Integration Test Matrix**: Create integration test matrix across service combinations
+- [ ] **Phase 3 - Go Workspace Approach**: Consider Go workspace approach for tighter integration
+- [ ] **Phase 3 - Semantic Versioning**: Implement semantic versioning based on proto changes
+- [ ] **Phase 3 - Breaking Change Detection**: Add breaking change detection and alerts
+
+**🔐 Security CI/CD Workflow Improvements:**
+- [ ] **Separate Security Workflows**: Create dedicated security workflows per repository (separate from main CI)
+- [ ] **Go Security Scanning**: Implement gosec and govulncheck for Go services (hub, relay, proto)
+- [ ] **Dependency Scanning**: Add npm audit and vulnerability scanning for Vue.js services (commander, website)
+- [ ] **Secret Scanning**: Implement GitLeaks or similar for preventing credential commits
+- [ ] **Weekly Security Scans**: Schedule comprehensive security scans with proper failure isolation
+- [ ] **Security-Specific Permissions**: Configure granular permissions for security workflows
+
+**🔒 Branch Protection & PR Requirements:**
+- [ ] **Audit PR Merge Requirements**: Review and standardize required status checks across all repositories
+- [ ] **Enforce Quality Gates**: Ensure build, test, and lint checks are required before merge
+- [ ] **Security Check Requirements**: Configure which security scans must pass vs. can be informational
+- [ ] **Review Requirements**: Standardize code review requirements (number of approvals, dismiss stale reviews)
+- [ ] **Branch Protection Rules**: Ensure consistent branch protection across all repositories
+- [ ] **Admin Override Policies**: Document when and how to bypass checks for emergency fixes
 
 **🔄 Major Framework Upgrades (Breaking Changes):**
 - [ ] **ESLint 8 → 9 Migration** (loqa-commander, www-loqalabs-com) **→ [Issue #29](https://github.com/loqalabs/loqa/issues/29)**
