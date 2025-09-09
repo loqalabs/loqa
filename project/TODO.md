@@ -43,12 +43,61 @@
 
 **🚀 Protocol Development Workflow Improvements:**
 - [x] **Phase 1 - Development Mode Toggle**: Implemented local proto testing without GitHub releases ✅ **COMPLETED**
-- [ ] **Phase 2 - Automated Proto Releases**: Implement automated proto releases on main branch pushes
-- [ ] **Phase 2 - Proto Validation CI**: Add proto validation CI that tests against consuming services  
-- [ ] **Phase 2 - Integration Test Matrix**: Create integration test matrix across service combinations
+- [x] **Phase 2 - Automated Proto Releases**: Implement automated proto releases on main branch pushes ✅ **COMPLETED** **→ [PR #17](https://github.com/loqalabs/loqa-proto/pull/17)**
+- [x] **Phase 2 - Proto Validation CI**: Add proto validation CI that tests against consuming services ✅ **COMPLETED** **→ [PR #17](https://github.com/loqalabs/loqa-proto/pull/17)** 
+- [x] **Phase 2 - Integration Test Matrix**: Create integration test matrix across service combinations ✅ **COMPLETED** **→ [PR #17](https://github.com/loqalabs/loqa-proto/pull/17)**
+- [x] **Phase 2 - Workflow Cleanup**: Remove troubleshooting artifacts and consolidate workflows ✅ **COMPLETED** **→ [PR #18](https://github.com/loqalabs/loqa-proto/pull/18)**
 - [ ] **Phase 3 - Go Workspace Approach**: Consider Go workspace approach for tighter integration
 - [ ] **Phase 3 - Semantic Versioning**: Implement semantic versioning based on proto changes
 - [ ] **Phase 3 - Breaking Change Detection**: Add breaking change detection and alerts
+
+### 🏗️ Unified System Versioning Architecture **[PRIORITY 3 - FOUNDATIONAL ARCHITECTURE]**
+**🔗 GitHub Issue**: [loqa#48 - Architecture Decision: Unified System Versioning Strategy](https://github.com/loqalabs/loqa/issues/48)
+
+**💭 Core Insight**: *"I want a way to unify versioning across the services. I am picturing a future nightmare where you have to know that service x requires v19, service y requires v32, and service z requires v1"*
+
+**📋 Context**: Past microservices experience shows version coordination becomes exponentially complex. With Loqa's multi-repository microservice architecture, this pain point will emerge as the system matures, affecting development velocity, deployment reliability, and user experience.
+
+**🎯 Vision**: Unified "Loqa v2.1.0" releases where entire system versions are coordinated, tested, and released together.
+
+**🚨 Pain Points to Prevent:**
+- **Development Complexity**: Developers needing to track compatibility matrices between services
+- **Deployment Orchestration**: Ensuring compatible service versions are deployed together  
+- **Debugging**: Troubleshooting issues across service boundaries with version mismatches
+- **Customer Communication**: Clear, simple version story for users and deployments
+
+**🔍 Architecture Decision Required:**
+- [ ] **Research unified versioning approaches** for microservices (monorepo, release trains, compatibility matrices)
+- [ ] **Evaluate Go workspace approach** for tighter version coordination **→ [Connects to Phase 3 above]**
+- [ ] **Design system-wide version schema** (semantic versioning at system level vs service level)
+- [ ] **Create version compatibility framework** with automated validation
+- [ ] **Define deployment orchestration strategy** ensuring compatible versions deploy together
+- [ ] **Plan migration path** from current individual service versioning
+
+**📊 Decision Framework:**
+- **Developer Experience**: How easy is it to know which versions work together?
+- **Deployment Reliability**: Can incompatible versions accidentally be deployed?
+- **Release Velocity**: Does unified versioning slow down or speed up releases?
+- **System Complexity**: Is the coordination overhead worth the benefits?
+- **OSS Community**: How do contributors understand system version story?
+
+**🔗 Related Work:**
+- **Protocol Semantic Versioning** (Phase 3) - Foundation for system versioning
+- **BACKLOG.md Line 93**: "Single-version releases vs individual microservice versioning strategy" 
+- **BACKLOG.md Line 99**: "Hub, relay, commander service versioning and coordination"
+- **Multi-repository structure** - Current architecture that creates the version coordination challenge
+
+**📅 Review Triggers:**
+- **Before OSS MVP** (Dec 2025) - Community needs clear version story
+- **When 5+ services exist** - Complexity becomes unmanageable without coordination
+- **Before customer deployments** (Q2 2026) - Production deployments need version reliability
+- **After Phase 3 protocol work** - Build on top of protocol versioning foundation
+
+**🎯 Success Criteria:**
+- Single "Loqa vX.Y.Z" version number represents entire system capability
+- Developers can determine service compatibility from system version alone
+- Deployment tools prevent incompatible service version combinations
+- Clear migration path from current per-service versioning
 
 
 **🔄 Major Framework Upgrades (Breaking Changes):**
@@ -64,7 +113,124 @@
 - [ ] If upgrade requires significant refactoring → Create issue for post-MVP
 - [ ] All major upgrades must pass quality checks and performance validation
 
-### 🔄 Basic Self-Healing Foundations **[PRIORITY 3 - RELIABILITY FOUNDATION]**
+### 🔧 GitHub Repository Protection Strategy Evaluation **[PRIORITY 3 - DEVELOPER EXPERIENCE]**
+**🔗 GitHub Issue**: *[Create new issue for this evaluation]*
+
+**📋 Context**: The Phase 2 Protocol automation experienced significant friction with GitHub Organization Rulesets and required status check naming. This pattern is likely to repeat across other repositories and block future development velocity.
+
+**🚨 Problem Identified:**
+- Organization Rulesets use opaque status check naming requirements
+- Developers cannot easily see what exact workflow/job names are expected
+- Troubleshooting requires organization admin access to ruleset configuration
+- Led to creation of 5+ debugging workflows and multiple failed PRs during Phase 2
+- Time spent on workflow naming issues instead of productive development
+
+**🎯 Evaluation Required:**
+
+**Option 1: Continue with Organization Rulesets**
+- [ ] **Document exact ruleset requirements** for each repository type
+- [ ] **Create standardized workflow naming conventions** across all repos  
+- [ ] **Implement ruleset visibility tooling** for developers
+- [ ] **Establish clear escalation path** for ruleset-related blocks
+
+**Option 2: Switch to Repository-specific Branch Protection**  
+- [ ] **Evaluate migration complexity** from org rulesets to repo branch protection
+- [ ] **Assess security implications** of distributed vs centralized protection  
+- [ ] **Document workflow naming transparency** benefits of branch protection
+- [ ] **Create migration plan** for existing repositories
+- [ ] **Test branch protection approach** in a pilot repository
+
+**🔍 Full Ruleset Approach Assessment:**
+- [ ] **Audit current organization rulesets** - what's actually configured?
+- [ ] **Document pain points** experienced across all repositories  
+- [ ] **Survey developer experience** with current ruleset approach
+- [ ] **Compare alternatives**: org rulesets vs repo branch protection vs hybrid approach
+- [ ] **Security analysis**: centralized control vs developer autonomy tradeoffs
+- [ ] **Maintenance overhead**: org admin dependency vs distributed management
+
+**📊 Decision Criteria:**
+- **Developer velocity**: How often do protection rules block productive work?
+- **Security effectiveness**: Are protection goals being met?  
+- **Maintenance burden**: Admin overhead vs developer self-service
+- **Transparency**: Can developers understand and fix protection issues independently?
+- **Scalability**: Will approach work as organization grows to 10+ repositories?
+
+**🎯 Success Metrics:**
+- Zero workflow naming blocks for 30 days after implementation
+- Developers can resolve protection issues without admin escalation  
+- Protection rule changes take <1 day instead of admin coordination
+- No security regressions from any approach changes
+
+**📅 Timeline Target**: Complete evaluation within 2 weeks, implement preferred approach within 1 month
+
+### 🔍 Security-Aware Observability for Failed Intents **[PRIORITY 2 - PRIVACY-FIRST DEBUGGING]**
+**🔗 GitHub Issue**: [loqa#49 - Architecture Decision: Security-Aware Observability for Intent Debugging](https://github.com/loqalabs/loqa/issues/49)
+
+**💭 Core Insight**: *"We are moving away from storing voice recordings and transcripts due to security concerns, but that poses challenges for observability and debugging. What if in particular cases (like Loqa didn't understand an intent) we log extra information (but in a secure way) so that a developer can understand what happened and try to fix it."*
+
+**📋 Context**: Past microservices experience shows that debugging production issues becomes exponentially harder without observability data. With Loqa's privacy-first approach removing traditional logging (voice recordings, full transcripts), we need novel approaches that preserve debugging capability without compromising security principles.
+
+**🎯 Vision**: Intelligent failure logging that provides actionable debugging information while maintaining zero-trust privacy guarantees.
+
+**🚨 Problem Being Solved:**
+- **Development Blindness**: When intents fail in production, developers have no insight into what went wrong
+- **Privacy vs Observability Tension**: Traditional logging conflicts with HIPAA/security requirements
+- **Community Support Difficulty**: Hard to help community users troubleshoot without diagnostic data
+- **Quality Assurance Gaps**: No systematic way to detect and fix recognition patterns
+
+**🔍 Security-Aware Debugging Approaches:**
+- [ ] **Failure Event Metadata Logging** - Store failure context without sensitive content:
+  - Confidence scores, processing times, component failures
+  - Intent classification attempts (without original text)
+  - Skill routing decisions and error codes
+  - Audio quality metrics (SNR, duration, etc.)
+- [ ] **Hashed Pattern Recognition** - Anonymous pattern detection:
+  - One-way hashes of failed utterances for pattern clustering
+  - Statistical failure analysis without content exposure
+  - Community-aggregate failure patterns (opt-in only)
+- [ ] **Development Mode Enhanced Logging** - Secure debugging environment:
+  - Explicit developer opt-in with clear data retention policies
+  - Encrypted logs accessible only with developer keys
+  - Automatic expiration and secure deletion
+- [ ] **Sanitized Transcript Logging** - Redacted content for analysis:
+  - PII/PHI redaction with placeholder tokens
+  - Intent-relevant keywords preserved, context removed
+  - Optional community contribution to improve recognition
+
+**🔗 Integration with Existing Privacy Architecture:**
+- Builds on **TODO.md:242-273** (Privacy-by-design foundation)
+- Connects to **BACKLOG.md:33** (Drill-down debugger mode for voice pipeline)
+- Extends **BACKLOG.md:28-30** (Encrypted logging and audit trails)
+- Supports **TODO.md:276** (Skill manifest `sensitive: true` field)
+
+**📊 Implementation Framework:**
+- [ ] **Privacy Impact Assessment** - Evaluate each logging approach against privacy principles
+- [ ] **Configurable Privacy Levels** - Multiple debugging modes based on user trust/security requirements
+  - Paranoid: Metadata only, no content logging
+  - Balanced: Hashed patterns + sanitized keywords
+  - Development: Full logging with explicit consent + encryption
+- [ ] **Community Feedback System** - Allow users to contribute anonymized failure patterns to improve system
+- [ ] **Developer Tooling** - Create secure debugging dashboards and analysis tools
+
+**🎯 Success Criteria:**
+- Developers can diagnose 80%+ of intent failures without accessing sensitive data
+- Privacy principles maintained: no clear-text voice content or full transcripts stored
+- Community can contribute to system improvement without compromising personal privacy
+- Debugging capability improvement measurable through reduced time-to-resolution
+
+**📅 Review Triggers:**
+- **Before Privacy Architecture Finalization** - Must influence core privacy design decisions
+- **When Intent Recognition Issues Emerge** - Real-world debugging needs become apparent
+- **Before Community Release** - Community needs support without privacy compromise
+- **Before Business Deployments** - Professional environments require audit-compliant debugging
+
+**🔗 Related Work:**
+- **Privacy-by-design architecture** (current TODO.md work)
+- **Advanced skill debugging tools** (BACKLOG.md)
+- **HIPAA compliance requirements** (TODO.md business deployment needs)
+- **Community support infrastructure** (OSS community engagement)
+
+### 🔄 Basic Self-Healing Foundations **[PRIORITY 4 - RELIABILITY FOUNDATION]**
 **🔗 GitHub Issue**: [loqa#25 - Self-Healing Foundations for Community Reliability](https://github.com/loqalabs/loqa/issues/25)
 
 **📋 Context**: >99.5% uptime is critical community requirement for reliable self-hosted deployment.
@@ -167,6 +333,13 @@
   - [ ] Support community durations ("set a 15-minute meeting timer")
   - [ ] Announce when timer expires via TTS playback
   - [ ] Store and cancel timers locally on the hub
+- [ ] **List Management Skill with Multi-Item Support** (Pain point identified from Siri usage feedback)
+  - [ ] **Batch list commands**: "Add milk, eggs, flour, and oil to my shopping list"
+  - [ ] **Interactive list building**: "I want to add items to my shopping list" → conversational item collection
+  - [ ] **List persistence**: Local SQLite storage with privacy-first design (ephemeral by default)
+  - [ ] **Voice confirmation**: Read back items added, support corrections ("Remove milk")
+  - [ ] **Multiple list types**: Shopping, todo, reminders, notes
+  - [ ] **Integration-ready**: Design for future sync with external apps (Home Assistant, task managers)
 - [ ] **CRITICAL**: Ensure manifest includes field for `sensitive: true` for privacy-tagged skills
 - [ ] Add basic community skills: "help", "version", "what can you do?" **→ [Issue #11](https://github.com/loqalabs/loqa-skills/issues/11)**
 - [ ] **Community Skills Foundation**: Medical terminology, legal dictation basics **→ [Issue #11](https://github.com/loqalabs/loqa-skills/issues/11)**

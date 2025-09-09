@@ -29,7 +29,7 @@ _Advanced observability features for enterprise deployments. Basic compliance fe
 - [ ] Add signed audit trail support (tamper-evident logs)  
 - [ ] Add local emergency wipe command / red button
 - [ ] Add integration tests for streaming STT pipeline
-- [ ] Add drill-down debugger mode for voice pipeline (NLU → Skill → Response)
+- [ ] Add drill-down debugger mode for voice pipeline (NLU → Skill → Response) **→ [Related: TODO.md - Security-Aware Observability, Issue #49](https://github.com/loqalabs/loqa/issues/49)**
 - [ ] **Enterprise**: Multi-tenant observability across business locations
 - [ ] **Enterprise**: Advanced performance analytics and capacity planning
 - [ ] **Enterprise**: Integration with business monitoring systems (Datadog, etc.)
@@ -90,13 +90,13 @@ _Comprehensive update mechanism design that preserves offline-first architecture
 
 **📋 Key Questions to Resolve:**
 - [ ] **Research Phase**: Survey P2P update distribution mechanisms (BitTorrent-like, gossip protocols, mesh networking)
-- [ ] **Architecture Decision**: Single-version releases vs individual microservice versioning strategy
+- [ ] **Architecture Decision**: Single-version releases vs individual microservice versioning strategy **→ [MOVED TO TODO.md - Unified System Versioning Architecture]**
 - [ ] **Compliance Research**: Medical environment update requirements and audit trails
 - [ ] **Offline Strategy**: Determine acceptable balance of online vs purely offline update paths
 
 **🎯 Core Requirements:**
 - [ ] **Docker-based updates** that don't require internet connectivity for isolated deployments
-- [ ] **System updates**: Hub, relay, commander service versioning and coordination
+- [ ] **System updates**: Hub, relay, commander service versioning and coordination **→ [Related: TODO.md - Unified System Versioning Architecture]**
 - [ ] **Skills updates**: Plugin/skill distribution without central dependency
 - [ ] **HIPAA compatibility**: Update mechanism that preserves audit trails and data isolation
 - [ ] **Rollback capability**: Safe update rollback for business continuity
