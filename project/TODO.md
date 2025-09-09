@@ -7,8 +7,6 @@
 
 ### 🔧 Tech Stack Modernization & Dependency Updates **[PRIORITY 1 - FOUNDATION FIRST]**
 **🔗 GitHub Issues**: 
-- [loqa#27 - Upgrade Go 1.23.0 → 1.25.1 across all services](https://github.com/loqalabs/loqa/issues/27)
-- [loqa#28 - Standardize gRPC & Protobuf versions across all services](https://github.com/loqalabs/loqa/issues/28)
 - [loqa#29 - ESLint 8 → 9 Migration (Breaking Changes)](https://github.com/loqalabs/loqa/issues/29)
 - [loqa#30 - Tailwind CSS 3 → 4 Migration (Breaking Changes)](https://github.com/loqalabs/loqa/issues/30)
 - [loqa#31 - Pinia 2 → 3 Migration (Breaking Changes)](https://github.com/loqalabs/loqa/issues/31)
@@ -461,12 +459,12 @@
   - *See detailed "did you mean?" UX patterns in STT section (lines 65-69)*
 - [ ] **NEW**: Performance monitoring dashboard for business SLA compliance
 - [ ] **NEW**: Professional licensing and activation system
-- [ ] **NEW**: Multi-location management for business chains/practices
+- [ ] **NEW**: Multi-location management for community deployments
 
 ### 🔄 Self-Healing Foundations **[NEW - SUPPORTS >99.5% UPTIME GOAL]**
-**🔗 GitHub Issue**: [loqa#25 - Self-Healing Foundations for Business MVP - >99.5% Uptime Resilience](https://github.com/loqalabs/loqa/issues/25)
+**🔗 GitHub Issue**: [loqa#25 - Self-Healing Foundations for Community Reliability](https://github.com/loqalabs/loqa/issues/25)
 
-**🎯 MVP Resilience Goal**: Basic automatic recovery without user intervention to support business reliability requirements
+**🎯 MVP Resilience Goal**: Basic automatic recovery without user intervention to support community reliability requirements
 
 **Smart Health & Recovery:**
 - [ ] **Enhanced health check system** with automatic remediation triggers
