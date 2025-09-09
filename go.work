@@ -1,0 +1,8 @@
+go 1.25.1
+
+use (
+	../loqa-hub
+	../loqa-proto/go
+	../loqa-relay/test-go
+	../loqa-skills/homeassistant-skill
+)
