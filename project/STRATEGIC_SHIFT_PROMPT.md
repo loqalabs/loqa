@@ -9,12 +9,14 @@ Use this prompt when you need to make a major change in focus, technology, appro
 ```
 ## 🚨 CRITICAL WORKFLOW REQUIREMENTS
 
-**BEFORE IMPLEMENTING ANY STRATEGIC SHIFT:**
+**BEFORE YOU START:**
 - [ ] **NEVER push directly to main branch** - Always create feature branches
-- [ ] **ALWAYS create PRs** for review, even for strategic changes
+- [ ] **ALWAYS create PRs** for review, even for simple changes
 - [ ] **ALL quality checks must PASS** - No exceptions for linting, tests, builds
+- [ ] **If a tool you need to finish a task is not installed, ALWAYS ask to install it and NEVER skip it
 - [ ] **End-to-end verification is REQUIRED** - Never assume functionality works
 - [ ] **When blocked, ASK** - Never make assumptions or work around errors
+- [ ] **If a task cannot be completed in this session, ALWAYS make sure it is tracked in TODO.md or BACKLOG.md
 
 **STRATEGIC CHANGES REQUIRE EXTRA CARE:**
 - [ ] **Multi-repo coordination is CRITICAL** - Strategic shifts often affect multiple services

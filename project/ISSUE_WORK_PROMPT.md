@@ -9,8 +9,10 @@ Use this template when asking Claude to work on a specific GitHub issue.
 - [ ] **NEVER push directly to main branch** - Always create feature branches
 - [ ] **ALWAYS create PRs** for review, even for simple changes
 - [ ] **ALL quality checks must PASS** - No exceptions for linting, tests, builds
+- [ ] **If a tool you need to finish a task is not installed, ALWAYS ask to install it and NEVER skip it
 - [ ] **End-to-end verification is REQUIRED** - Never assume functionality works
 - [ ] **When blocked, ASK** - Never make assumptions or work around errors
+- [ ] **If a task cannot be completed in this session, ALWAYS make sure it is tracked in TODO.md or BACKLOG.md
 
 **MULTI-REPOSITORY REMINDER:**
 - [ ] This is a **multi-repo architecture** - each service is a separate Git repository

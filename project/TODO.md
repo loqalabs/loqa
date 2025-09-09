@@ -1,6 +1,6 @@
 ## 🟥 P1 – Must-Fix Before OSS MVP
 
-> **📊 Track Progress**: View all issues and milestones in the [**Loqa OSS MVP Project**](https://github.com/orgs/loqalabs/projects/1)  
+> **📊 Track Progress**: View all issues and milestones in the [**Loqa MVP Roadmap**](https://github.com/orgs/loqalabs/projects/1)  
 > **🎯 OSS MVP Milestone**: [Due Dec 31, 2025](https://github.com/loqalabs/loqa/milestone/1)
 > **🎯 Target Community**: Developers, privacy enthusiasts, and self-hosting advocates who value autonomy and creative freedom
 > **💻 Reference Platform**: Any modern machine (Docker/self-hosted) - Privacy-first by default
@@ -30,6 +30,7 @@
 - [ ] **Phase 3 - Breaking Change Detection**: Add breaking change detection and alerts
 
 **🔐 Security CI/CD Workflow Improvements:**
+**🔗 GitHub Issue**: [loqa#42 - Security CI/CD Workflow Improvements (Epic)](https://github.com/loqalabs/loqa/issues/42)
 - [ ] **Separate Security Workflows**: Create dedicated security workflows per repository (separate from main CI)
 - [ ] **Go Security Scanning**: Implement gosec and govulncheck for Go services (hub, relay, proto)
 - [ ] **Dependency Scanning**: Add npm audit and vulnerability scanning for Vue.js services (commander, website)
@@ -38,6 +39,7 @@
 - [ ] **Security-Specific Permissions**: Configure granular permissions for security workflows
 
 **🔒 Branch Protection & PR Requirements:**
+**🔗 GitHub Issue**: [loqa#43 - Branch Protection & PR Requirements Audit (Epic)](https://github.com/loqalabs/loqa/issues/43)
 - [ ] **Audit PR Merge Requirements**: Review and standardize required status checks across all repositories
 - [ ] **Enforce Quality Gates**: Ensure build, test, and lint checks are required before merge
 - [ ] **Security Check Requirements**: Configure which security scans must pass vs. can be informational
@@ -59,23 +61,23 @@
 - [ ] All major upgrades must pass quality checks and performance validation
 
 ### 🔄 Basic Self-Healing Foundations **[PRIORITY 2 - RELIABILITY FOUNDATION]**
-**🔗 GitHub Issue**: [loqa#25 - Self-Healing Foundations for Business MVP - >99.5% Uptime Resilience](https://github.com/loqalabs/loqa/issues/25)
+**🔗 GitHub Issue**: [loqa#25 - Self-Healing Foundations for Community Reliability](https://github.com/loqalabs/loqa/issues/25)
 
-**📋 Context**: Moved from P2 to P1 as >99.5% uptime is critical business requirement for professional deployment.
+**📋 Context**: Moved from P2 to P1 as >99.5% uptime is critical community requirement for reliable self-hosted deployment.
 
 **Essential Reliability Features:**
-- [ ] **Enhanced health check system** with automatic service restart capabilities
-- [ ] **Intelligent retry logic** with exponential backoff for STT/LLM/NATS failures
-- [ ] **Basic circuit breaker patterns** to prevent cascade failures
+- [ ] **Enhanced health check system** with automatic service restart capabilities **→ [Issue #44](https://github.com/loqalabs/loqa/issues/44)**
+- [ ] **Intelligent retry logic** with exponential backoff for STT/LLM/NATS failures **→ [Issue #45](https://github.com/loqalabs/loqa/issues/45)**
+- [ ] **Basic circuit breaker patterns** to prevent cascade failures **→ [Issue #45](https://github.com/loqalabs/loqa/issues/45)**
 - [ ] **Graceful degradation modes** (continue core functionality when non-critical components fail)
-- [ ] **Service restart coordination** that preserves system state and user sessions
-- [ ] **Professional status indicators** in Commander UI without technical complexity
+- [ ] **Service restart coordination** that preserves system state and user sessions **→ [Issue #44](https://github.com/loqalabs/loqa/issues/44)**
+- [ ] **Community status indicators** in Commander UI without technical complexity
 
 ### 🎙️ Home Assistant Voice PE Hardware Evaluation **[PRIORITY 3 - PHYSICAL TESTING FOUNDATION]**
 **🔗 GitHub Issues**: 
 - [loqa#33 - HA Voice PE Stock Firmware Evaluation & UX Documentation](https://github.com/loqalabs/loqa/issues/33)
 - [loqa#34 - HA Voice PE Custom Firmware Development & Hardware Integration](https://github.com/loqalabs/loqa/issues/34)
-- [loqa#35 - HA Voice PE Comparative Analysis & Business Feasibility Assessment](https://github.com/loqalabs/loqa/issues/35)
+- [loqa#35 - HA Voice PE Comparative Analysis & Community Feasibility Assessment](https://github.com/loqalabs/loqa/issues/35)
 
 **📋 Context**: Having physical hardware for testing is critical for validating voice pipeline features, wake word detection, audio quality, and real-world performance. **Priority elevated - physical testing foundation needed before developing voice components.**
 
@@ -90,11 +92,11 @@
 - [ ] **Loqa Firmware Development**: Develop custom firmware integrating with Loqa gRPC protocol
 - [ ] **Hardware Integration Testing**: Verify LED ring control, button functionality, audio quality with custom firmware
 
-**Phase 3: Comparative Analysis & Business Decision**
+**Phase 3: Comparative Analysis & Community Decision**
 - [ ] **Performance Comparison**: Test custom firmware vs stock firmware across identical scenarios
 - [ ] **Feature Gap Analysis**: Identify areas where stock firmware excels and improve custom implementation
-- [ ] **Business Feasibility Assessment**: Cost analysis, manufacturing scalability, regulatory compliance for custom hardware path
-- [ ] **Go-to-Market Strategy**: Recommend hardware approach (custom firmware, hardware partnership, or full custom development)
+- [ ] **Community Feasibility Assessment**: Cost analysis, manufacturing scalability, regulatory compliance for custom hardware path
+- [ ] **OSS Strategy**: Recommend hardware approach (custom firmware, community partnership, or full open development)
 
 ### 🔒 Privacy-by-Design Architecture **[PRIORITY 4 - CORE DIFFERENTIATOR]**
 **🔗 GitHub Issues**:
@@ -129,23 +131,23 @@
 - [ ] Strip wake word ("Hey Loqa") before passing to intent parser
 - [ ] Normalize common misspellings of "Loqa" (e.g., "Luca") in post-STT
 - [ ] Define and enforce default confidence threshold for rejecting low-quality transcriptions
-- [ ] **Professional UX Enhancement**: Implement "did you mean?" patterns for low-confidence commands
+- [ ] **Community UX Enhancement**: Implement "did you mean?" patterns for low-confidence commands
   - [ ] Use confidence gradient: "I heard..." vs "I think you said..." vs "Did you mean..."
   - [ ] Avoid default "I'm not sure what you want me to do" - always attempt interpretation
-  - [ ] **Context**: Essential for professional UX differentiation from consumer assistants
+  - [ ] **Context**: Essential for community UX differentiation from consumer assistants
 
 ### 🔊 Text-to-Speech (TTS) **[PRIORITY 6 - VOICE PIPELINE CORE]**
-**🔗 GitHub Issue**: [loqa-hub#21 - Integrate Kokoro-82M TTS for professional natural voices](https://github.com/loqalabs/loqa-hub/issues/21)
+**🔗 GitHub Issue**: [loqa-hub#26 - Integrate Kokoro-82M TTS for professional natural voices](https://github.com/loqalabs/loqa-hub/issues/26)
 
 - [ ] **PRIORITY**: Integrate Kokoro-82M TTS system for natural, expressive voices
   - [ ] Replace/augment current TTS with Kokoro-82M (82M parameters, sub-0.3s processing)
   - [ ] Support 10+ simultaneous voice streams for multi-user environments
   - [ ] Optimize for Mac Mini M4 performance
-  - [ ] Ensure voices sound natural and professional for business environments
+  - [ ] Ensure voices sound natural and professional for community environments
 - [ ] Play returned TTS phrase through speakers when using the test relay (must remain ephemeral and never stored to disk)
 
 ### 🧠 Intent Parsing & Command Execution **[PRIORITY 7 - LOGIC PIPELINE]**
-**🔗 GitHub Issue**: [loqa-hub#18 - Multi-command intent parsing and chaining](https://github.com/loqalabs/loqa-hub/issues/18)
+**🔗 GitHub Issue**: [loqa-hub#27 - Multi-command intent parsing and chaining](https://github.com/loqalabs/loqa-hub/issues/27)
 
 - [ ] Support multi-command chaining in parsed intent pipeline
   - [ ] Parse compound utterances (e.g., "Turn off the lights and play music")
@@ -158,19 +160,19 @@
 **🔗 GitHub Issue**: [loqa-skills#9 - Built-in Timer Skill with local tracking](https://github.com/loqalabs/loqa-skills/issues/9)
 
 - [ ] Add built-in "Set a timer" skill with local tracking and TTS countdown/complete response
-  - [ ] Support professional durations ("set a 15-minute patient consultation timer")
+  - [ ] Support community durations ("set a 15-minute meeting timer")
   - [ ] Announce when timer expires via TTS playback
   - [ ] Store and cancel timers locally on the hub
 - [ ] **CRITICAL**: Ensure manifest includes field for `sensitive: true` for privacy-tagged skills
-- [ ] Add basic professional skills: "help", "version", "what can you do?"
-- [ ] **Professional Skills Foundation**: Medical terminology, legal dictation basics
+- [ ] Add basic community skills: "help", "version", "what can you do?" **→ [Issue #11](https://github.com/loqalabs/loqa-skills/issues/11)**
+- [ ] **Community Skills Foundation**: Medical terminology, legal dictation basics **→ [Issue #11](https://github.com/loqalabs/loqa-skills/issues/11)**
 
 ### 🖥️ Commander UI & API Surface **[PRIORITY 9 - USER INTERFACE]**
-**🔗 GitHub Issue**: [loqa-commander#18 - Timeline filtering and event categorization](https://github.com/loqalabs/loqa-commander/issues/18)
+**🔗 GitHub Issue**: [loqa-commander#14 - Timeline filtering and event categorization](https://github.com/loqalabs/loqa-commander/issues/14)
 
 - [ ] Add ability to filter timeline by success, failure, or low-confidence events
-- [ ] **Simplified Professional UI**: Create non-technical interface for business administrators
-- [ ] **Professional Status Indicators**: System health display without technical complexity
+- [ ] **Simplified Community UI**: Create non-technical interface for community administrators
+- [ ] **Community Status Indicators**: System health display without technical complexity
 
 ### ⚡ Innovation-First Performance & Emerging Tech **[PRIORITY 10 - OPTIMIZATION]**
 **🔗 GitHub Issues**:
@@ -184,15 +186,15 @@
 - [ ] **Document current voice pipeline performance** across Mac Mini M4 and other hardware configurations
 - [ ] **Implement automated performance regression testing** in CI/CD pipeline with alerts
 - [ ] **Create real-time performance monitoring dashboard** with component-level metrics
-- [ ] **Establish professional SLA targets** based on customer requirements (target: sub-2s response)
-- [ ] **Benchmark against competitive solutions** where possible for market positioning
+- [ ] **Establish community SLA targets** based on community requirements (target: sub-2s response)
+- [ ] **Benchmark against competitive solutions** where possible for innovation positioning
 
 **Advanced AI Model Integration:**
 - [ ] **Evaluate speech-to-speech models** (Ultravox v0.5, Google Moshi) for direct audio processing
 - [ ] **Implement streaming LLM inference** for improved perceived performance and user engagement
 - [ ] **Add WebRTC support evaluation** for real-time audio streaming optimization
 - [ ] **Benchmark latest STT models** (AssemblyAI Slam-1, Deepgram Nova-2) vs current Whisper
-- [ ] **A/B test performance improvements** with pilot customers for validation
+- [ ] **A/B test performance improvements** with community members for validation
 
 **Resource Optimization:**
 - [ ] **Optimize concurrent processing** and resource utilization patterns for Mac Mini M4
