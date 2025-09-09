@@ -5,7 +5,30 @@
 > **🎯 Target Community**: Developers, privacy enthusiasts, and self-hosting advocates who value autonomy and creative freedom
 > **💻 Reference Platform**: Any modern machine (Docker/self-hosted) - Privacy-first by default
 
-### 🔧 Tech Stack Modernization & Dependency Updates **[PRIORITY 1 - FOUNDATION FIRST]**
+### 🔐 Security CI/CD Workflow & Branch Protection **[PRIORITY 1 - FOUNDATION SECURITY]**
+**🔗 GitHub Issues**: 
+- [loqa#42 - Security CI/CD Workflow Improvements (Epic)](https://github.com/loqalabs/loqa/issues/42)
+- [loqa#43 - Branch Protection & PR Requirements Audit (Epic)](https://github.com/loqalabs/loqa/issues/43)
+
+**📋 Context**: Security and development workflow foundation must be established before major feature work to prevent rework and ensure quality gates are enforced consistently.
+
+**🔐 Security CI/CD Workflow Improvements:**
+- [ ] **Separate Security Workflows**: Create dedicated security workflows per repository (separate from main CI)
+- [ ] **Go Security Scanning**: Implement gosec and govulncheck for Go services (hub, relay, proto)
+- [ ] **Dependency Scanning**: Add npm audit and vulnerability scanning for Vue.js services (commander, website)
+- [ ] **Secret Scanning**: Implement GitLeaks or similar for preventing credential commits
+- [ ] **Weekly Security Scans**: Schedule comprehensive security scans with proper failure isolation
+- [ ] **Security-Specific Permissions**: Configure granular permissions for security workflows
+
+**🔒 Branch Protection & PR Requirements:**
+- [ ] **Audit PR Merge Requirements**: Review and standardize required status checks across all repositories
+- [ ] **Enforce Quality Gates**: Ensure build, test, and lint checks are required before merge
+- [ ] **Security Check Requirements**: Configure which security scans must pass vs. can be informational
+- [ ] **Review Requirements**: Standardize code review requirements (number of approvals, dismiss stale reviews)
+- [ ] **Branch Protection Rules**: Ensure consistent branch protection across all repositories
+- [ ] **Admin Override Policies**: Document when and how to bypass checks for emergency fixes
+
+### 🔧 Tech Stack Modernization & Dependency Updates **[PRIORITY 2 - FOUNDATION UPGRADES]**
 **🔗 GitHub Issues**: 
 - [loqa#29 - ESLint 8 → 9 Migration (Breaking Changes)](https://github.com/loqalabs/loqa/issues/29)
 - [loqa#30 - Tailwind CSS 3 → 4 Migration (Breaking Changes)](https://github.com/loqalabs/loqa/issues/30)
@@ -27,23 +50,6 @@
 - [ ] **Phase 3 - Semantic Versioning**: Implement semantic versioning based on proto changes
 - [ ] **Phase 3 - Breaking Change Detection**: Add breaking change detection and alerts
 
-**🔐 Security CI/CD Workflow Improvements:**
-**🔗 GitHub Issue**: [loqa#42 - Security CI/CD Workflow Improvements (Epic)](https://github.com/loqalabs/loqa/issues/42)
-- [ ] **Separate Security Workflows**: Create dedicated security workflows per repository (separate from main CI)
-- [ ] **Go Security Scanning**: Implement gosec and govulncheck for Go services (hub, relay, proto)
-- [ ] **Dependency Scanning**: Add npm audit and vulnerability scanning for Vue.js services (commander, website)
-- [ ] **Secret Scanning**: Implement GitLeaks or similar for preventing credential commits
-- [ ] **Weekly Security Scans**: Schedule comprehensive security scans with proper failure isolation
-- [ ] **Security-Specific Permissions**: Configure granular permissions for security workflows
-
-**🔒 Branch Protection & PR Requirements:**
-**🔗 GitHub Issue**: [loqa#43 - Branch Protection & PR Requirements Audit (Epic)](https://github.com/loqalabs/loqa/issues/43)
-- [ ] **Audit PR Merge Requirements**: Review and standardize required status checks across all repositories
-- [ ] **Enforce Quality Gates**: Ensure build, test, and lint checks are required before merge
-- [ ] **Security Check Requirements**: Configure which security scans must pass vs. can be informational
-- [ ] **Review Requirements**: Standardize code review requirements (number of approvals, dismiss stale reviews)
-- [ ] **Branch Protection Rules**: Ensure consistent branch protection across all repositories
-- [ ] **Admin Override Policies**: Document when and how to bypass checks for emergency fixes
 
 **🔄 Major Framework Upgrades (Breaking Changes):**
 - [ ] **ESLint 8 → 9 Migration** (loqa-commander, www-loqalabs-com) **→ [Issue #29](https://github.com/loqalabs/loqa/issues/29)**
@@ -58,10 +64,10 @@
 - [ ] If upgrade requires significant refactoring → Create issue for post-MVP
 - [ ] All major upgrades must pass quality checks and performance validation
 
-### 🔄 Basic Self-Healing Foundations **[PRIORITY 2 - RELIABILITY FOUNDATION]**
+### 🔄 Basic Self-Healing Foundations **[PRIORITY 3 - RELIABILITY FOUNDATION]**
 **🔗 GitHub Issue**: [loqa#25 - Self-Healing Foundations for Community Reliability](https://github.com/loqalabs/loqa/issues/25)
 
-**📋 Context**: Moved from P2 to P1 as >99.5% uptime is critical community requirement for reliable self-hosted deployment.
+**📋 Context**: >99.5% uptime is critical community requirement for reliable self-hosted deployment.
 
 **Essential Reliability Features:**
 - [ ] **Enhanced health check system** with automatic service restart capabilities **→ [Issue #44](https://github.com/loqalabs/loqa/issues/44)**
@@ -71,13 +77,13 @@
 - [ ] **Service restart coordination** that preserves system state and user sessions **→ [Issue #44](https://github.com/loqalabs/loqa/issues/44)**
 - [ ] **Community status indicators** in Commander UI without technical complexity
 
-### 🎙️ Home Assistant Voice PE Hardware Evaluation **[PRIORITY 3 - PHYSICAL TESTING FOUNDATION]**
+### 🎙️ Home Assistant Voice PE Hardware Evaluation **[PRIORITY 4 - PHYSICAL TESTING FOUNDATION]**
 **🔗 GitHub Issues**: 
 - [loqa#33 - HA Voice PE Stock Firmware Evaluation & UX Documentation](https://github.com/loqalabs/loqa/issues/33)
 - [loqa#34 - HA Voice PE Custom Firmware Development & Hardware Integration](https://github.com/loqalabs/loqa/issues/34)
 - [loqa#35 - HA Voice PE Comparative Analysis & Community Feasibility Assessment](https://github.com/loqalabs/loqa/issues/35)
 
-**📋 Context**: Having physical hardware for testing is critical for validating voice pipeline features, wake word detection, audio quality, and real-world performance. **Priority elevated - physical testing foundation needed before developing voice components.**
+**📋 Context**: Having physical hardware for testing is critical for validating voice pipeline features, wake word detection, audio quality, and real-world performance.
 
 **Phase 1: Stock Firmware Evaluation**
 - [ ] **HA Voice PE Setup & Integration**: Install Home Assistant, configure test devices, set up Voice PE device
@@ -96,7 +102,7 @@
 - [ ] **Community Feasibility Assessment**: Cost analysis, manufacturing scalability, regulatory compliance for custom hardware path
 - [ ] **OSS Strategy**: Recommend hardware approach (custom firmware, community partnership, or full open development)
 
-### 🔒 Privacy-by-Design Architecture **[PRIORITY 4 - CORE DIFFERENTIATOR]**
+### 🔒 Privacy-by-Design Architecture **[PRIORITY 5 - CORE DIFFERENTIATOR]**
 **🔗 GitHub Issues**:
 - [loqa#13 - Privacy-by-Design Architecture & User Autonomy](https://github.com/loqalabs/loqa/issues/13)
 
@@ -123,7 +129,7 @@
 - [ ] **Develop privacy advocacy materials** for broader voice AI ecosystem
 - [ ] **Establish privacy research collaboration** with academic and activist communities
 
-### 🗣️ Speech-to-Text (STT) **[PRIORITY 5 - VOICE PIPELINE CORE]**
+### 🗣️ Speech-to-Text (STT) **[PRIORITY 6 - VOICE PIPELINE CORE]**
 **🔗 GitHub Issue**: [loqa-hub#20 - STT confidence thresholds and wake word normalization](https://github.com/loqalabs/loqa-hub/issues/20)
 
 - [ ] Strip wake word ("Hey Loqa") before passing to intent parser
@@ -134,7 +140,7 @@
   - [ ] Avoid default "I'm not sure what you want me to do" - always attempt interpretation
   - [ ] **Context**: Essential for community UX differentiation from consumer assistants
 
-### 🔊 Text-to-Speech (TTS) **[PRIORITY 6 - VOICE PIPELINE CORE]**
+### 🔊 Text-to-Speech (TTS) **[PRIORITY 7 - VOICE PIPELINE CORE]**
 **🔗 GitHub Issue**: [loqa-hub#26 - Integrate Kokoro-82M TTS for professional natural voices](https://github.com/loqalabs/loqa-hub/issues/26)
 
 - [x] **PRIORITY**: Integrate Kokoro-82M TTS system for natural, expressive voices ✅ **COMPLETED**
@@ -144,7 +150,7 @@
   - [x] Ensure voices sound natural and professional for community environments ✅ **COMPLETED**
 - [ ] Play returned TTS phrase through speakers when using the test relay (must remain ephemeral and never stored to disk)
 
-### 🧠 Intent Parsing & Command Execution **[PRIORITY 7 - LOGIC PIPELINE]**
+### 🧠 Intent Parsing & Command Execution **[PRIORITY 8 - LOGIC PIPELINE]**
 **🔗 GitHub Issue**: [loqa-hub#27 - Multi-command intent parsing and chaining](https://github.com/loqalabs/loqa-hub/issues/27)
 
 - [ ] Support multi-command chaining in parsed intent pipeline
@@ -154,7 +160,7 @@
   - [ ] Combine or sequence TTS responses for multiple results
   - [ ] If chaining fails, gracefully fallback to the first valid command
 
-### 🧠 Skills & Plugin System **[PRIORITY 8 - EXTENSIBILITY FOUNDATION]**
+### 🧠 Skills & Plugin System **[PRIORITY 9 - EXTENSIBILITY FOUNDATION]**
 **🔗 GitHub Issue**: [loqa-skills#9 - Built-in Timer Skill with local tracking](https://github.com/loqalabs/loqa-skills/issues/9)
 
 - [ ] Add built-in "Set a timer" skill with local tracking and TTS countdown/complete response
@@ -165,14 +171,14 @@
 - [ ] Add basic community skills: "help", "version", "what can you do?" **→ [Issue #11](https://github.com/loqalabs/loqa-skills/issues/11)**
 - [ ] **Community Skills Foundation**: Medical terminology, legal dictation basics **→ [Issue #11](https://github.com/loqalabs/loqa-skills/issues/11)**
 
-### 🖥️ Commander UI & API Surface **[PRIORITY 9 - USER INTERFACE]**
+### 🖥️ Commander UI & API Surface **[PRIORITY 10 - USER INTERFACE]**
 **🔗 GitHub Issue**: [loqa-commander#14 - Timeline filtering and event categorization](https://github.com/loqalabs/loqa-commander/issues/14)
 
 - [ ] Add ability to filter timeline by success, failure, or low-confidence events
 - [ ] **Simplified Community UI**: Create non-technical interface for community administrators
 - [ ] **Community Status Indicators**: System health display without technical complexity
 
-### ⚡ Innovation-First Performance & Emerging Tech **[PRIORITY 10 - OPTIMIZATION]**
+### ⚡ Innovation-First Performance & Emerging Tech **[PRIORITY 11 - OPTIMIZATION]**
 **🔗 GitHub Issues**:
 - [loqa#40 - Developer-First Installation & Setup Experience](https://github.com/loqalabs/loqa/issues/40)
 - [loqa#37 - Speech-to-Speech Model Integration for Sub-200ms Responses](https://github.com/loqalabs/loqa/issues/37)
@@ -200,7 +206,7 @@
 - [ ] **Add performance profiling tools** for ongoing optimization and troubleshooting
 
 
-### 🌟 Community Building & OSS Ecosystem Development **[PRIORITY 11 - COMMUNITY GROWTH]**
+### 🌟 Community Building & OSS Ecosystem Development **[PRIORITY 12 - COMMUNITY GROWTH]**
 **🔗 GitHub Issues**:
 - [loqa#41 - OSS Community Outreach & Developer Engagement Strategy](https://github.com/loqalabs/loqa/issues/41)
 - [loqa#39 - GitHub Sponsors Setup & Community Funding](https://github.com/loqalabs/loqa/issues/39)
@@ -229,7 +235,7 @@
 - [ ] **Establish thought leadership** in local-first, privacy-preserving voice AI
 - [ ] **Connect with AI research community** for cutting-edge model integration
 
-### 📊 OSS MVP Success Criteria & Innovation Metrics **[PRIORITY 12 - SUCCESS FRAMEWORK]**
+### 📊 OSS MVP Success Criteria & Innovation Metrics **[PRIORITY 13 - SUCCESS FRAMEWORK]**
 **🔗 GitHub Issues**: 
 - [loqa#11 - MVP Success Criteria - Define and track measurable goals](https://github.com/loqalabs/loqa/issues/11)
 - [loqa#16 - OSS MVP Success Metrics & Community Growth Validation](https://github.com/loqalabs/loqa/issues/16)
