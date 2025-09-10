@@ -1,9 +1,41 @@
+## 🚨 NEXT ACTIONS - IMMEDIATE PRIORITIES
+
+> **🔥 START THESE NOW** - Critical path items blocking MVP progress:
+
+### **📋 WEEK 1-2 PRIORITIES (October 2025)**
+1. **🔧 Repository Protection Migration** - [Issue #51](https://github.com/loqalabs/loqa/issues/51) - **CRITICAL BLOCKER**
+   - [ ] Phase 1: Pilot testing in `loqa-proto` repository
+   - [ ] Test branch protection rules work without naming complexity
+   
+2. **🎙️ Hardware Evaluation Setup** - [Issue #33](https://github.com/loqalabs/loqa/issues/33) - **MVP ESSENTIAL** 
+   - [ ] Order/setup HA Voice PE device for testing
+   - [ ] Basic integration with current voice pipeline
+
+### **📋 WEEK 3-4 PRIORITIES (Late October 2025)**
+3. **🔄 Self-Healing Implementation** - [Issues #44, #45](https://github.com/loqalabs/loqa/issues/44) - **RELIABILITY CORE**
+   - [ ] Enhanced health check system with auto-restart
+   - [ ] Basic retry logic for STT/LLM/NATS failures
+
+4. **🎙️ Hardware Testing** - [Issue #34](https://github.com/loqalabs/loqa/issues/34) - **INTEGRATION CRITICAL**
+   - [ ] Test voice pipeline with physical hardware
+   - [ ] Document hardware setup process for community
+
+### **📋 NOVEMBER 2025 PRIORITIES**
+5. **🗣️ STT Pipeline** - [Issue loqa-hub#20](https://github.com/loqalabs/loqa-hub/issues/20)
+6. **🧠 Multi-Command Parsing** - [Issue loqa-hub#27](https://github.com/loqalabs/loqa-hub/issues/27)
+7. **🧠 Basic Skills System** - [Issue loqa-skills#9](https://github.com/loqalabs/loqa-skills/issues/9)
+
+---
+
 ## 🟥 P1 – Must-Fix Before OSS MVP
 
+> **🚨 CRITICAL TIMELINE**: Only ~3.5 months remaining until Dec 31, 2025 deadline  
 > **📊 Track Progress**: View all issues and milestones in the [**Loqa MVP Roadmap**](https://github.com/orgs/loqalabs/projects/1)  
-> **🎯 OSS MVP Milestone**: [Due Dec 31, 2025](https://github.com/loqalabs/loqa/milestone/1)
+> **🎯 OSS MVP Milestone**: [Due Dec 31, 2025](https://github.com/loqalabs/loqa/milestone/1) - **FOCUSED MVP SCOPE**
 > **🎯 Target Community**: Developers, privacy enthusiasts, and self-hosting advocates who value autonomy and creative freedom
-> **💻 Reference Platform**: Any modern machine (Docker/self-hosted) - Privacy-first by default
+> **💻 Reference Platform**: Any modern machine (Docker/self-hosted) + HA Voice PE hardware
+
+> **⚠️ TIMELINE CRISIS**: We are in September 2025 with Q4 2025 (Oct-Dec) as the final quarter before OSS MVP deadline. Previous quarters Q4 2024-Q3 2025 targets are overdue and require immediate status assessment.
 
 ### 🔐 Security CI/CD Workflow & Branch Protection **[PRIORITY 1 - FOUNDATION SECURITY]**
 **🔗 GitHub Issues**: 
@@ -113,34 +145,48 @@
 - [ ] If upgrade requires significant refactoring → Create issue for post-MVP
 - [ ] All major upgrades must pass quality checks and performance validation
 
-### 🔧 GitHub Repository Protection Strategy Evaluation ✅ **COMPLETED**
-**🔗 GitHub Issue**: [loqa#51 - GitHub Repository Protection Migration: Rulesets → Branch Protection](https://github.com/loqalabs/loqa/issues/51)
+### 🔧 GitHub Repository Protection Migration **[PRIORITY 1 - CRITICAL BLOCKER]**
+**🔗 GitHub Issue**: [loqa#51 - GitHub Repository Protection Migration: Rulesets → Branch Protection](https://github.com/loqalabs/loqa/issues/51) - **⚠️ OPEN/BLOCKING**
 
-**📋 Context**: The Phase 2 Protocol automation experienced significant friction with repository-level rulesets and required status check naming. Analysis revealed systematic "stuck PR" issues due to opaque naming requirements.
+**🚨 CRITICAL DEVELOPMENT BLOCKER**: Systematic "stuck PR" issues are actively hindering all development work and must be resolved immediately for MVP progress.
 
-**🚨 Critical Technical Issue Identified:**
-- **Repository rulesets** (not organization rulesets as initially assumed) require complex naming: `"Test & Build / Test & Build"`
+**Critical Technical Issue:**
+- **Repository rulesets** require complex naming: `"Test & Build / Test & Build"`
 - **Branch protection** uses intuitive naming: `"Test & Build"`  
-- **Result**: PRs get stuck waiting for status checks that never match due to naming complexity
-- **Impact**: Developers must frequently bypass security checks, defeating their purpose
-- **Evidence**: loqa-commander PR #28 shows actual status check names like `"Test & Lint / Lint, Format, Build, and Upload Dist"`
+- **Current Impact**: Developers must frequently bypass security checks, defeating their purpose
+- **Evidence**: loqa-commander PR #28 shows actual problematic status check names
 
-**✅ Evaluation Complete:**
-- [x] **Comprehensive analysis**: `project/GITHUB_REPOSITORY_PROTECTION_EVALUATION.md`
-- [x] **Root cause identified**: Ruleset status check naming opacity vs branch protection transparency
-- [x] **Migration plan developed**: 5-week phased approach starting with pilot repository
-- [x] **Templates designed**: Branch protection configurations for each repository type
-- [x] **Success metrics defined**: Zero bypass necessity, intuitive configuration, maintained security
+**✅ Analysis Complete** (PR #50):
+- [x] **Comprehensive evaluation**: `project/GITHUB_REPOSITORY_PROTECTION_EVALUATION.md` 
+- [x] **Root cause identified**: Ruleset status check naming opacity
+- [x] **Migration plan developed**: 5-week phased approach
+- [x] **Templates designed**: Branch protection configurations ready
 
-**🎯 **RECOMMENDATION**: Migrate from Repository-Level Rulesets to Branch Protection Rules**
+**🚨 URGENT IMPLEMENTATION NEEDED** (Issue #51):
+- [ ] **Phase 1**: Pilot testing in `loqa-proto` - **START IMMEDIATELY**
+- [ ] **Phase 2**: Template development for all repository types
+- [ ] **Phase 3**: Phased migration across all repositories  
+- [ ] **Phase 4**: Validation and cleanup
 
-**Key Benefits**:
-- **Eliminate "stuck PR" issues**: Intuitive workflow job name mapping
-- **End systematic bypassing**: Developers won't need admin bypass for naming issues  
-- **Maintain security**: All current protection rules preserved
-- **Improve developer experience**: GitHub autocomplete for status checks
+**💥 MVP IMPACT**: This blocker affects ALL repository development velocity and MUST be resolved in October 2025 or MVP deadline is at risk.
 
-**📅 Implementation Status**: Ready for Phase 1 pilot testing in `loqa-proto` repository
+**📅 EMERGENCY TIMELINE**: Complete migration by end of October 2025 (first month of Q4) to unblock remaining MVP work.
+
+### 🧹 Repository Hygiene & Binary Management ✅ **COMPLETED** 
+**🔗 GitHub Issues**: Binary cleanup across Go repositories
+**🔗 PRs**: 
+- [loqa#52 - Binary Management Best Practices Documentation](https://github.com/loqalabs/loqa/pull/52)
+- [loqa-hub#34 - Clean up committed binaries](https://github.com/loqalabs/loqa-hub/pull/34)
+- [loqa-relay#8 - Clean up committed test binary](https://github.com/loqalabs/loqa-relay/pull/8)
+
+**✅ Completed September 2025:**
+- [x] **Identified committed binaries**: ~45MB across repositories (loqa-hub-test, skills-cli, test-go/test-puck)
+- [x] **Updated .gitignore files**: Enhanced patterns to prevent future binary commits
+- [x] **Removed binaries from repositories**: All tracked binaries removed while preserving build functionality
+- [x] **Created best practices documentation**: Comprehensive guide for binary management across ecosystem
+- [x] **Validated cleanup**: All binaries can be rebuilt locally, proper git ignore working
+
+**🎯 Impact**: Improved repository hygiene, reduced clone sizes, eliminated platform-specific binaries from version control.
 
 ### 🔍 Security-Aware Observability for Failed Intents **[PRIORITY 2 - PRIVACY-FIRST DEBUGGING]**
 **🔗 GitHub Issue**: [loqa#49 - Architecture Decision: Security-Aware Observability for Intent Debugging](https://github.com/loqalabs/loqa/issues/49)
@@ -209,43 +255,47 @@
 - **HIPAA compliance requirements** (TODO.md business deployment needs)
 - **Community support infrastructure** (OSS community engagement)
 
-### 🔄 Basic Self-Healing Foundations **[PRIORITY 4 - RELIABILITY FOUNDATION]**
+### 🔄 Basic Self-Healing Foundations **[PRIORITY 3 - MVP RELIABILITY REQUIREMENT]**
 **🔗 GitHub Issue**: [loqa#25 - Self-Healing Foundations for Community Reliability](https://github.com/loqalabs/loqa/issues/25)
 
-**📋 Context**: >99.5% uptime is critical community requirement for reliable self-hosted deployment.
+**📋 Context**: >99.5% uptime is critical for OSS MVP credibility. **Community will not adopt unreliable self-hosted systems.**
 
-**Essential Reliability Features:**
-- [ ] **Enhanced health check system** with automatic service restart capabilities **→ [Issue #44](https://github.com/loqalabs/loqa/issues/44)**
-- [ ] **Intelligent retry logic** with exponential backoff for STT/LLM/NATS failures **→ [Issue #45](https://github.com/loqalabs/loqa/issues/45)**
-- [ ] **Basic circuit breaker patterns** to prevent cascade failures **→ [Issue #45](https://github.com/loqalabs/loqa/issues/45)**
-- [ ] **Graceful degradation modes** (continue core functionality when non-critical components fail)
-- [ ] **Service restart coordination** that preserves system state and user sessions **→ [Issue #44](https://github.com/loqalabs/loqa/issues/44)**
-- [ ] **Community status indicators** in Commander UI without technical complexity
+**🚨 MVP-ESSENTIAL Reliability Features:**
+- [ ] **Enhanced health check system** with automatic service restart **→ [Issue #44](https://github.com/loqalabs/loqa/issues/44)** - **NOVEMBER 2025**
+- [ ] **Intelligent retry logic** for STT/LLM/NATS failures **→ [Issue #45](https://github.com/loqalabs/loqa/issues/45)** - **NOVEMBER 2025** 
+- [ ] **Basic circuit breaker patterns** to prevent cascade failures **→ [Issue #45](https://github.com/loqalabs/loqa/issues/45)** - **DECEMBER 2025**
+- [ ] **Graceful degradation modes** (continue when non-critical components fail) - **DECEMBER 2025**
+- [ ] **Service restart coordination** that preserves system state **→ [Issue #44](https://github.com/loqalabs/loqa/issues/44)** - **NOVEMBER 2025**
 
-### 🎙️ Home Assistant Voice PE Hardware Evaluation **[PRIORITY 4 - PHYSICAL TESTING FOUNDATION]**
+**⚠️ SCOPE REDUCTION**: Community status indicators moved to P2 (post-MVP) to focus on core reliability.
+
+**💥 MVP BLOCKER**: Without basic self-healing, OSS community adoption will fail. These are minimum viable reliability features.
+
+### 🎙️ Hardware Integration & Testing **[PRIORITY 4 - MVP ESSENTIAL]** 
 **🔗 GitHub Issues**: 
 - [loqa#33 - HA Voice PE Stock Firmware Evaluation & UX Documentation](https://github.com/loqalabs/loqa/issues/33)
-- [loqa#34 - HA Voice PE Custom Firmware Development & Hardware Integration](https://github.com/loqalabs/loqa/issues/34)
+- [loqa#34 - HA Voice PE Custom Firmware Development & Hardware Integration](https://github.com/loqalabs/loqa/issues/34) 
 - [loqa#35 - HA Voice PE Comparative Analysis & Community Feasibility Assessment](https://github.com/loqalabs/loqa/issues/35)
 
-**📋 Context**: Having physical hardware for testing is critical for validating voice pipeline features, wake word detection, audio quality, and real-world performance.
+**📋 MVP CRITICAL**: Hardware evaluation restored to MVP priority. **Voice assistant without physical hardware is not functional for community adoption.**
 
-**Phase 1: Stock Firmware Evaluation**
-- [ ] **HA Voice PE Setup & Integration**: Install Home Assistant, configure test devices, set up Voice PE device
-- [ ] **UX Documentation**: Document user experience, strengths, and weaknesses through comprehensive testing scenarios
-- [ ] **Hardware Assessment**: Evaluate build quality, microphone array, speaker quality, LED ring, button responsiveness
+**🚨 MVP TIMELINE ADJUSTED**:
 
-**Phase 2: Custom Firmware Development**
-- [ ] **Firmware Backup**: Create backup of original firmware (if modification requires replacement)
-- [ ] **Hardware Reverse Engineering**: Investigate flashing capabilities (USB vs disassembly), LED ring control, button integration
-- [ ] **Loqa Firmware Development**: Develop custom firmware integrating with Loqa gRPC protocol
-- [ ] **Hardware Integration Testing**: Verify LED ring control, button functionality, audio quality with custom firmware
+**October 2025 - MVP Foundation:**
+- [ ] **HA Voice PE Setup**: Order/configure device for testing - **WEEK 1-2**
+- [ ] **Basic Integration**: Connect HA Voice PE with current voice pipeline - **WEEK 2-3**
+- [ ] **Hardware Testing**: Validate audio quality, wake word, speaker output - **WEEK 3-4**
 
-**Phase 3: Comparative Analysis & Community Decision**
-- [ ] **Performance Comparison**: Test custom firmware vs stock firmware across identical scenarios
-- [ ] **Feature Gap Analysis**: Identify areas where stock firmware excels and improve custom implementation
-- [ ] **Community Feasibility Assessment**: Cost analysis, manufacturing scalability, regulatory compliance for custom hardware path
-- [ ] **OSS Strategy**: Recommend hardware approach (custom firmware, community partnership, or full open development)
+**November 2025 - Integration & Documentation:**
+- [ ] **Performance Optimization**: Tune hardware settings for optimal performance
+- [ ] **Community Documentation**: Create hardware setup guide for self-hosting
+- [ ] **Alternative Hardware**: Test with standard USB microphones as backup option
+
+**December 2025 - MVP Hardware Story:**
+- [ ] **Hardware Deployment Guide**: Complete instructions for community hardware setup
+- [ ] **Backup Options**: Document software-only alternatives where hardware unavailable
+
+**🎯 MVP HARDWARE REQUIREMENTS**: Community needs physical device to interact with voice assistant. Software-only approach creates adoption barrier.
 
 ### 🔒 Privacy-by-Design Architecture **[PRIORITY 5 - CORE DIFFERENTIATOR]**
 **🔗 GitHub Issues**:
@@ -426,59 +476,57 @@
 
 ---
 
-## 📅 Quarterly Implementation Roadmap
+## 🚨 EMERGENCY REVISED TIMELINE - Q4 2025 FINAL SPRINT
 
-### Q4 2024 (October - December): OSS Foundation & Innovation
-**🎯 Milestone**: OSS MVP Foundation Complete
+> **⚠️ TIMELINE REALITY CHECK**: We are in September 2025. Previous quarterly targets (Q4 2024 - Q3 2025) are overdue. Only Q4 2025 remains before OSS MVP deadline.
 
-**October 2024:**
-- [ ] Complete Go 1.25+ upgrade and ESLint 8→9 migration
-- [ ] Launch developer community outreach (Reddit, HN, dev Twitter)
-- [ ] Implement streaming LLM responses for improved UX
-- [ ] Document experimental performance approaches and benchmarks
+### 📋 Past Quarter Status (Requires Assessment)
+**Q4 2024 - Q3 2025: OVERDUE STATUS UNKNOWN**
+- [ ] **URGENT**: Assess actual completion status of overdue quarterly targets
+- [ ] **CRITICAL**: Document lessons learned from missed deadlines
+- [ ] **ANALYZE**: Identify root causes of timeline slippage for prevention
 
-**November 2024:**
-- [ ] Complete HA Voice PE evaluation as development/testing hardware
-- [ ] Launch OSS community with comprehensive self-hosting documentation
-- [ ] Begin privacy-by-design architecture implementation
-- [ ] Evaluate cutting-edge speech-to-speech models (Ultravox v0.5)
+### Q4 2025 (October - December): **FINAL MVP SPRINT** 
+**🎯 Milestone**: OSS MVP Launch or FAILURE
 
-**December 2024:**
-- [ ] OSS MVP feature complete with innovation showcases
-- [ ] Privacy-first implementation 80% complete (RAM-only by default)
-- [ ] Community feedback collection and innovation roadmap
-- [ ] Developer-friendly installation and contribution system ready
+**🔥 OCTOBER 2025 - CRITICAL BLOCKERS + HARDWARE:**
+- [ ] **WEEK 1-2**: Complete GitHub Repository Protection Migration (Issue #51) - **ABSOLUTE PRIORITY**
+- [ ] **WEEK 1-2**: Order/setup HA Voice PE device (Issue #33) - **HARDWARE FOUNDATION**
+- [ ] **WEEK 3-4**: Basic hardware integration with voice pipeline (Issue #34)
+- [ ] **WEEK 3-4**: Implement basic self-healing foundations (Issues #44, #45)
+- [ ] **ALL MONTH**: Focus on MVP essentials: repo protection, hardware, reliability
 
-### Q1 2025 (January - March): Community Growth & Innovation Leadership
-**🎯 Milestone**: OSS Innovation Platform Ready
+**🚀 NOVEMBER 2025 - MVP CORE FEATURES + HARDWARE TESTING:**
+- [ ] **Week 1-2**: Complete STT/TTS pipeline stabilization + hardware optimization
+- [ ] **Week 3-4**: Basic multi-command parsing and execution + hardware validation
+- [ ] **ONGOING**: Self-healing reliability implementation
+- [ ] **HARDWARE**: Community documentation for HA Voice PE setup
 
-**January 2025:**
-- [ ] Complete privacy-by-design architecture with transparency
-- [ ] Developer-friendly installation automation and tutorials
-- [ ] Community success stories documented and promoted
-- [ ] Performance innovation (novel approaches achieving <1s response)
+**🎯 DECEMBER 2025 - LAUNCH PREPARATION:**
+- [ ] **Week 1-2**: Community documentation and self-hosting guides
+- [ ] **Week 3**: Final testing and bug fixes
+- [ ] **Week 4**: OSS MVP LAUNCH before Dec 31, 2025 deadline
 
-**February 2025:**
-- [ ] Comprehensive developer documentation and contribution guides
-- [ ] AI research community engagement and collaboration
-- [ ] Advanced AI model integration (S2S, emerging techniques)
-- [ ] Community metrics and innovation tracking implemented
+### 🚨 SCOPE REDUCTION DECISIONS REQUIRED
+**DEFERRED TO 2026 (Post-MVP):**
+- Hardware evaluation (HA Voice PE) - **Q1 2026**
+- Advanced AI model integration - **Q2 2026**  
+- Community monetization - **Q3 2026**
+- Performance optimization - **Ongoing post-MVP**
 
-**March 2025:**
-- [ ] OSS thought leadership established in voice AI space
-- [ ] Privacy advocacy materials and ecosystem positioning
-- [ ] Multi-platform deployment options (not just Mac Mini)
-- [ ] Optional monetization paths identified and documented
+### 💥 SUCCESS CRITERIA REVISION
+**Minimum Viable OSS MVP (Dec 2025):**
+- [ ] Repository protection issues resolved (unblocks development)
+- [ ] Basic voice pipeline working (STT → LLM → TTS)  
+- [ ] Self-healing reliability (>99% uptime)
+- [ ] Docker-based self-hosting guide
+- [ ] Community can successfully install and use
 
-### Q2 2025 (April - June): OSS MVP Launch & Monetization
-**🎯 Milestone**: OSS Success with Optional Business Model
-
-**Target Outcomes:**
-- [ ] 1000+ active self-hosted installations with community growth
-- [ ] $10K+ Monthly Recurring Revenue from optional paid features
-- [ ] Privacy leadership demonstrated to developer and maker communities
-- [ ] Multiple installation/deployment options for diverse use cases
-- [ ] Clear path to sustainable OSS development with optional revenue streams
+**REALISTIC TARGETS (Not Previous Ambitious Goals):**
+- **Community Size**: 50+ successful self-hosted installations (not 1000+)
+- **Revenue**: $0 (focus on adoption, not monetization)
+- **Performance**: <5s response time (not <1s optimization)
+- **Platform Support**: Docker-only (not multi-platform)
 
 ---
 
