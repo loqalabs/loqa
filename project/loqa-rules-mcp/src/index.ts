@@ -496,6 +496,545 @@ class LoqaTaskManager {
   }
 }
 
+interface RoleConfig {
+  role_id: string;
+  role_name: string;
+  role_description: string;
+  capabilities: string[];
+  detection_patterns: string[];
+  model_preference: string;
+  task_templates_preferred: string[];
+}
+
+interface RoleDetectionResult {
+  detectedRole: string;
+  confidence: number;
+  reasoning: string[];
+  alternatives: { role: string; confidence: number }[];
+}
+
+class LoqaRoleManager {
+  private workspaceRoot: string;
+  private roleConfigs: Map<string, RoleConfig> = new Map();
+  private roleSystemConfig: any;
+
+  constructor(workspaceRoot?: string) {
+    this.workspaceRoot = workspaceRoot || process.cwd();
+  }
+
+  /**
+   * Load role configurations from files
+   */
+  async loadRoleConfigurations(): Promise<void> {
+    const roleConfigsPath = join(this.workspaceRoot, 'project', 'role-configs');
+    
+    try {
+      // Load role system configuration
+      const roleSystemPath = join(roleConfigsPath, 'role-system.json');
+      const roleSystemContent = await fs.readFile(roleSystemPath, 'utf-8');
+      this.roleSystemConfig = JSON.parse(roleSystemContent);
+
+      // Load individual role configurations
+      for (const roleInfo of this.roleSystemConfig.available_roles) {
+        const rolePath = join(roleConfigsPath, roleInfo.config_file);
+        try {
+          const roleContent = await fs.readFile(rolePath, 'utf-8');
+          const roleConfig = JSON.parse(roleContent);
+          this.roleConfigs.set(roleInfo.role_id, {
+            role_id: roleConfig.role_id,
+            role_name: roleConfig.role_name,
+            role_description: roleConfig.role_description,
+            capabilities: roleConfig.capabilities || [],
+            detection_patterns: roleConfig.role_detection_patterns || [],
+            model_preference: roleInfo.model_preference,
+            task_templates_preferred: roleConfig.task_templates_preferred || []
+          });
+        } catch (error) {
+          console.warn(`Failed to load role config for ${roleInfo.role_id}:`, error);
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to load role configurations:', error);
+      // Initialize with basic default role
+      this.roleConfigs.set('general', {
+        role_id: 'general',
+        role_name: 'General Developer',
+        role_description: 'Multi-disciplinary development work',
+        capabilities: ['General development', 'Documentation', 'Basic testing'],
+        detection_patterns: ['general', 'basic', 'documentation'],
+        model_preference: 'haiku',
+        task_templates_preferred: ['general-task-template']
+      });
+    }
+  }
+
+  /**
+   * Detect appropriate role based on task context
+   */
+  async detectRole(context: {
+    title?: string;
+    description?: string;
+    filePaths?: string[];
+    repositoryType?: string;
+  }): Promise<RoleDetectionResult> {
+    await this.loadRoleConfigurations();
+
+    const text = [
+      context.title || '',
+      context.description || '',
+      ...(context.filePaths || [])
+    ].join(' ').toLowerCase();
+
+    const scores: { [role: string]: { score: number; matches: string[] } } = {};
+
+    // Score each role based on pattern matching
+    for (const [roleId, roleConfig] of this.roleConfigs) {
+      scores[roleId] = { score: 0, matches: [] };
+
+      for (const pattern of roleConfig.detection_patterns) {
+        const regex = new RegExp(`\\b${pattern.toLowerCase()}\\b`, 'gi');
+        const matches = text.match(regex);
+        if (matches) {
+          scores[roleId].score += matches.length;
+          scores[roleId].matches.push(...matches);
+        }
+      }
+
+      // Bonus scoring for repository-specific patterns
+      if (context.repositoryType) {
+        if (roleId === 'architect' && ['loqa-proto', 'loqa'].includes(context.repositoryType)) {
+          scores[roleId].score += 2;
+        }
+        if (roleId === 'developer' && ['loqa-hub', 'loqa-relay', 'loqa-skills'].includes(context.repositoryType)) {
+          scores[roleId].score += 2;
+        }
+        if (roleId === 'devops' && context.repositoryType === 'loqa') {
+          scores[roleId].score += 2;
+        }
+        if (roleId === 'qa' && text.includes('test')) {
+          scores[roleId].score += 3;
+        }
+      }
+
+      // File path bonus scoring
+      for (const filePath of context.filePaths || []) {
+        const path = filePath.toLowerCase();
+        if (roleId === 'devops' && (path.includes('docker') || path.includes('ci') || path.includes('deploy'))) {
+          scores[roleId].score += 3;
+        }
+        if (roleId === 'developer' && (path.includes('.go') || path.includes('.ts') || path.includes('.js'))) {
+          scores[roleId].score += 2;
+        }
+        if (roleId === 'architect' && (path.includes('.proto') || path.includes('api'))) {
+          scores[roleId].score += 3;
+        }
+        if (roleId === 'qa' && path.includes('test')) {
+          scores[roleId].score += 3;
+        }
+      }
+    }
+
+    // Find highest scoring role
+    const sortedRoles = Object.entries(scores)
+      .sort(([, a], [, b]) => b.score - a.score)
+      .map(([role, data]) => ({ role, ...data }));
+
+    const topRole = sortedRoles[0];
+    const totalWords = text.split(/\s+/).filter(word => word.length > 0).length;
+    const confidence = totalWords > 0 ? Math.min(topRole.score / totalWords, 1.0) : 0;
+
+    // Apply confidence threshold
+    const threshold = this.roleSystemConfig?.role_detection?.confidence_threshold || 0.6;
+    const detectedRole = confidence >= threshold ? topRole.role : 
+                        (this.roleSystemConfig?.role_detection?.fallback_role || 'general');
+
+    return {
+      detectedRole,
+      confidence,
+      reasoning: topRole.matches,
+      alternatives: sortedRoles.slice(1, 4).map(item => ({
+        role: item.role,
+        confidence: totalWords > 0 ? Math.min(item.score / totalWords, 1.0) : 0
+      }))
+    };
+  }
+
+  /**
+   * Get role configuration by ID
+   */
+  async getRoleConfig(roleId: string): Promise<RoleConfig | null> {
+    await this.loadRoleConfigurations();
+    return this.roleConfigs.get(roleId) || null;
+  }
+
+  /**
+   * List all available roles
+   */
+  async listRoles(): Promise<RoleConfig[]> {
+    await this.loadRoleConfigurations();
+    return Array.from(this.roleConfigs.values());
+  }
+
+  /**
+   * Get recommended templates for a role
+   */
+  async getTemplatesForRole(roleId: string): Promise<string[]> {
+    const roleConfig = await this.getRoleConfig(roleId);
+    return roleConfig?.task_templates_preferred || ['general-task-template'];
+  }
+
+  /**
+   * Get model preference for a role
+   */
+  async getModelPreference(roleId: string): Promise<string> {
+    const roleConfig = await this.getRoleConfig(roleId);
+    return roleConfig?.model_preference || 'haiku';
+  }
+}
+
+interface ModelSelectionContext {
+  roleId?: string;
+  taskTitle?: string;
+  taskDescription?: string;
+  complexity?: 'low' | 'medium' | 'high';
+  filePaths?: string[];
+  repositoryType?: string;
+  manualOverride?: string;
+}
+
+interface ModelRecommendation {
+  model: string;
+  reasoning: string[];
+  confidence: number;
+  alternatives: { model: string; reasoning: string; score: number }[];
+}
+
+class LoqaModelSelector {
+  private workspaceRoot: string;
+  private roleManager: LoqaRoleManager;
+
+  constructor(workspaceRoot?: string) {
+    this.workspaceRoot = workspaceRoot || process.cwd();
+    this.roleManager = new LoqaRoleManager(workspaceRoot);
+  }
+
+  /**
+   * Select appropriate model based on context and complexity
+   */
+  async selectModel(context: ModelSelectionContext): Promise<ModelRecommendation> {
+    const reasoning: string[] = [];
+    let selectedModel = 'haiku'; // Default
+    let confidence = 0.5;
+    const alternatives: { model: string; reasoning: string; score: number }[] = [];
+
+    // Manual override takes precedence
+    if (context.manualOverride) {
+      return {
+        model: context.manualOverride,
+        reasoning: [`Manual override specified: ${context.manualOverride}`],
+        confidence: 1.0,
+        alternatives: []
+      };
+    }
+
+    // Role-based model preference
+    if (context.roleId) {
+      const roleConfig = await this.roleManager.getRoleConfig(context.roleId);
+      if (roleConfig) {
+        selectedModel = roleConfig.model_preference;
+        reasoning.push(`Role-based preference: ${roleConfig.role_name} → ${selectedModel}`);
+        confidence += 0.3;
+      }
+    }
+
+    // Task complexity analysis
+    const complexityScore = this.analyzeComplexity(context);
+    if (complexityScore.level === 'high') {
+      if (selectedModel !== 'sonnet-4') {
+        alternatives.push({
+          model: selectedModel,
+          reasoning: `Original role preference`,
+          score: 0.6
+        });
+        selectedModel = 'sonnet-4';
+        reasoning.push(`High complexity detected (${complexityScore.score}) → upgraded to Sonnet 4`);
+        confidence = Math.max(confidence, 0.8);
+      } else {
+        reasoning.push(`High complexity confirmed, Sonnet 4 appropriate`);
+        confidence += 0.2;
+      }
+    } else if (complexityScore.level === 'low') {
+      if (selectedModel === 'sonnet-4') {
+        alternatives.push({
+          model: selectedModel,
+          reasoning: `Role-based preference`,
+          score: 0.7
+        });
+        selectedModel = 'haiku';
+        reasoning.push(`Low complexity detected (${complexityScore.score}) → downgraded to Haiku for efficiency`);
+        confidence = Math.max(confidence, 0.7);
+      } else {
+        reasoning.push(`Low complexity confirmed, Haiku appropriate`);
+        confidence += 0.2;
+      }
+    }
+
+    // Repository-specific adjustments
+    if (context.repositoryType) {
+      const repoAdjustment = this.getRepositoryModelPreference(context.repositoryType);
+      if (repoAdjustment.preferredModel !== selectedModel) {
+        alternatives.push({
+          model: selectedModel,
+          reasoning: `Previous selection`,
+          score: confidence
+        });
+        selectedModel = repoAdjustment.preferredModel;
+        reasoning.push(repoAdjustment.reasoning);
+        confidence = Math.max(confidence, 0.6);
+      }
+    }
+
+    // File path analysis for additional context
+    const fileAnalysis = this.analyzeFilePaths(context.filePaths || []);
+    if (fileAnalysis.suggestedModel && fileAnalysis.suggestedModel !== selectedModel) {
+      alternatives.push({
+        model: selectedModel,
+        reasoning: `Previous selection based on role/complexity`,
+        score: confidence
+      });
+      selectedModel = fileAnalysis.suggestedModel;
+      reasoning.push(fileAnalysis.reasoning);
+      confidence = Math.max(confidence, 0.7);
+    }
+
+    // Ensure confidence is capped at 1.0
+    confidence = Math.min(confidence, 1.0);
+
+    return {
+      model: selectedModel,
+      reasoning,
+      confidence,
+      alternatives: alternatives.slice(0, 2) // Top 2 alternatives
+    };
+  }
+
+  /**
+   * Analyze task complexity based on various factors
+   */
+  private analyzeComplexity(context: ModelSelectionContext): { level: 'low' | 'medium' | 'high'; score: number } {
+    let complexityScore = 0;
+    const factors: string[] = [];
+
+    // Manual complexity override
+    if (context.complexity) {
+      const scoreMap = { low: 0.2, medium: 0.5, high: 0.8 };
+      return { level: context.complexity, score: scoreMap[context.complexity] };
+    }
+
+    // Analyze task title and description
+    const text = [context.taskTitle || '', context.taskDescription || ''].join(' ').toLowerCase();
+    
+    // High complexity indicators
+    const highComplexityPatterns = [
+      'architect', 'architecture', 'design system', 'protocol', 'api design',
+      'microservice', 'distributed', 'scalability', 'performance optimization',
+      'security', 'infrastructure', 'kubernetes', 'deployment', 'ci/cd',
+      'migration', 'refactor large', 'cross-service', 'breaking change'
+    ];
+
+    const mediumComplexityPatterns = [
+      'implement', 'feature', 'integration', 'database', 'testing',
+      'debugging', 'optimization', 'configuration', 'monitoring'
+    ];
+
+    const lowComplexityPatterns = [
+      'documentation', 'readme', 'comment', 'typo', 'style',
+      'update', 'minor', 'simple', 'small fix', 'cleanup'
+    ];
+
+    // Count pattern matches
+    for (const pattern of highComplexityPatterns) {
+      if (text.includes(pattern)) {
+        complexityScore += 0.3;
+        factors.push(`high: ${pattern}`);
+      }
+    }
+
+    for (const pattern of mediumComplexityPatterns) {
+      if (text.includes(pattern)) {
+        complexityScore += 0.2;
+        factors.push(`medium: ${pattern}`);
+      }
+    }
+
+    for (const pattern of lowComplexityPatterns) {
+      if (text.includes(pattern)) {
+        complexityScore += 0.1;
+        factors.push(`low: ${pattern}`);
+      }
+    }
+
+    // Length-based complexity (longer descriptions often indicate complexity)
+    const textLength = text.length;
+    if (textLength > 500) {
+      complexityScore += 0.2;
+    } else if (textLength > 200) {
+      complexityScore += 0.1;
+    }
+
+    // File count complexity (more files = more complex)
+    const fileCount = context.filePaths?.length || 0;
+    if (fileCount > 10) {
+      complexityScore += 0.3;
+    } else if (fileCount > 5) {
+      complexityScore += 0.2;
+    } else if (fileCount > 0) {
+      complexityScore += 0.1;
+    }
+
+    // Determine level based on score
+    let level: 'low' | 'medium' | 'high';
+    if (complexityScore >= 0.7) {
+      level = 'high';
+    } else if (complexityScore >= 0.4) {
+      level = 'medium';
+    } else {
+      level = 'low';
+    }
+
+    return { level, score: Math.min(complexityScore, 1.0) };
+  }
+
+  /**
+   * Get repository-specific model preferences
+   */
+  private getRepositoryModelPreference(repositoryType: string): { preferredModel: string; reasoning: string } {
+    const repoPreferences: Record<string, { preferredModel: string; reasoning: string }> = {
+      'loqa': {
+        preferredModel: 'sonnet-4',
+        reasoning: 'Main orchestration repo requires architectural understanding'
+      },
+      'loqa-proto': {
+        preferredModel: 'sonnet-4', 
+        reasoning: 'Protocol design requires careful API considerations'
+      },
+      'loqa-hub': {
+        preferredModel: 'sonnet-4',
+        reasoning: 'Core service with complex business logic and integrations'
+      },
+      'loqa-skills': {
+        preferredModel: 'sonnet-4',
+        reasoning: 'Plugin system requires architectural understanding'
+      },
+      'loqa-relay': {
+        preferredModel: 'sonnet-4',
+        reasoning: 'Audio processing and real-time communication complexity'
+      },
+      'loqa-commander': {
+        preferredModel: 'haiku',
+        reasoning: 'UI components generally have lower complexity requirements'
+      },
+      'www-loqalabs-com': {
+        preferredModel: 'haiku',
+        reasoning: 'Website content and styling work is typically straightforward'
+      },
+      'loqalabs-github-config': {
+        preferredModel: 'haiku',
+        reasoning: 'Configuration and template work is generally simple'
+      }
+    };
+
+    return repoPreferences[repositoryType] || { 
+      preferredModel: 'haiku', 
+      reasoning: 'Unknown repository type, using efficient default' 
+    };
+  }
+
+  /**
+   * Analyze file paths for complexity indicators
+   */
+  private analyzeFilePaths(filePaths: string[]): { suggestedModel?: string; reasoning: string } {
+    const complexityIndicators = {
+      high: ['.proto', 'Dockerfile', 'docker-compose', 'kubernetes', 'helm', '.tf', 'terraform'],
+      medium: ['.go', '.ts', '.js', '.py', 'Makefile', '.sql', '.graphql'],
+      low: ['.md', '.txt', '.json', '.yaml', '.yml', '.css', '.scss']
+    };
+
+    let highCount = 0, mediumCount = 0, lowCount = 0;
+
+    for (const path of filePaths) {
+      const pathLower = path.toLowerCase();
+      
+      if (complexityIndicators.high.some(ext => pathLower.includes(ext))) {
+        highCount++;
+      } else if (complexityIndicators.medium.some(ext => pathLower.includes(ext))) {
+        mediumCount++;
+      } else if (complexityIndicators.low.some(ext => pathLower.includes(ext))) {
+        lowCount++;
+      }
+    }
+
+    if (highCount > 0) {
+      return {
+        suggestedModel: 'sonnet-4',
+        reasoning: `File analysis: ${highCount} high-complexity files detected (infrastructure/protocol)`
+      };
+    } else if (mediumCount > lowCount && mediumCount > 2) {
+      return {
+        suggestedModel: 'sonnet-4',
+        reasoning: `File analysis: ${mediumCount} code files suggest implementation complexity`
+      };
+    } else if (lowCount > mediumCount) {
+      return {
+        suggestedModel: 'haiku',
+        reasoning: `File analysis: ${lowCount} documentation/config files suggest low complexity`
+      };
+    }
+
+    return { reasoning: 'File analysis inconclusive, maintaining current selection' };
+  }
+
+  /**
+   * Get model capabilities and use cases
+   */
+  getModelCapabilities(): Record<string, { strengths: string[]; useCases: string[]; performance: string }> {
+    return {
+      'sonnet-4': {
+        strengths: [
+          'Complex reasoning and analysis',
+          'Architectural design and system thinking',
+          'Advanced code generation and debugging',
+          'Multi-step problem solving'
+        ],
+        useCases: [
+          'System architecture design',
+          'Complex algorithm implementation', 
+          'Cross-service integration planning',
+          'Performance optimization',
+          'Security analysis and implementation'
+        ],
+        performance: 'Higher latency, more thorough analysis'
+      },
+      'haiku': {
+        strengths: [
+          'Fast response times',
+          'Efficient for straightforward tasks',
+          'Good for documentation and simple code',
+          'Cost-effective for high-volume work'
+        ],
+        useCases: [
+          'Documentation writing',
+          'Simple bug fixes',
+          'Code formatting and style',
+          'Configuration updates',
+          'Basic testing tasks'
+        ],
+        performance: 'Lower latency, optimized for efficiency'
+      }
+    };
+  }
+}
+
 /**
  * Get role-specific capabilities and context
  */
@@ -759,6 +1298,333 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           required: ["role"],
         },
       },
+      {
+        name: "detect_role",
+        description: "Automatically detect appropriate role based on task context",
+        inputSchema: {
+          type: "object",
+          properties: {
+            title: {
+              type: "string",
+              description: "Task or work title",
+            },
+            description: {
+              type: "string", 
+              description: "Detailed description of the work",
+            },
+            filePaths: {
+              type: "array",
+              items: { type: "string" },
+              description: "File paths related to the work",
+            },
+            repositoryType: {
+              type: "string",
+              description: "Type of repository (loqa-hub, loqa-commander, etc.)",
+            },
+          },
+          required: [],
+        },
+      },
+      {
+        name: "get_role_config",
+        description: "Get detailed configuration for a specific role",
+        inputSchema: {
+          type: "object",
+          properties: {
+            roleId: {
+              type: "string",
+              description: "Role identifier (architect, developer, devops, qa, general)",
+            },
+          },
+          required: ["roleId"],
+        },
+      },
+      {
+        name: "list_roles",
+        description: "List all available roles with their capabilities",
+        inputSchema: {
+          type: "object",
+          properties: {},
+          required: [],
+        },
+      },
+      {
+        name: "get_role_templates",
+        description: "Get recommended task templates for a specific role",
+        inputSchema: {
+          type: "object",
+          properties: {
+            roleId: {
+              type: "string",
+              description: "Role identifier",
+            },
+          },
+          required: ["roleId"],
+        },
+      },
+      {
+        name: "select_model",
+        description: "Select appropriate Claude model based on task context and complexity",
+        inputSchema: {
+          type: "object",
+          properties: {
+            roleId: {
+              type: "string",
+              description: "Role identifier for role-based model preference",
+            },
+            taskTitle: {
+              type: "string",
+              description: "Title of the task or work",
+            },
+            taskDescription: {
+              type: "string",
+              description: "Detailed description of the work",
+            },
+            complexity: {
+              type: "string",
+              enum: ["low", "medium", "high"],
+              description: "Manual complexity override",
+            },
+            filePaths: {
+              type: "array",
+              items: { type: "string" },
+              description: "File paths related to the work",
+            },
+            repositoryType: {
+              type: "string",
+              description: "Type of repository",
+            },
+            manualOverride: {
+              type: "string",
+              enum: ["sonnet-4", "haiku"],
+              description: "Manual model override",
+            },
+          },
+          required: [],
+        },
+      },
+      {
+        name: "get_model_capabilities",
+        description: "Get information about available Claude models and their capabilities",
+        inputSchema: {
+          type: "object",
+          properties: {},
+          required: [],
+        },
+      },
+      {
+        name: "start_issue_work",
+        description: "Start comprehensive GitHub issue work with full workflow guidance (replaces ISSUE_WORK_PROMPT.md)",
+        inputSchema: {
+          type: "object",
+          properties: {
+            issueUrl: {
+              type: "string",
+              description: "GitHub issue URL",
+            },
+            issueTitle: {
+              type: "string",
+              description: "Issue title",
+            },
+            issueNumber: {
+              type: "string",
+              description: "Issue number",
+            },
+            repository: {
+              type: "string",
+              description: "Repository name",
+            },
+            currentBranch: {
+              type: "string",
+              description: "Current branch (default: main)",
+            },
+            blockers: {
+              type: "string",
+              description: "Any blockers or dependencies",
+            },
+            preferredApproach: {
+              type: "string",
+              description: "Preferred technical approach",
+            },
+            roleContext: {
+              type: "string",
+              enum: ["architect", "developer", "devops", "qa", "general", "auto-detect"],
+              description: "Role specialization context",
+            },
+            scopeBoundaries: {
+              type: "string",
+              description: "What's in/out of scope",
+            },
+            complexity: {
+              type: "string",
+              enum: ["simple", "moderate", "complex", "unknown"],
+              description: "Estimated issue complexity",
+            },
+            crossRepoImpact: {
+              type: "string",
+              enum: ["single-repo", "simple-multi-repo", "complex-coordination"],
+              description: "Cross-repository impact level",
+            },
+            testingRequirements: {
+              type: "string",
+              description: "Testing requirements and expectations",
+            },
+          },
+          required: ["issueTitle"],
+        },
+      },
+      {
+        name: "plan_strategic_shift",
+        description: "Plan comprehensive strategic shift with full workflow guidance (replaces STRATEGIC_SHIFT_PROMPT.md)",
+        inputSchema: {
+          type: "object",
+          properties: {
+            shiftType: {
+              type: "string",
+              enum: ["focus", "technology", "approach", "design-philosophy", "branding"],
+              description: "Type of strategic shift",
+            },
+            currentState: {
+              type: "string",
+              description: "Current state we're shifting away from",
+            },
+            desiredState: {
+              type: "string",
+              description: "Desired future state",
+            },
+            motivation: {
+              type: "string",
+              description: "Motivation and drivers for the shift",
+            },
+            urgency: {
+              type: "string",
+              enum: ["critical", "high", "medium", "low"],
+              description: "Urgency level",
+            },
+            budgetConstraints: {
+              type: "string",
+              description: "Budget constraints if any",
+            },
+            timelineConstraints: {
+              type: "string",
+              description: "Timeline constraints if any",
+            },
+            resourceConstraints: {
+              type: "string",
+              description: "Resource constraints if any",
+            },
+            technicalConstraints: {
+              type: "string",
+              description: "Technical constraints if any",
+            },
+            roleContext: {
+              type: "string",
+              enum: ["architect", "developer", "devops", "qa", "general", "auto-detect"],
+              description: "Role specialization context",
+            },
+          },
+          required: ["shiftType", "currentState", "desiredState", "motivation"],
+        },
+      },
+      {
+        name: "capture_comprehensive_thought",
+        description: "Capture thought with comprehensive workflow and categorization (enhanced thought capture)",
+        inputSchema: {
+          type: "object",
+          properties: {
+            thought: {
+              type: "string",
+              description: "The idea, concern, or consideration",
+            },
+            context: {
+              type: "string",
+              description: "What triggered this thought",
+            },
+            category: {
+              type: "string",
+              enum: ["technical-architecture", "privacy-security", "user-experience", "business-strategy", "process-workflow", "product-direction", "infrastructure", "compliance-legal"],
+              description: "Thought category",
+            },
+            timeline: {
+              type: "string",
+              enum: ["next-sprint", "next-quarter", "next-release", "when-conditions-met", "ongoing"],
+              description: "When should this be revisited",
+            },
+            impactLevel: {
+              type: "string",
+              enum: ["low", "medium", "high", "critical"],
+              description: "Impact level",
+            },
+            dependencies: {
+              type: "string",
+              description: "What needs to happen before this can be addressed",
+            },
+            relatedWork: {
+              type: "string",
+              description: "Related issues, docs, or initiatives",
+            },
+            roleContext: {
+              type: "string",
+              enum: ["architect", "developer", "devops", "qa", "general", "auto-detect"],
+              description: "Role specialization context",
+            },
+          },
+          required: ["thought"],
+        },
+      },
+      {
+        name: "start_complex_todo",
+        description: "Create complex TODO with comprehensive planning and workflow guidance (enhanced add_todo)",
+        inputSchema: {
+          type: "object",
+          properties: {
+            title: {
+              type: "string",
+              description: "Task title",
+            },
+            category: {
+              type: "string",
+              enum: ["feature", "bug-fix", "technical-debt", "documentation", "devops-infrastructure", "research-exploration", "security-compliance", "internal-tools"],
+              description: "Task category",
+            },
+            priority: {
+              type: "string",
+              enum: ["P1", "P2", "P3"],
+              description: "Priority level (P1=Urgent, P2=Important, P3=Nice-to-have)",
+            },
+            description: {
+              type: "string",
+              description: "Detailed task description",
+            },
+            context: {
+              type: "string",
+              description: "Context that led to this task",
+            },
+            dependencies: {
+              type: "string",
+              description: "Dependencies or blockers",
+            },
+            acceptanceCriteria: {
+              type: "string",
+              description: "What does 'done' look like",
+            },
+            estimatedEffort: {
+              type: "string",
+              description: "Estimated effort (e.g., 1 day, 2 weeks)",
+            },
+            roleContext: {
+              type: "string",
+              enum: ["architect", "developer", "devops", "qa", "general", "auto-detect"],
+              description: "Role specialization context",
+            },
+            breakdown: {
+              type: "boolean",
+              description: "Whether to break down into smaller tasks if complex",
+            },
+          },
+          required: ["title", "category", "priority"],
+        },
+      },
     ],
   };
 });
@@ -770,6 +1636,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
     const validator = new LoqaRulesValidator();
     const taskManager = new LoqaTaskManager();
+    const roleManager = new LoqaRoleManager();
+    const modelSelector = new LoqaModelSelector();
 
     switch (name) {
       case "validate_commit_message": {
@@ -881,9 +1749,33 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           throw new Error("title parameter is required and must be a string");
         }
         
+        let template = args.template as string | undefined;
+        let detectedRole = 'general';
+        
+        // Auto-detect role and template if not specified
+        if (!template) {
+          const roleDetection = await roleManager.detectRole({
+            title: args.title,
+            description: args.description as string | undefined,
+            repositoryType: args.repositoryType as string | undefined,
+          });
+          
+          detectedRole = roleDetection.detectedRole;
+          const recommendedTemplates = await roleManager.getTemplatesForRole(detectedRole);
+          template = recommendedTemplates[0]; // Use the first recommended template
+        }
+        
+        // Get model recommendation for this task
+        const modelRecommendation = await modelSelector.selectModel({
+          roleId: detectedRole,
+          taskTitle: args.title,
+          taskDescription: args.description as string | undefined,
+          repositoryType: args.repositoryType as string | undefined,
+        });
+        
         const options: TaskCreationOptions = {
           title: args.title,
-          template: args.template as string | undefined,
+          template: template,
           priority: args.priority as 'High' | 'Medium' | 'Low' | undefined,
           type: args.type as 'Feature' | 'Bug Fix' | 'Improvement' | 'Documentation' | undefined,
           assignee: args.assignee as string | undefined,
@@ -901,10 +1793,19 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 filePath: result.filePath,
                 summary: `✅ Created task ${result.taskId}: "${args.title}"`,
                 template: options.template || 'default',
+                detectedRole: detectedRole,
+                modelRecommendation: {
+                  model: modelRecommendation.model,
+                  confidence: modelRecommendation.confidence,
+                  reasoning: modelRecommendation.reasoning[0] // First reason for brevity
+                },
+                autoDetection: !args.template ? `Auto-detected role: ${detectedRole}` : undefined,
                 nextSteps: [
                   `Edit the task file: ${result.filePath}`,
+                  `Recommended model for this task: ${modelRecommendation.model}`,
                   `View in Kanban board: backlog board view`,
-                  `Open in browser: backlog browser`
+                  `Open in browser: backlog browser`,
+                  ...(detectedRole !== 'general' ? [`Consider using /set-role ${detectedRole} for specialized context`] : [])
                 ]
               }, null, 2),
             },
@@ -1023,6 +1924,604 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                   `Specialized prompts and context will be applied`,
                   `Use /set-role general to return to general mode`
                 ]
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "detect_role": {
+        const context = {
+          title: args?.title as string | undefined,
+          description: args?.description as string | undefined,
+          filePaths: args?.filePaths as string[] | undefined,
+          repositoryType: args?.repositoryType as string | undefined,
+        };
+        
+        const result = await roleManager.detectRole(context);
+        
+        // Get model recommendation based on detected role and context
+        const modelRecommendation = await modelSelector.selectModel({
+          roleId: result.detectedRole,
+          taskTitle: context.title,
+          taskDescription: context.description,
+          filePaths: context.filePaths,
+          repositoryType: context.repositoryType,
+        });
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                detectedRole: result.detectedRole,
+                confidence: result.confidence,
+                reasoning: result.reasoning,
+                alternatives: result.alternatives,
+                summary: `🎭 Detected role: ${result.detectedRole} (${Math.round(result.confidence * 100)}% confidence)`,
+                roleInfo: await roleManager.getRoleConfig(result.detectedRole),
+                recommendedTemplates: await roleManager.getTemplatesForRole(result.detectedRole),
+                modelRecommendation: {
+                  model: modelRecommendation.model,
+                  confidence: modelRecommendation.confidence,
+                  reasoning: modelRecommendation.reasoning[0] // First reason for brevity
+                },
+                nextSteps: [
+                  `Use /set-role ${result.detectedRole} to activate this role`,
+                  `Recommended model: ${modelRecommendation.model}`,
+                  `Create tasks with recommended templates: ${(await roleManager.getTemplatesForRole(result.detectedRole)).join(', ')}`,
+                  `Leverage role-specific capabilities and context`
+                ]
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "get_role_config": {
+        if (!args || typeof args.roleId !== 'string') {
+          throw new Error("roleId parameter is required and must be a string");
+        }
+        
+        const roleConfig = await roleManager.getRoleConfig(args.roleId);
+        if (!roleConfig) {
+          throw new Error(`Role '${args.roleId}' not found`);
+        }
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                role: roleConfig,
+                templates: await roleManager.getTemplatesForRole(args.roleId),
+                modelPreference: await roleManager.getModelPreference(args.roleId),
+                summary: `📋 Role: ${roleConfig.role_name}`,
+                description: roleConfig.role_description,
+                capabilities: roleConfig.capabilities,
+                usage: `Use /set-role ${roleConfig.role_id} to activate this role`
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "list_roles": {
+        const roles = await roleManager.listRoles();
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                roles: roles.map(role => ({
+                  id: role.role_id,
+                  name: role.role_name,
+                  description: role.role_description,
+                  capabilities: role.capabilities.slice(0, 3), // First 3 for brevity
+                  modelPreference: role.model_preference
+                })),
+                summary: `🎭 Found ${roles.length} available roles`,
+                usage: {
+                  detect: "Use /detect-role with task context for automatic selection",
+                  manual: "Use /set-role <role-id> for manual selection",
+                  config: "Use /get-role-config <role-id> for detailed information"
+                }
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "get_role_templates": {
+        if (!args || typeof args.roleId !== 'string') {
+          throw new Error("roleId parameter is required and must be a string");
+        }
+        
+        const templates = await roleManager.getTemplatesForRole(args.roleId);
+        const roleConfig = await roleManager.getRoleConfig(args.roleId);
+        
+        if (!roleConfig) {
+          throw new Error(`Role '${args.roleId}' not found`);
+        }
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                roleId: args.roleId,
+                roleName: roleConfig.role_name,
+                templates: templates,
+                summary: `📋 Templates for ${roleConfig.role_name}: ${templates.length} available`,
+                usage: templates.map(template => 
+                  `/add-todo "Task title" --template=${template} --priority=Medium`
+                ),
+                description: `Recommended task templates optimized for ${roleConfig.role_description.toLowerCase()}`
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "select_model": {
+        const context: ModelSelectionContext = {
+          roleId: args?.roleId as string | undefined,
+          taskTitle: args?.taskTitle as string | undefined,
+          taskDescription: args?.taskDescription as string | undefined,
+          complexity: args?.complexity as 'low' | 'medium' | 'high' | undefined,
+          filePaths: args?.filePaths as string[] | undefined,
+          repositoryType: args?.repositoryType as string | undefined,
+          manualOverride: args?.manualOverride as string | undefined,
+        };
+        
+        const recommendation = await modelSelector.selectModel(context);
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                recommendedModel: recommendation.model,
+                confidence: recommendation.confidence,
+                reasoning: recommendation.reasoning,
+                alternatives: recommendation.alternatives,
+                summary: `🤖 Recommended model: ${recommendation.model} (${Math.round(recommendation.confidence * 100)}% confidence)`,
+                modelInfo: modelSelector.getModelCapabilities()[recommendation.model],
+                nextSteps: [
+                  `Use the recommended model for optimal performance`,
+                  `Consider alternatives if specific constraints apply`,
+                  `Model selection is based on task complexity and role requirements`
+                ]
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "get_model_capabilities": {
+        const capabilities = modelSelector.getModelCapabilities();
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                models: capabilities,
+                summary: `🤖 Available models: ${Object.keys(capabilities).join(', ')}`,
+                usage: {
+                  automatic: "Use /select-model with task context for automatic selection",
+                  manual: "Specify model preference when creating tasks or setting roles",
+                  optimization: "Model selection balances capability vs efficiency"
+                },
+                guidelines: {
+                  "sonnet-4": "Use for complex architecture, design, and development tasks",
+                  "haiku": "Use for documentation, simple fixes, and routine tasks"
+                }
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "start_issue_work": {
+        // Interactive GitHub issue workflow with comprehensive guidance
+        const issueTitle = args?.issueTitle as string;
+        const roleContext = args?.roleContext as string || 'auto-detect';
+        
+        // Auto-detect role if requested
+        let detectedRole = roleContext;
+        if (roleContext === 'auto-detect') {
+          const roleResult = await roleManager.detectRole({
+            title: issueTitle,
+            description: args?.scopeBoundaries as string || ''
+          });
+          detectedRole = roleResult.detectedRole;
+        }
+        
+        // Get role-specific guidance
+        const roleConfig = await roleManager.getRoleConfig(detectedRole);
+        
+        // Handle null roleConfig with fallback
+        const safeRoleConfig = roleConfig || {
+          role_name: 'General',
+          role_description: 'General development tasks',
+          capabilities: [],
+          detection_patterns: [],
+          model_preference: 'sonnet-4',
+          task_templates_preferred: []
+        };
+        
+        // Build comprehensive workflow guidance
+        const workflow = {
+          issueInfo: {
+            title: issueTitle,
+            url: args?.issueUrl || '',
+            repository: args?.repository || '',
+            number: args?.issueNumber || '',
+          },
+          context: {
+            currentBranch: args?.currentBranch || 'main',
+            blockers: args?.blockers || 'none',
+            preferredApproach: args?.preferredApproach || '',
+            roleContext: detectedRole,
+          },
+          scopeGuidance: {
+            boundaries: args?.scopeBoundaries || 'Ask for clarification if unclear',
+            complexity: args?.complexity || 'unknown',
+            crossRepoImpact: args?.crossRepoImpact || 'single-repo',
+            testingRequirements: args?.testingRequirements || 'Standard testing required',
+          },
+          workflowSteps: [
+            '🔍 Analyze issue requirements and scope',
+            '🏗️ Create feature branch: git checkout -b feature/issue-name',
+            '📋 Plan implementation approach',
+            '💻 Implement solution with incremental commits',
+            '🧪 Run quality checks: make quality-check',
+            '✅ Verify end-to-end functionality',
+            '📝 Create PR with detailed description',
+            '👀 Wait for review and approval before merging'
+          ],
+          roleSpecificGuidance: {
+            role: safeRoleConfig.role_name,
+            focus: safeRoleConfig.role_description,
+            keyConsiderations: 'Role-specific best practices applied',
+          },
+          criticalReminders: [
+            '🚨 NEVER push directly to main branch',
+            '📋 ALL quality checks must PASS',
+            '🔄 End-to-end verification is REQUIRED',
+            '❓ When blocked, ASK - never make assumptions'
+          ]
+        };
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                workflow,
+                summary: `🚀 Issue workflow started for: ${issueTitle}`,
+                roleOptimization: `Optimized for ${safeRoleConfig.role_name} role`,
+                nextActions: [
+                  'Review scope and approach guidance',
+                  'Create feature branch if not done',
+                  'Create backlog tasks for implementation steps using /start-complex-todo',
+                  'Use backlog board view to track progress',
+                  'Follow role-specific workflow considerations'
+                ],
+                templateReplacement: 'This replaces ISSUE_WORK_PROMPT.md with interactive guidance'
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "plan_strategic_shift": {
+        // Interactive strategic shift planning with comprehensive workflow
+        const shiftType = args?.shiftType as string;
+        const currentState = args?.currentState as string;
+        const desiredState = args?.desiredState as string;
+        const motivation = args?.motivation as string;
+        const roleContext = args?.roleContext as string || 'auto-detect';
+        
+        // Auto-detect role if requested
+        let detectedRole = roleContext;
+        if (roleContext === 'auto-detect') {
+          const roleResult = await roleManager.detectRole({
+            title: shiftType,
+            description: motivation
+          });
+          detectedRole = roleResult.detectedRole;
+        }
+        
+        const roleConfig = await roleManager.getRoleConfig(detectedRole);
+        
+        // Handle null roleConfig with fallback
+        const safeRoleConfig = roleConfig || {
+          role_name: 'General',
+          role_description: 'General strategic planning',
+          capabilities: [],
+          detection_patterns: [],
+          model_preference: 'sonnet-4',
+          task_templates_preferred: []
+        };
+        
+        const strategicPlan = {
+          shiftDetails: {
+            type: shiftType,
+            from: currentState,
+            to: desiredState,
+            why: motivation,
+            urgency: args?.urgency || 'medium',
+            roleContext: detectedRole,
+          },
+          constraints: {
+            budget: args?.budgetConstraints || 'none specified',
+            timeline: args?.timelineConstraints || 'none specified',
+            resources: args?.resourceConstraints || 'none specified',
+            technical: args?.technicalConstraints || 'none specified',
+          },
+          phasesPlan: {
+            'Phase 1: Discovery & Analysis': [
+              'Ask clarifying questions about scope and impact',
+              'Review current backlog status and priorities',
+              'Analyze repository structure and dependencies',
+              'Assess technical and business impact'
+            ],
+            'Phase 2: Strategic Planning': [
+              'Create detailed transition plan with timelines',
+              'Update backlog priorities and status in backlog.md system',
+              'Define success criteria and milestones',
+              'Identify immediate, short-term, and long-term actions'
+            ],
+            'Phase 3: Project Management': [
+              'Update GitHub Issues and Projects',
+              'Close irrelevant issues, update priorities',
+              'Create new issues for shift-related work',
+              'Plan repository organization changes'
+            ],
+            'Phase 4: Implementation': [
+              'Update branding and messaging if applicable',
+              'Create detailed implementation roadmap',
+              'Establish checkpoints and review gates',
+              'Coordinate multi-repository changes'
+            ],
+            'Phase 5: Documentation': [
+              'Update README files and documentation',
+              'Create migration guides if needed',
+              'Update CLAUDE.md with new workflows',
+              'Document the strategic shift rationale'
+            ]
+          },
+          roleSpecificFocus: {
+            role: safeRoleConfig.role_name,
+            considerations: safeRoleConfig.role_description,
+            expertise: `Leverage ${detectedRole} expertise for optimal planning`
+          },
+          criticalRequirements: [
+            '🌿 MANDATORY: Feature branches for ALL changes',
+            '📋 ALL quality checks must PASS',
+            '🔄 Multi-repo coordination is CRITICAL',
+            '📚 Document impact across all repositories'
+          ]
+        };
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                strategicPlan,
+                summary: `📋 Strategic shift plan: ${shiftType} transformation`,
+                roleOptimization: `Planned with ${safeRoleConfig.role_name} perspective`,
+                nextSteps: [
+                  'Review and validate the phase-by-phase plan',
+                  'Start with Phase 1: Discovery & Analysis',
+                  'Create backlog tasks for each phase using /start-complex-todo',
+                  'Use backlog board view to track strategic shift progress',
+                  'Create GitHub issues for coordination tasks'
+                ],
+                templateReplacement: 'This replaces STRATEGIC_SHIFT_PROMPT.md with interactive planning'
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "capture_comprehensive_thought": {
+        // Enhanced thought capture with comprehensive workflow
+        const thought = args?.thought as string;
+        const roleContext = args?.roleContext as string || 'auto-detect';
+        
+        // Auto-detect role if requested
+        let detectedRole = roleContext;
+        if (roleContext === 'auto-detect') {
+          const roleResult = await roleManager.detectRole({
+            title: thought,
+            description: args?.context as string || ''
+          });
+          detectedRole = roleResult.detectedRole;
+        }
+        
+        const roleConfig = await roleManager.getRoleConfig(detectedRole);
+        
+        // Handle null roleConfig with fallback
+        const safeRoleConfig = roleConfig || {
+          role_name: 'General',
+          role_description: 'General thought processing',
+          capabilities: [],
+          detection_patterns: [],
+          model_preference: 'sonnet-4',
+          task_templates_preferred: []
+        };
+        
+        // Create comprehensive thought structure
+        const thoughtCapture = {
+          content: {
+            thought: thought,
+            context: args?.context || '',
+            category: args?.category || 'general',
+            roleContext: detectedRole,
+          },
+          planning: {
+            timeline: args?.timeline || 'ongoing',
+            impactLevel: args?.impactLevel || 'medium',
+            dependencies: args?.dependencies || 'none identified',
+            relatedWork: args?.relatedWork || '',
+          },
+          workflow: {
+            captureLocation: 'Will be saved to backlog/drafts/',
+            reviewTrigger: args?.timeline || 'next planning session',
+            followUpActions: [
+              'Review and decide if this needs to become a formal task',
+              'Connect to related existing work',
+              'Set appropriate review trigger',
+              'Archive if no longer relevant'
+            ]
+          },
+          roleSpecificLens: {
+            role: safeRoleConfig.role_name,
+            perspective: safeRoleConfig.role_description,
+            considerations: `Captured through ${detectedRole} lens for optimal categorization`
+          },
+          integrationPlan: {
+            backlogCreation: 'Use /start-complex-todo to create formal backlog task if actionable',
+            thoughtTracking: 'Saved to backlog/drafts/ for review and potential promotion',
+            workflowIntegration: 'Use backlog board view and browser interface for management',
+            issueCreation: 'Create GitHub issue if needs collaboration across team',
+            documentationUpdate: 'Update strategic docs if architecturally significant'
+          }
+        };
+        
+        // Actually save the thought using existing logic
+        const savedThought = await taskManager.captureThought({
+          content: thought,
+          tags: [args?.category as string || 'general', detectedRole],
+          context: args?.context as string,
+          timestamp: new Date()
+        });
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                thoughtCapture,
+                savedTo: savedThought.filePath,
+                summary: `💭 Thought captured with ${safeRoleConfig.role_name} perspective`,
+                roleOptimization: `Categorized and processed through ${detectedRole} expertise`,
+                nextActions: [
+                  'Thought saved to backlog/drafts/ for future review',
+                  'Use backlog browser to view and manage captured thoughts',
+                  'Convert to formal task using /start-complex-todo when actionable',
+                  'Review during backlog planning sessions',
+                  'Use backlog board view to track thought progression'
+                ],
+                templateReplacement: 'This replaces THOUGHT_CAPTURE_PROMPT.md with enhanced workflow'
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "start_complex_todo": {
+        // Enhanced TODO creation with comprehensive planning
+        const title = args?.title as string;
+        const category = args?.category as string;
+        const priority = args?.priority as string;
+        const roleContext = args?.roleContext as string || 'auto-detect';
+        
+        // Auto-detect role if requested
+        let detectedRole = roleContext;
+        if (roleContext === 'auto-detect') {
+          const roleResult = await roleManager.detectRole({
+            title: title,
+            description: args?.description as string || ''
+          });
+          detectedRole = roleResult.detectedRole;
+        }
+        
+        const roleConfig = await roleManager.getRoleConfig(detectedRole);
+        
+        // Handle null roleConfig with fallback
+        const safeRoleConfig = roleConfig || {
+          role_name: 'General',
+          role_description: 'General task management',
+          capabilities: [],
+          detection_patterns: [],
+          model_preference: 'sonnet-4',
+          task_templates_preferred: ['general']
+        };
+        
+        // Build comprehensive task structure
+        const taskPlan = {
+          taskInfo: {
+            title,
+            category,
+            priority,
+            description: args?.description || '',
+            roleContext: detectedRole,
+          },
+          planning: {
+            context: args?.context || '',
+            dependencies: args?.dependencies || 'none',
+            acceptanceCriteria: args?.acceptanceCriteria || '',
+            estimatedEffort: args?.estimatedEffort || 'unknown',
+          },
+          breakdown: {
+            shouldBreakdown: args?.breakdown || false,
+            complexityIndicators: [
+              (args?.estimatedEffort as string)?.includes('week') ? 'Multi-week effort' : '',
+              args?.dependencies !== 'none' ? 'Has dependencies' : '',
+              ((args?.description as string) || '').length > 200 ? 'Detailed description' : ''
+            ].filter(Boolean),
+          },
+          roleSpecificGuidance: {
+            role: safeRoleConfig.role_name,
+            expertise: safeRoleConfig.role_description,
+            workflow: 'Role-specific workflow principles applied',
+          },
+          qualityGates: [
+            'Code review completed',
+            'All tests passing (unit, integration, e2e)',
+            'Quality checks passing (lint, format, type-check)',
+            'Documentation updated',
+            'Feature branch and PR workflow followed'
+          ],
+          completionCriteria: [
+            'Task appropriately scoped',
+            'Created in backlog system for proper tracking',
+            'GitHub Issue created if needed',
+            'Clear acceptance criteria defined',
+            'Quality gates established'
+          ]
+        };
+        
+        // Create the actual task using existing createTaskFromTemplate method
+        const savedTask = await taskManager.createTaskFromTemplate({
+          title,
+          priority: priority as 'High' | 'Medium' | 'Low',
+          template: safeRoleConfig.task_templates_preferred[0] || 'general'
+        });
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                taskPlan,
+                savedTo: savedTask.filePath,
+                summary: `📋 Complex task created with ${safeRoleConfig.role_name} optimization`,
+                roleOptimization: `Structured using ${detectedRole} best practices`,
+                recommendedNext: [
+                  args?.breakdown ? 'Use /start-complex-todo to create smaller subtasks' : 'Task is appropriately scoped',
+                  'View in backlog board: backlog board view',
+                  'Manage via web interface: backlog browser', 
+                  'Create GitHub issue for team collaboration if needed',
+                  'Use backlog priority system for sprint planning'
+                ],
+                templateReplacement: 'This replaces TODO_ITEM_PROMPT.md with enhanced planning'
               }, null, 2),
             },
           ],
