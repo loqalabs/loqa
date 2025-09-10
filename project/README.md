@@ -2,9 +2,27 @@
 
 This directory contains project management and planning files:
 
-- **TODO.md** - Priority 1 & 2 tasks: Must-fix issues and high-impact features
-- **BACKLOG.md** - Priority 3 features: Optional post-MVP enhancements and future ideas  
-- **ISSUE_WORK_PROMPT.md** - Template for structured GitHub issue work
-- **STRATEGIC_SHIFT_PROMPT.md** - Template for major strategic changes
+## 📋 **Core Planning Documents**
+- **backlog/** - Modern task management system with CLI and web interface
+  - Use `/start-complex-todo` for formal task creation
+  - Use `/capture-comprehensive-thought` for idea capture
+  - View with `backlog board view` (terminal) or `backlog browser` (web)
+- **TODO.md** - Legacy high-priority documentation (consider migrating to backlog/)
+- **BACKLOG.md** - Legacy long-term planning (consider migrating to backlog/)
 
-These files guide the development roadmap and strategic direction of the Loqa project.
+## 🚀 **Interactive Workflow Commands**
+- **INTERACTIVE_COMMANDS.md** - Comprehensive guide to interactive MCP commands
+- Use `/start-issue-work` for GitHub issue workflows (replaces copy-paste templates)
+- Use `/plan-strategic-shift` for strategic planning and major changes
+- Use `/capture-comprehensive-thought` for idea capture and processing
+- Use `/start-complex-todo` for advanced task creation and planning
+
+## 🎭 **Role Specialization**
+- **role-configs/** - Role-based AI specialization configurations
+- **role-configs/prompt-libraries/** - Role-specific best practices and methodologies
+
+## 🛠️ **Development Tools**
+- **loqa-rules-mcp/** - MCP server for workflow automation and rule enforcement
+- **backlog/** - Backlog.md CLI integration and task templates
+
+These files guide the development roadmap and strategic direction of the Loqa project through interactive, role-aware workflows.

@@ -1,0 +1,86 @@
+{
+  "role_system_version": "1.0.0",
+  "description": "Role-based specialization system for Claude Code AI agents",
+  "available_roles": [
+    {
+      "role_id": "architect",
+      "config_file": "architect.claude-code.json",
+      "priority": 10,
+      "complexity_level": "high",
+      "model_preference": "sonnet-4"
+    },
+    {
+      "role_id": "developer", 
+      "config_file": "developer.claude-code.json",
+      "priority": 8,
+      "complexity_level": "medium",
+      "model_preference": "sonnet-4"
+    },
+    {
+      "role_id": "devops",
+      "config_file": "devops.claude-code.json", 
+      "priority": 9,
+      "complexity_level": "high",
+      "model_preference": "sonnet-4"
+    },
+    {
+      "role_id": "qa",
+      "config_file": "qa.claude-code.json",
+      "priority": 7, 
+      "complexity_level": "medium",
+      "model_preference": "haiku"
+    },
+    {
+      "role_id": "general",
+      "config_file": "general.claude-code.json",
+      "priority": 1,
+      "complexity_level": "low",
+      "model_preference": "haiku"
+    }
+  ],
+  "role_detection": {
+    "detection_method": "pattern_matching",
+    "confidence_threshold": 0.6,
+    "fallback_role": "general",
+    "detection_sources": [
+      "task_title",
+      "task_description", 
+      "file_paths",
+      "repository_context"
+    ]
+  },
+  "model_selection": {
+    "sonnet-4": {
+      "use_for": ["architect", "developer", "devops"],
+      "complexity_threshold": "high",
+      "description": "Use for complex architecture, development, and infrastructure tasks"
+    },
+    "haiku": {
+      "use_for": ["qa", "general"],
+      "complexity_threshold": "low-medium", 
+      "description": "Use for testing, documentation, and general tasks"
+    }
+  },
+  "role_switching": {
+    "allow_manual_override": true,
+    "session_persistence": true,
+    "cross_task_learning": true,
+    "auto_detection_enabled": true
+  },
+  "integration": {
+    "mcp_commands": {
+      "set_role": "Manual role selection via MCP command",
+      "detect_role": "Automatic role detection from context",
+      "list_roles": "Show available roles and capabilities"
+    },
+    "backlog_integration": {
+      "template_mapping": {
+        "architect": ["protocol-change-template", "cross-repo-work-template"],
+        "developer": ["feature-template", "bug-fix-template"],
+        "devops": ["general-task-template"],
+        "qa": ["bug-fix-template", "feature-template"],
+        "general": ["general-task-template"]
+      }
+    }
+  }
+}
