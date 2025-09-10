@@ -8,6 +8,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { simpleGit, SimpleGit } from 'simple-git';
 import { promises as fs } from 'fs';
+import { randomBytes } from 'crypto';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import * as yaml from 'yaml';
@@ -1902,7 +1903,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           context: args.context as string | undefined,
           duration: args.duration as string | undefined,
           timestamp: new Date().toISOString(),
-          sessionId: Math.random().toString(36).substring(7)
+          sessionId: randomBytes(4).toString('hex')
         };
         
         // In a real implementation, this might store role context in a session file
