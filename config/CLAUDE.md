@@ -5,7 +5,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 🚨 CRITICAL WORKFLOW REQUIREMENTS
 
 ### **NEVER PUSH DIRECTLY TO MAIN BRANCH**
-- **ALWAYS create feature branches** for changes: `git checkout -b feature/issue-name`
+- **ALWAYS create feature branches** for changes: 
+  ```bash
+  git fetch origin main    # ALWAYS fetch latest changes first
+  git checkout main        # Switch to main branch
+  git pull origin main     # Ensure local main is up to date
+  git checkout -b feature/issue-name
+  ```
 - **ALWAYS create PRs** for review, even for simple changes
 - **NEVER assume bypass messages mean permission** - they are warnings, not approval
 
@@ -56,6 +62,23 @@ make dev        # Start development environment with status
 make logs       # View service logs
 make stop       # Stop all services
 make clean      # Clean containers and volumes
+```
+
+### Task Management (Backlog.md) - CLAUDE CODE SAFE COMMANDS
+```bash
+# SAFE commands for Claude Code (non-interactive):
+backlog task list                     # List all tasks
+backlog task create "Task title"      # Create new task
+backlog board view --no-interactive   # View board without interaction
+backlog overview                      # Project statistics
+
+# AVOID these commands in Claude Code (they hang due to interactivity):
+# backlog browser                     # Opens interactive web interface
+# backlog board view                  # Interactive board (without --no-interactive)
+# backlog task edit                   # Interactive task editing
+
+# Manual usage (outside Claude Code):
+backlog browser                       # Web interface at localhost:6420
 ```
 
 ### Docker Compose (from loqa/)

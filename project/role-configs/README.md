@@ -32,6 +32,13 @@ This directory contains role-specific configurations for Claude Code AI agents, 
 - **Templates**: Bug fix, general, feature templates
 - **Detection Keywords**: test, testing, quality, qa, validation, verify, bug
 
+### 🐙 GitHub CLI Specialist (`github-cli-specialist.claude-code.json`)
+**Focus**: GitHub CLI operations, multi-repository coordination, reliable git workflows
+- **Capabilities**: Multi-repo GitHub ops, PR management, issue tracking, release coordination
+- **Model Preference**: Sonnet 4 (medium complexity)
+- **Templates**: Cross-repo work, protocol change, general templates
+- **Detection Keywords**: github, gh, pull request, pr, issue, release, multi-repo, coordinate
+
 ### 🔧 General (`general.claude-code.json`)
 **Focus**: Multi-disciplinary work, default fallback role
 - **Capabilities**: General development, documentation, basic testing
@@ -101,6 +108,12 @@ Each role has preferred task templates from the backlog.md system:
 ```bash
 /set-role qa
 /add-todo "Create integration test suite" --template=bug-fix
+```
+
+### GitHub CLI Operations
+```bash
+/set-role github-cli-specialist
+/add-todo "Coordinate feature branch across all repos" --template=cross-repo-work
 ```
 
 ## Integration Points
