@@ -5,6 +5,7 @@ status: To Do
 assignee:
   - development
 created_date: '2025-09-10 20:45'
+updated_date: '2025-09-10 21:17'
 labels:
   - hardware
   - integration
@@ -16,3 +17,7 @@ priority: high
 ## Description
 
 Test voice pipeline with physical hardware and document hardware setup process for community.
+
+## Implementation Notes
+
+GitHub Issue: https://github.com/loqalabs/loqa/issues/34 - HA Voice PE Custom Firmware Development & Hardware Integration
