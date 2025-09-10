@@ -113,55 +113,34 @@
 - [ ] If upgrade requires significant refactoring → Create issue for post-MVP
 - [ ] All major upgrades must pass quality checks and performance validation
 
-### 🔧 GitHub Repository Protection Strategy Evaluation **[PRIORITY 3 - DEVELOPER EXPERIENCE]**
-**🔗 GitHub Issue**: *[Create new issue for this evaluation]*
+### 🔧 GitHub Repository Protection Strategy Evaluation ✅ **COMPLETED**
+**🔗 GitHub Issue**: [loqa#51 - GitHub Repository Protection Migration: Rulesets → Branch Protection](https://github.com/loqalabs/loqa/issues/51)
 
-**📋 Context**: The Phase 2 Protocol automation experienced significant friction with GitHub Organization Rulesets and required status check naming. This pattern is likely to repeat across other repositories and block future development velocity.
+**📋 Context**: The Phase 2 Protocol automation experienced significant friction with repository-level rulesets and required status check naming. Analysis revealed systematic "stuck PR" issues due to opaque naming requirements.
 
-**🚨 Problem Identified:**
-- Organization Rulesets use opaque status check naming requirements
-- Developers cannot easily see what exact workflow/job names are expected
-- Troubleshooting requires organization admin access to ruleset configuration
-- Led to creation of 5+ debugging workflows and multiple failed PRs during Phase 2
-- Time spent on workflow naming issues instead of productive development
+**🚨 Critical Technical Issue Identified:**
+- **Repository rulesets** (not organization rulesets as initially assumed) require complex naming: `"Test & Build / Test & Build"`
+- **Branch protection** uses intuitive naming: `"Test & Build"`  
+- **Result**: PRs get stuck waiting for status checks that never match due to naming complexity
+- **Impact**: Developers must frequently bypass security checks, defeating their purpose
+- **Evidence**: loqa-commander PR #28 shows actual status check names like `"Test & Lint / Lint, Format, Build, and Upload Dist"`
 
-**🎯 Evaluation Required:**
+**✅ Evaluation Complete:**
+- [x] **Comprehensive analysis**: `project/GITHUB_REPOSITORY_PROTECTION_EVALUATION.md`
+- [x] **Root cause identified**: Ruleset status check naming opacity vs branch protection transparency
+- [x] **Migration plan developed**: 5-week phased approach starting with pilot repository
+- [x] **Templates designed**: Branch protection configurations for each repository type
+- [x] **Success metrics defined**: Zero bypass necessity, intuitive configuration, maintained security
 
-**Option 1: Continue with Organization Rulesets**
-- [ ] **Document exact ruleset requirements** for each repository type
-- [ ] **Create standardized workflow naming conventions** across all repos  
-- [ ] **Implement ruleset visibility tooling** for developers
-- [ ] **Establish clear escalation path** for ruleset-related blocks
+**🎯 **RECOMMENDATION**: Migrate from Repository-Level Rulesets to Branch Protection Rules**
 
-**Option 2: Switch to Repository-specific Branch Protection**  
-- [ ] **Evaluate migration complexity** from org rulesets to repo branch protection
-- [ ] **Assess security implications** of distributed vs centralized protection  
-- [ ] **Document workflow naming transparency** benefits of branch protection
-- [ ] **Create migration plan** for existing repositories
-- [ ] **Test branch protection approach** in a pilot repository
+**Key Benefits**:
+- **Eliminate "stuck PR" issues**: Intuitive workflow job name mapping
+- **End systematic bypassing**: Developers won't need admin bypass for naming issues  
+- **Maintain security**: All current protection rules preserved
+- **Improve developer experience**: GitHub autocomplete for status checks
 
-**🔍 Full Ruleset Approach Assessment:**
-- [ ] **Audit current organization rulesets** - what's actually configured?
-- [ ] **Document pain points** experienced across all repositories  
-- [ ] **Survey developer experience** with current ruleset approach
-- [ ] **Compare alternatives**: org rulesets vs repo branch protection vs hybrid approach
-- [ ] **Security analysis**: centralized control vs developer autonomy tradeoffs
-- [ ] **Maintenance overhead**: org admin dependency vs distributed management
-
-**📊 Decision Criteria:**
-- **Developer velocity**: How often do protection rules block productive work?
-- **Security effectiveness**: Are protection goals being met?  
-- **Maintenance burden**: Admin overhead vs developer self-service
-- **Transparency**: Can developers understand and fix protection issues independently?
-- **Scalability**: Will approach work as organization grows to 10+ repositories?
-
-**🎯 Success Metrics:**
-- Zero workflow naming blocks for 30 days after implementation
-- Developers can resolve protection issues without admin escalation  
-- Protection rule changes take <1 day instead of admin coordination
-- No security regressions from any approach changes
-
-**📅 Timeline Target**: Complete evaluation within 2 weeks, implement preferred approach within 1 month
+**📅 Implementation Status**: Ready for Phase 1 pilot testing in `loqa-proto` repository
 
 ### 🔍 Security-Aware Observability for Failed Intents **[PRIORITY 2 - PRIVACY-FIRST DEBUGGING]**
 **🔗 GitHub Issue**: [loqa#49 - Architecture Decision: Security-Aware Observability for Intent Debugging](https://github.com/loqalabs/loqa/issues/49)
