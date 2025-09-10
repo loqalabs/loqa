@@ -3,12 +3,14 @@
 This directory contains project management and planning files:
 
 ## 📋 **Core Planning Documents**
-- **backlog/** - Modern task management system with CLI and web interface
+- **../backlog/** - Modern task management system with CLI and web interface (located in main loqa/ directory)
   - Use `/start-complex-todo` for formal task creation
   - Use `/capture-comprehensive-thought` for idea capture
-  - View with `backlog board view` (terminal) or `backlog browser` (web)
-- **TODO.md** - Legacy high-priority documentation (consider migrating to backlog/)
-- **BACKLOG.md** - Legacy long-term planning (consider migrating to backlog/)
+  - View with `backlog board` (terminal) or `backlog browser` (web)
+  - View task lists with `backlog tasks list`
+- **MIGRATION_SUMMARY.md** - Summary of TODO.md/BACKLOG.md migration to backlog.md system
+- **TODO.md.legacy** - Archived high-priority documentation (migrated to backlog/)
+- **BACKLOG.md.legacy** - Archived long-term planning (migrated to backlog/)
 
 ## 🚀 **Interactive Workflow Commands**
 - **INTERACTIVE_COMMANDS.md** - Comprehensive guide to interactive MCP commands
