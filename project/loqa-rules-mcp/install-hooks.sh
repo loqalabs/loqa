@@ -13,7 +13,8 @@ NC='\033[0m' # No Color
 
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HOOK_SOURCE="$SCRIPT_DIR/pre-commit-hook.sh"
+PRE_COMMIT_HOOK_SOURCE="$SCRIPT_DIR/pre-commit-hook.sh"
+COMMIT_MSG_HOOK_SOURCE="$SCRIPT_DIR/commit-msg-hook.sh"
 
 # Find the Loqa workspace root by looking for the loqa/ directory structure
 WORKSPACE_ROOT=""
@@ -68,6 +69,20 @@ if [ ${#MISSING_DEPS[@]} -gt 0 ]; then
     echo ""
 fi
 
+# Check if dependencies are installed and MCP server is built
+if [ ! -d "$SCRIPT_DIR/node_modules" ]; then
+    echo -e "${YELLOW}⚠️  Dependencies not installed. Installing now...${NC}"
+    cd "$SCRIPT_DIR"
+    if command -v npm >/dev/null 2>&1; then
+        npm install
+    else
+        echo -e "${RED}❌ npm not found. Please install dependencies manually:${NC}"
+        echo -e "   cd $SCRIPT_DIR && npm install"
+        exit 1
+    fi
+    echo ""
+fi
+
 # Check if MCP server is built
 if [ ! -f "$SCRIPT_DIR/dist/index.js" ]; then
     echo -e "${YELLOW}⚠️  MCP server not built. Building now...${NC}"
@@ -89,7 +104,8 @@ ERROR_COUNT=0
 for repo in "${REPOSITORIES[@]}"; do
     REPO_PATH="$WORKSPACE_ROOT/$repo"
     GIT_HOOKS_DIR="$REPO_PATH/.git/hooks"
-    HOOK_TARGET="$GIT_HOOKS_DIR/pre-commit"
+    PRE_COMMIT_TARGET="$GIT_HOOKS_DIR/pre-commit"
+    COMMIT_MSG_TARGET="$GIT_HOOKS_DIR/commit-msg"
     
     echo -e "${BLUE}📁 Processing repository: $repo${NC}"
     
@@ -110,31 +126,63 @@ for repo in "${REPOSITORIES[@]}"; do
     # Create hooks directory if it doesn't exist
     mkdir -p "$GIT_HOOKS_DIR"
     
-    # Check if pre-commit hook already exists
-    if [ -f "$HOOK_TARGET" ]; then
+    REPO_INSTALLED_COUNT=0
+    
+    # Install pre-commit hook (branch protection)
+    if [ -f "$PRE_COMMIT_TARGET" ]; then
         # Check if it's already our hook
-        if grep -q "Loqa Pre-commit Hook" "$HOOK_TARGET" 2>/dev/null; then
-            echo -e "${GREEN}   ✅ Loqa hook already installed${NC}"
+        if grep -q "Loqa Pre-commit Hook" "$PRE_COMMIT_TARGET" 2>/dev/null; then
+            echo -e "${GREEN}   ✅ Pre-commit hook already installed${NC}"
         else
             # Backup existing hook
-            BACKUP_NAME="$HOOK_TARGET.backup.$(date +%Y%m%d-%H%M%S)"
-            cp "$HOOK_TARGET" "$BACKUP_NAME"
-            echo -e "${YELLOW}   📋 Backed up existing hook to: $(basename "$BACKUP_NAME")${NC}"
+            BACKUP_NAME="$PRE_COMMIT_TARGET.backup.$(date +%Y%m%d-%H%M%S)"
+            cp "$PRE_COMMIT_TARGET" "$BACKUP_NAME"
+            echo -e "${YELLOW}   📋 Backed up existing pre-commit hook to: $(basename "$BACKUP_NAME")${NC}"
             
             # Install our hook
-            cp "$HOOK_SOURCE" "$HOOK_TARGET"
-            chmod +x "$HOOK_TARGET"
-            echo -e "${GREEN}   ✅ Loqa hook installed (replaced existing)${NC}"
-            ((INSTALLED_COUNT++))
+            cp "$PRE_COMMIT_HOOK_SOURCE" "$PRE_COMMIT_TARGET"
+            chmod +x "$PRE_COMMIT_TARGET"
+            echo -e "${GREEN}   ✅ Pre-commit hook installed${NC}"
+            ((REPO_INSTALLED_COUNT++))
         fi
     else
         # Install our hook
-        cp "$HOOK_SOURCE" "$HOOK_TARGET"
-        chmod +x "$HOOK_TARGET"
-        echo -e "${GREEN}   ✅ Loqa hook installed${NC}"
-        ((INSTALLED_COUNT++))
+        cp "$PRE_COMMIT_HOOK_SOURCE" "$PRE_COMMIT_TARGET"
+        chmod +x "$PRE_COMMIT_TARGET"
+        echo -e "${GREEN}   ✅ Pre-commit hook installed${NC}"
+        ((REPO_INSTALLED_COUNT++))
     fi
     
+    # Install commit-msg hook (AI attribution detection)
+    if [ -f "$COMMIT_MSG_TARGET" ]; then
+        # Check if it's already our hook
+        if grep -q "Loqa Commit Message Hook" "$COMMIT_MSG_TARGET" 2>/dev/null; then
+            echo -e "${GREEN}   ✅ Commit-msg hook already installed${NC}"
+        else
+            # Backup existing hook
+            BACKUP_NAME="$COMMIT_MSG_TARGET.backup.$(date +%Y%m%d-%H%M%S)"
+            cp "$COMMIT_MSG_TARGET" "$BACKUP_NAME"
+            echo -e "${YELLOW}   📋 Backed up existing commit-msg hook to: $(basename "$BACKUP_NAME")${NC}"
+            
+            # Install our hook
+            cp "$COMMIT_MSG_HOOK_SOURCE" "$COMMIT_MSG_TARGET"
+            chmod +x "$COMMIT_MSG_TARGET"
+            echo -e "${GREEN}   ✅ Commit-msg hook installed${NC}"
+            ((REPO_INSTALLED_COUNT++))
+        fi
+    else
+        # Install our hook
+        cp "$COMMIT_MSG_HOOK_SOURCE" "$COMMIT_MSG_TARGET"
+        chmod +x "$COMMIT_MSG_TARGET"
+        echo -e "${GREEN}   ✅ Commit-msg hook installed${NC}"
+        ((REPO_INSTALLED_COUNT++))
+    fi
+    
+    if [ $REPO_INSTALLED_COUNT -eq 0 ]; then
+        echo -e "${GREEN}   ✅ All Loqa hooks already installed${NC}"
+    fi
+    
+    ((INSTALLED_COUNT += REPO_INSTALLED_COUNT))
     echo ""
 done
 
@@ -148,13 +196,14 @@ if [ $INSTALLED_COUNT -gt 0 ]; then
     echo -e "${GREEN}🎉 Pre-commit hooks successfully installed!${NC}"
     echo ""
     echo -e "${BLUE}What happens now:${NC}"
-    echo -e "   • All commits will be validated against Loqa workflow rules"
-    echo -e "   • AI attribution will be blocked"
-    echo -e "   • Branch name validation will be enforced"
-    echo -e "   • Quality gate configuration will be checked"
+    echo -e "   • Pre-commit hooks prevent direct commits to main/master branches"
+    echo -e "   • Commit-msg hooks block AI attribution in commit messages"
+    echo -e "   • Branch name suggestions provided for better conventions"
+    echo -e "   • All validation happens automatically during git commits"
     echo ""
-    echo -e "${YELLOW}💡 To test a hook manually:${NC}"
-    echo -e "   cd /path/to/repo && .git/hooks/pre-commit"
+    echo -e "${YELLOW}💡 To test hooks manually:${NC}"
+    echo -e "   Pre-commit: echo 'test' | .git/hooks/pre-commit"
+    echo -e "   Commit-msg: echo 'test message 🤖 Generated with Claude Code' > /tmp/msg && .git/hooks/commit-msg /tmp/msg"
 else
     echo -e "${YELLOW}ℹ️  No new hooks were installed.${NC}"
 fi
