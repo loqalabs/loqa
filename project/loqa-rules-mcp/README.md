@@ -12,23 +12,27 @@ Automated workflow rule enforcement for the Loqa ecosystem. This system prevents
 
 ### Installation
 
-1. **Install and Build the MCP Server**:
-   ```bash
-   cd loqa/project/loqa-rules-mcp
-   npm install
-   npm run build
-   ```
+**One-Command Setup** (handles everything automatically):
+```bash
+cd loqa/project/loqa-rules-mcp
+./install-hooks.sh
+```
 
-2. **Install Pre-commit Hooks Across All Repositories**:
-   ```bash
-   ./install-hooks.sh
-   ```
-   
-   This automatically:
-   - Discovers all Git repositories in the Loqa workspace
-   - Installs pre-commit hooks in each repository  
-   - Backs up any existing hooks
-   - Uses relative paths (works on any developer machine)
+This automatically:
+- ✅ **Installs Dependencies**: Runs `npm install` if needed
+- ✅ **Builds MCP Server**: Runs `npm run build` if needed  
+- ✅ **Discovers Repositories**: Finds all Git repositories in workspace
+- ✅ **Installs Hooks**: Deploys pre-commit hooks to all repositories
+- ✅ **Backs Up Existing**: Preserves any existing hooks with timestamps
+- ✅ **Works Anywhere**: Uses relative paths (no hardcoded user paths)
+
+**Manual Setup** (if you prefer step-by-step):
+```bash
+cd loqa/project/loqa-rules-mcp
+npm install          # Install dependencies
+npm run build        # Build MCP server  
+./install-hooks.sh   # Install hooks
+```
 
 ## ✅ What Gets Enforced
 

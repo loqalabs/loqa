@@ -68,6 +68,20 @@ if [ ${#MISSING_DEPS[@]} -gt 0 ]; then
     echo ""
 fi
 
+# Check if dependencies are installed and MCP server is built
+if [ ! -d "$SCRIPT_DIR/node_modules" ]; then
+    echo -e "${YELLOW}⚠️  Dependencies not installed. Installing now...${NC}"
+    cd "$SCRIPT_DIR"
+    if command -v npm >/dev/null 2>&1; then
+        npm install
+    else
+        echo -e "${RED}❌ npm not found. Please install dependencies manually:${NC}"
+        echo -e "   cd $SCRIPT_DIR && npm install"
+        exit 1
+    fi
+    echo ""
+fi
+
 # Check if MCP server is built
 if [ ! -f "$SCRIPT_DIR/dist/index.js" ]; then
     echo -e "${YELLOW}⚠️  MCP server not built. Building now...${NC}"
