@@ -36,37 +36,56 @@ npm run build        # Build MCP server
 
 ## ✅ What Gets Enforced
 
-The system automatically prevents:
+### 🛡️ Git Hook Protection (Automatic)
+- **🚫 Direct Main Branch Commits**: Pre-commit hook blocks commits to `main` or `master` branches
+- **🚫 AI Attribution in Messages**: Commit-msg hook blocks "🤖 Generated with Claude Code", "Co-Authored-By: Claude", etc.
+- **💡 Best Practice Suggestions**: Recommends conventional branch naming and commit formats
 
-- **🚫 AI Attribution in Commits**: Blocks messages with "🤖 Generated with Claude Code", "Co-Authored-By: Claude", etc.
-- **🚫 Direct Main Branch Commits**: Prevents commits to `main` or `master` branches
-- **⚠️  Poor Commit Practices**: Warns about short messages and suggests conventional commit format
+### 🔧 MCP Server Validation (for Claude Code sessions)
+- **📋 Advanced Validation**: Full commit message analysis and quality checking
+- **🏗️  Quality Gate Validation**: Verifies repository has proper testing/linting setup
+- **📊 Repository Analysis**: Comprehensive project health checking
 
 ## 🔧 How It Works
 
-### Pre-commit Hooks
+### Git Hooks (Dual Protection)
+
+**Pre-commit Hook**:
 - **Location**: `.git/hooks/pre-commit` in each repository
-- **Trigger**: Runs automatically before every `git commit`
-- **Validation**: Uses simple shell pattern matching (no external dependencies)
-- **Fallback**: Gracefully skips validation if MCP server unavailable
+- **Trigger**: Runs before `git commit` processes the message
+- **Purpose**: Branch protection (prevents main/master commits)
+- **Dependencies**: None - uses only standard git commands
+
+**Commit-msg Hook**:
+- **Location**: `.git/hooks/commit-msg` in each repository  
+- **Trigger**: Runs after commit message is written
+- **Purpose**: AI attribution detection and message validation
+- **Dependencies**: None - uses only standard shell tools
 
 ### MCP Server
 - **Purpose**: Advanced validation tools for Claude Code sessions
-- **Location**: `loqa/project/loqa-rules-mcp/dist/index.js`
-- **Tools**: Commit validation, branch checking, quality gate verification
+- **Location**: `loqa/project/loqa-rules-mcp/dist/index.js`  
+- **Capabilities**: Full repository analysis, quality gate checking, advanced validation
+- **When**: Used during Claude Code development sessions for comprehensive analysis
 
 ## 🛠️ Developer Usage
 
 ### Testing Hooks Manually
 
 ```bash
-# Test with a problematic commit message
-echo "fix bug 🤖 Generated with Claude Code" | .git/hooks/pre-commit
-# ❌ Will fail with clear violation message
+# Test pre-commit hook (branch protection)
+echo "test message" | .git/hooks/pre-commit
+# ✅ Passes on feature branches, ❌ fails on main/master
 
-# Test with a good commit message  
-echo "fix(auth): resolve validation bug" | .git/hooks/pre-commit
-# ✅ Will pass (but warn about main branch if applicable)
+# Test commit-msg hook (AI attribution detection)
+echo "fix bug 🤖 Generated with Claude Code" > /tmp/test-msg
+.git/hooks/commit-msg /tmp/test-msg
+# ❌ Will fail with AI attribution violation
+
+# Test with a good commit message
+echo "fix(auth): resolve validation bug" > /tmp/test-msg  
+.git/hooks/commit-msg /tmp/test-msg
+# ✅ Will pass with helpful suggestions
 ```
 
 ### Re-installing Hooks
@@ -184,16 +203,17 @@ git commit --no-verify -m "emergency fix"
 
 | Rule | Enforcement | Bypass |
 |------|-------------|--------|
-| No AI attribution in commits | Pre-commit hook | `--no-verify` |
 | No direct main branch commits | Pre-commit hook | `--no-verify` |
-| Feature branch naming | Warning only | N/A |
-| Conventional commits | Suggestion only | N/A |
-| Quality gates configured | MCP tools only | N/A |
+| No AI attribution in commits | Commit-msg hook | `--no-verify` |
+| Feature branch naming | Pre-commit suggestion | N/A |
+| Conventional commits | Commit-msg suggestion | N/A |
+| Quality gates configured | MCP server only | N/A |
 
 ## 🎯 Integration Status
 
-- ✅ **Pre-commit Hooks**: Installed across all 8 Loqa repositories
-- ✅ **MCP Server**: Built and functional  
+- ✅ **Pre-commit Hooks**: Installed across all 8 Loqa repositories (branch protection)
+- ✅ **Commit-msg Hooks**: Installed across all 8 Loqa repositories (AI attribution blocking)
+- ✅ **MCP Server**: Built and functional with advanced validation tools
 - ✅ **.claude-code.json**: Updated with rule enforcement documentation
 - 🔄 **Interactive Commands**: Planned for Phase 1B
 - 🔄 **Quality Gate Integration**: Planned for Phase 3
