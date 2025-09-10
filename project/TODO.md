@@ -1,10 +1,39 @@
+## 🚨 NEXT ACTIONS - IMMEDIATE PRIORITIES
+
+> **🔥 START THESE NOW** - Critical path items blocking MVP progress:
+
+### **📋 WEEK 1-2 PRIORITIES (October 2025)**
+1. **🔧 Repository Protection Migration** - [Issue #51](https://github.com/loqalabs/loqa/issues/51) - **CRITICAL BLOCKER**
+   - [ ] Phase 1: Pilot testing in `loqa-proto` repository
+   - [ ] Test branch protection rules work without naming complexity
+   
+2. **🎙️ Hardware Evaluation Setup** - [Issue #33](https://github.com/loqalabs/loqa/issues/33) - **MVP ESSENTIAL** 
+   - [ ] Order/setup HA Voice PE device for testing
+   - [ ] Basic integration with current voice pipeline
+
+### **📋 WEEK 3-4 PRIORITIES (Late October 2025)**
+3. **🔄 Self-Healing Implementation** - [Issues #44, #45](https://github.com/loqalabs/loqa/issues/44) - **RELIABILITY CORE**
+   - [ ] Enhanced health check system with auto-restart
+   - [ ] Basic retry logic for STT/LLM/NATS failures
+
+4. **🎙️ Hardware Testing** - [Issue #34](https://github.com/loqalabs/loqa/issues/34) - **INTEGRATION CRITICAL**
+   - [ ] Test voice pipeline with physical hardware
+   - [ ] Document hardware setup process for community
+
+### **📋 NOVEMBER 2025 PRIORITIES**
+5. **🗣️ STT Pipeline** - [Issue loqa-hub#20](https://github.com/loqalabs/loqa-hub/issues/20)
+6. **🧠 Multi-Command Parsing** - [Issue loqa-hub#27](https://github.com/loqalabs/loqa-hub/issues/27)
+7. **🧠 Basic Skills System** - [Issue loqa-skills#9](https://github.com/loqalabs/loqa-skills/issues/9)
+
+---
+
 ## 🟥 P1 – Must-Fix Before OSS MVP
 
 > **🚨 CRITICAL TIMELINE**: Only ~3.5 months remaining until Dec 31, 2025 deadline  
 > **📊 Track Progress**: View all issues and milestones in the [**Loqa MVP Roadmap**](https://github.com/orgs/loqalabs/projects/1)  
-> **🎯 OSS MVP Milestone**: [Due Dec 31, 2025](https://github.com/loqalabs/loqa/milestone/1) - **URGENT SCOPE REDUCTION NEEDED**
+> **🎯 OSS MVP Milestone**: [Due Dec 31, 2025](https://github.com/loqalabs/loqa/milestone/1) - **FOCUSED MVP SCOPE**
 > **🎯 Target Community**: Developers, privacy enthusiasts, and self-hosting advocates who value autonomy and creative freedom
-> **💻 Reference Platform**: Any modern machine (Docker/self-hosted) - Privacy-first by default
+> **💻 Reference Platform**: Any modern machine (Docker/self-hosted) + HA Voice PE hardware
 
 > **⚠️ TIMELINE CRISIS**: We are in September 2025 with Q4 2025 (Oct-Dec) as the final quarter before OSS MVP deadline. Previous quarters Q4 2024-Q3 2025 targets are overdue and require immediate status assessment.
 
@@ -242,22 +271,31 @@
 
 **💥 MVP BLOCKER**: Without basic self-healing, OSS community adoption will fail. These are minimum viable reliability features.
 
-### 🎙️ Hardware Testing Foundation **[PRIORITY 7 - POST-MVP]** 
+### 🎙️ Hardware Integration & Testing **[PRIORITY 4 - MVP ESSENTIAL]** 
 **🔗 GitHub Issues**: 
 - [loqa#33 - HA Voice PE Stock Firmware Evaluation & UX Documentation](https://github.com/loqalabs/loqa/issues/33)
 - [loqa#34 - HA Voice PE Custom Firmware Development & Hardware Integration](https://github.com/loqalabs/loqa/issues/34) 
 - [loqa#35 - HA Voice PE Comparative Analysis & Community Feasibility Assessment](https://github.com/loqalabs/loqa/issues/35)
 
-**📋 SCOPE REDUCTION**: Hardware evaluation moved to **POST-MVP** (Q1 2026). OSS MVP must focus on software-only deployment that works on any hardware.
+**📋 MVP CRITICAL**: Hardware evaluation restored to MVP priority. **Voice assistant without physical hardware is not functional for community adoption.**
 
-**⚠️ MVP FOCUS**: Docker/software-only approach eliminates hardware dependencies and accelerates MVP delivery.
+**🚨 MVP TIMELINE ADJUSTED**:
 
-**DEFERRED TO 2026:**
-- [ ] **Phase 1**: HA Voice PE stock firmware evaluation - **Q1 2026**
-- [ ] **Phase 2**: Custom firmware development - **Q2 2026**  
-- [ ] **Phase 3**: Community hardware strategy - **Q3 2026**
+**October 2025 - MVP Foundation:**
+- [ ] **HA Voice PE Setup**: Order/configure device for testing - **WEEK 1-2**
+- [ ] **Basic Integration**: Connect HA Voice PE with current voice pipeline - **WEEK 2-3**
+- [ ] **Hardware Testing**: Validate audio quality, wake word, speaker output - **WEEK 3-4**
 
-**MVP ALTERNATIVE**: Use existing test relay (software) and standard USB microphones for development and community adoption.
+**November 2025 - Integration & Documentation:**
+- [ ] **Performance Optimization**: Tune hardware settings for optimal performance
+- [ ] **Community Documentation**: Create hardware setup guide for self-hosting
+- [ ] **Alternative Hardware**: Test with standard USB microphones as backup option
+
+**December 2025 - MVP Hardware Story:**
+- [ ] **Hardware Deployment Guide**: Complete instructions for community hardware setup
+- [ ] **Backup Options**: Document software-only alternatives where hardware unavailable
+
+**🎯 MVP HARDWARE REQUIREMENTS**: Community needs physical device to interact with voice assistant. Software-only approach creates adoption barrier.
 
 ### 🔒 Privacy-by-Design Architecture **[PRIORITY 5 - CORE DIFFERENTIATOR]**
 **🔗 GitHub Issues**:
@@ -451,16 +489,18 @@
 ### Q4 2025 (October - December): **FINAL MVP SPRINT** 
 **🎯 Milestone**: OSS MVP Launch or FAILURE
 
-**🔥 OCTOBER 2025 - CRITICAL BLOCKERS:**
+**🔥 OCTOBER 2025 - CRITICAL BLOCKERS + HARDWARE:**
 - [ ] **WEEK 1-2**: Complete GitHub Repository Protection Migration (Issue #51) - **ABSOLUTE PRIORITY**
+- [ ] **WEEK 1-2**: Order/setup HA Voice PE device (Issue #33) - **HARDWARE FOUNDATION**
+- [ ] **WEEK 3-4**: Basic hardware integration with voice pipeline (Issue #34)
 - [ ] **WEEK 3-4**: Implement basic self-healing foundations (Issues #44, #45)
-- [ ] **ALL MONTH**: Focus ONLY on P1 MVP-blocking items - NO feature creep
+- [ ] **ALL MONTH**: Focus on MVP essentials: repo protection, hardware, reliability
 
-**🚀 NOVEMBER 2025 - MVP CORE FEATURES:**
-- [ ] **Week 1-2**: Complete STT/TTS pipeline stabilization
-- [ ] **Week 3-4**: Basic multi-command parsing and execution  
+**🚀 NOVEMBER 2025 - MVP CORE FEATURES + HARDWARE TESTING:**
+- [ ] **Week 1-2**: Complete STT/TTS pipeline stabilization + hardware optimization
+- [ ] **Week 3-4**: Basic multi-command parsing and execution + hardware validation
 - [ ] **ONGOING**: Self-healing reliability implementation
-- [ ] **NO SCOPE EXPANSION**: Defer all non-essential features
+- [ ] **HARDWARE**: Community documentation for HA Voice PE setup
 
 **🎯 DECEMBER 2025 - LAUNCH PREPARATION:**
 - [ ] **Week 1-2**: Community documentation and self-hosting guides
