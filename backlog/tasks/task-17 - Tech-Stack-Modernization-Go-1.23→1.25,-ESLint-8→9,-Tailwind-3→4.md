@@ -1,10 +1,11 @@
 ---
 id: task-17
 title: 'Tech Stack Modernization - Go 1.23→1.25, ESLint 8→9, Tailwind 3→4'
-status: To Do
+status: Done
 assignee:
   - development
 created_date: '2025-09-10 20:47'
+updated_date: '2025-09-10 21:15'
 labels:
   - infrastructure
   - completed

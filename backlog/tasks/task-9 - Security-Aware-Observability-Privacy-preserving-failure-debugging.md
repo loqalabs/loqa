@@ -5,6 +5,7 @@ status: To Do
 assignee:
   - development
 created_date: '2025-09-10 20:46'
+updated_date: '2025-09-10 21:17'
 labels:
   - security
   - observability
@@ -17,3 +18,7 @@ priority: medium
 ## Description
 
 Intelligent failure logging that provides actionable debugging information while maintaining zero-trust privacy guarantees. Store failure context without sensitive content.
+
+## Implementation Notes
+
+GitHub Issue: https://github.com/loqalabs/loqa/issues/49 - Architecture Decision: Security-Aware Observability for Intent Debugging

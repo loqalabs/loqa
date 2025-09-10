@@ -1,10 +1,11 @@
 ---
 id: task-18
 title: Kokoro-82M TTS Integration - Professional natural voices
-status: To Do
+status: Done
 assignee:
   - development
 created_date: '2025-09-10 20:47'
+updated_date: '2025-09-10 21:15'
 labels:
   - tts
   - voice-pipeline
