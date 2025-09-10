@@ -48,11 +48,11 @@ Implementation of improved AI development workflow based on research into Agent 
   - **Dependencies:** Task 1A-1
   - **Estimated Effort:** 1 hour per repository
 
-### Phase 1B: Foundation + Interactive Commands (Week 1)
+### Phase 1B: Foundation + Interactive Commands (Week 1) ✅ **COMPLETED**
 **Goal:** Establish task management foundation and interactive command system
 
 #### Tasks:
-- [ ] **Task 1B-1: Install and Configure Backlog.md**
+- [x] **Task 1B-1: Install and Configure Backlog.md**
   - **Context:** Need persistent, AI-friendly task management across all repositories
   - **Implementation:**
     - Install backlog.md in all Loqa repositories
@@ -65,7 +65,7 @@ Implementation of improved AI development workflow based on research into Agent 
   - **Dependencies:** None
   - **Estimated Effort:** 1 hour per repository
 
-- [ ] **Task 1B-2: Create Task Templates for Common Work Patterns**
+- [x] **Task 1B-2: Create Task Templates for Common Work Patterns**
   - **Context:** Standardize task creation for different types of work
   - **Implementation:**
     - Create templates for: bug fixes, features, protocol changes, cross-repo work
@@ -78,7 +78,7 @@ Implementation of improved AI development workflow based on research into Agent 
   - **Dependencies:** Task 1B-1
   - **Estimated Effort:** 3-4 hours
 
-- [ ] **Task 1B-3: Build Custom MCP Commands**
+- [x] **Task 1B-3: Build Custom MCP Commands**
   - **Context:** Need interactive commands instead of copying/pasting templates
   - **Implementation:**
     - Create MCP server with commands: /add-todo, /capture-thought, /set-role
@@ -91,7 +91,7 @@ Implementation of improved AI development workflow based on research into Agent 
   - **Dependencies:** Task 1B-2
   - **Estimated Effort:** 6-8 hours
 
-- [ ] **Task 1B-4: Update CLAUDE.md with Integration Instructions**
+- [x] **Task 1B-4: Update CLAUDE.md with Integration Instructions**
   - **Context:** Document new workflow for team adoption
   - **Implementation:**
     - Add Backlog.md workflow documentation to CLAUDE.md
@@ -172,6 +172,93 @@ Implementation of improved AI development workflow based on research into Agent 
     - Templates work with automatic role detection
   - **Dependencies:** Task 2-3
   - **Estimated Effort:** 2-3 hours
+
+### Phase 2B: Enhanced Interactive Commands (Week 2) ✅ **COMPLETED**
+**Goal:** Replace copy-paste templates with comprehensive interactive commands
+
+#### Tasks:
+- [x] **Task 2B-1: Design Enhanced MCP Commands**
+  - **Context:** Users want to eliminate copy-paste workflow from templates
+  - **Implementation:**
+    - Analyze existing template functionality and workflow guidance
+    - Design comprehensive interactive commands that provide same guidance
+    - Plan integration with role specialization system
+  - **Acceptance Criteria:**
+    - All template functionality mapped to interactive commands
+    - Role specialization integration planned
+    - User experience designed for zero copy-paste workflow
+  - **Dependencies:** Task 2-5
+  - **Estimated Effort:** 2-3 hours
+
+- [x] **Task 2B-2: Implement `/start-issue-work` Command**
+  - **Context:** Replace ISSUE_WORK_PROMPT.md with interactive workflow
+  - **Implementation:**
+    - Build comprehensive GitHub issue workflow command
+    - Include role detection and specialization
+    - Provide scope guidance, testing requirements, and workflow steps
+  - **Acceptance Criteria:**
+    - Interactive prompts for all issue workflow parameters
+    - Automatic role detection and optimization
+    - Complete workflow guidance with critical reminders
+    - Integration with cross-repository coordination
+  - **Dependencies:** Task 2B-1
+  - **Estimated Effort:** 3-4 hours
+
+- [x] **Task 2B-3: Implement `/plan-strategic-shift` Command**
+  - **Context:** Replace STRATEGIC_SHIFT_PROMPT.md with interactive planning
+  - **Implementation:**
+    - Build comprehensive strategic shift planning command
+    - Include 5-phase planning process with role optimization
+    - Provide constraint analysis and multi-repo coordination
+  - **Acceptance Criteria:**
+    - Interactive strategic shift planning with all phases
+    - Role-specific planning considerations
+    - Comprehensive documentation and implementation roadmap
+    - Multi-repository coordination planning
+  - **Dependencies:** Task 2B-1
+  - **Estimated Effort:** 3-4 hours
+
+- [x] **Task 2B-4: Implement Enhanced Thought Capture**
+  - **Context:** Extend thought capture with comprehensive workflow
+  - **Implementation:**
+    - Build `/capture-comprehensive-thought` command
+    - Include categorization, impact assessment, and integration planning
+    - Add role-based processing and review triggers
+  - **Acceptance Criteria:**
+    - Comprehensive thought structure with workflow integration
+    - Role-based categorization and processing
+    - Integration planning for TODO.md, BACKLOG.md, and GitHub issues
+    - Automatic review trigger setting
+  - **Dependencies:** Task 2B-1
+  - **Estimated Effort:** 2-3 hours
+
+- [x] **Task 2B-5: Implement Complex TODO Creation**
+  - **Context:** Replace TODO_ITEM_PROMPT.md with enhanced task planning
+  - **Implementation:**
+    - Build `/start-complex-todo` command with comprehensive planning
+    - Include complexity analysis and breakdown recommendations
+    - Add role-specific task structuring and quality gates
+  - **Acceptance Criteria:**
+    - Interactive complex task creation with planning
+    - Complexity analysis and breakdown suggestions
+    - Role-specific task structuring and quality gates
+    - Integration with existing task management system
+  - **Dependencies:** Task 2B-1
+  - **Estimated Effort:** 2-3 hours
+
+- [x] **Task 2B-6: Update Documentation and Remove Template References**
+  - **Context:** Complete migration from templates to interactive commands
+  - **Implementation:**
+    - Create comprehensive INTERACTIVE_COMMANDS.md documentation
+    - Update project README and documentation to reference new commands
+    - Mark old templates as deprecated with migration guidance
+  - **Acceptance Criteria:**
+    - Complete interactive commands documentation
+    - All project documentation updated
+    - Clear migration path from old templates
+    - Legacy templates marked as deprecated
+  - **Dependencies:** Tasks 2B-2, 2B-3, 2B-4, 2B-5
+  - **Estimated Effort:** 2 hours
 
 ### Phase 3: Session Management + Advanced Orchestration (Week 2-3)
 **Goal:** Multi-repository coordination with persistent session context
