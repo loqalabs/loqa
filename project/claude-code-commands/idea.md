@@ -1,6 +1,6 @@
 ---
-description: "Capture feature ideas and improvements for later processing"
-allowed_tools: ["mcp__loqa-assistant__capture_thought"]
+description: "Capture feature ideas and improvements with intelligent task creation suggestions"
+allowed_tools: ["mcp__loqa-assistant__capture_thought", "mcp__loqa-assistant__capture_comprehensive_thought", "mcp__loqa-assistant__start_comprehensive_task_creation"]
 ---
 
 # Capture Feature Idea
@@ -23,7 +23,11 @@ If no parameters are provided, use this interactive workflow:
 
 3. **Confirmation**: Present suggestions to user: "Based on your description, I suggest capturing this idea with the following details: [show suggestions]. Would you like to save the idea with these parameters, or would you like to modify any of them?"
 
-4. **Capture idea**: Only after user confirmation, use the MCP function `mcp__loqa-assistant__capture_thought` with the final parameters.
+4. **Intelligent evaluation**: The system will analyze the idea against current project priorities and suggest task creation if warranted.
+
+5. **Task creation suggestion**: If the idea aligns with project goals, you'll see intelligent recommendations to create a comprehensive task.
+
+6. **Capture idea**: Use the appropriate MCP function based on complexity and scope of the idea.
 
 ## Parameters for MCP Function
 
