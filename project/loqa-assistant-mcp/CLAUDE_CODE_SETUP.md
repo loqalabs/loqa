@@ -76,7 +76,7 @@ Your Loqa Assistant MCP server is now configured to work with Claude Code!
 ### **Intelligent Task Prioritization:**
 - **Multi-criteria scoring:** Priority (40%) + Status (20%) + Role (20%) + Time (10%) + Context (10%)
 - **Cross-repository analysis:** Scans all 8 Loqa repositories
-- **Role-based matching:** architect, developer, devops, qa, github-cli-specialist
+- **Role-based matching:** architect, developer, devops, qa
 - **Time-effort correlation:** Matches tasks to available time
 
 ### **Workflow Automation:**

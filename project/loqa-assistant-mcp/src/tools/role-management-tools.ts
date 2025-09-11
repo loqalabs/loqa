@@ -14,8 +14,8 @@ export const roleManagementTools = [
       properties: {
         roleId: {
           type: "string",
-          description: "Role ID to set (architect, developer, devops, qa, github-cli-specialist, general)",
-          enum: ["architect", "developer", "devops", "qa", "github-cli-specialist", "general"]
+          description: "Role ID to set (architect, developer, devops, qa, general)",
+          enum: ["architect", "developer", "devops", "qa", "general"]
         },
         context: {
           type: "string", 
