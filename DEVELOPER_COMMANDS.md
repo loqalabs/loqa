@@ -24,13 +24,36 @@ cd loqa/project/claude-code-commands
 
 ## Quick Start
 
-For immediate productivity, start with these essential commands:
+For immediate productivity, start with these essential **interactive commands** - just run them without parameters for guided workflows:
 
 ```bash
-/work                    # Begin working on the next recommended task
-/recommend              # Get AI recommendations for what to work on
-/thought                # Quickly capture technical thoughts and concerns
-/idea                   # Quickly capture feature ideas and improvements
+/work                    # Interactive task selection based on your preferences
+/create-task            # Interactive task creation with AI-powered suggestions  
+/idea                   # Interactive feature idea capture with intelligent categorization
+/thought                # Interactive technical thought capture with smart tagging
+/branch                 # Interactive branch creation with task selection
+/pr                     # Interactive PR creation with quality checklists
+/plan                   # Interactive strategic planning with risk assessment
+/analyze                # Interactive protocol analysis with impact assessment
+```
+
+**✨ Revolutionary Interactive Experience**: All commands now work conversationally! Simply run them without parameters to get:
+
+- 🗣️ **Natural Language Input**: Describe your intent in your own words
+- 🤖 **AI-Powered Suggestions**: Get intelligent parameter recommendations
+- 🔍 **Guided Questions**: Follow-up questions to refine your approach
+- ✅ **Smart Confirmation**: Review and modify before execution
+- 🔄 **Full Compatibility**: Traditional parameter syntax still works perfectly
+
+**Example Interactive Flow:**
+```bash
+/create-task
+# → "Please describe the task you'd like to create in your own words..."
+# → You: "I need to fix the memory leak in audio processing"
+# → AI: "I suggest: Title: 'Fix memory leak in audio processing module', 
+#       Template: bug-fix, Priority: High, Tags: performance,technical-debt"
+# → You: "Looks good!"
+# → Creates structured task automatically
 ```
 
 ## Command Categories
@@ -81,12 +104,20 @@ For immediate productivity, start with these essential commands:
 
 ### `/work` - Begin Development Work
 
-**Purpose**: The primary command for starting development work. Intelligently selects the next best task or works on a specific task you specify.
+**Purpose**: The primary command for starting development work. **Interactive mode** asks about your preferences and intelligently recommends the best tasks for you.
 
-**Most Common Usage:**
+**Interactive Usage (Recommended):**
 ```bash
-/work                    # Let AI pick the best next task
+/work                    # Starts guided workflow asking about your preferences
+# → "What kind of work would you like to focus on today?"
+# → AI suggests 2-3 optimal tasks based on your response
+# → Select and begin work automatically
+```
+
+**Traditional Usage:**
+```bash
 /work --taskId=task-21   # Work on a specific task
+/work --priority=P1 --repository=loqa-hub   # Filter and auto-select
 ```
 
 **Key Features:**
@@ -159,12 +190,25 @@ For immediate productivity, start with these essential commands:
 
 ### `/thought` and `/idea` - Capture Ideas and Notes
 
-**Purpose**: Quickly capture ideas, technical insights, concerns, or observations that arise during development.
+**Purpose**: Quickly capture ideas, technical insights, concerns, or observations using **interactive workflows** that help structure and categorize your thoughts.
 
-**Usage:**
+**Interactive Usage (Recommended):**
 ```bash
-/thought      # Capture technical concerns, insights, or observations
-/idea         # Capture feature ideas, improvements, or enhancements
+/thought                 # Starts guided workflow for technical thoughts
+# → "Please describe your technical thought, concern, or insight..."
+# → AI suggests appropriate tags, context, and categorization
+# → Confirm and save structured thought
+
+/idea                    # Starts guided workflow for feature ideas  
+# → "Please describe your feature idea..."
+# → AI suggests relevant tags and proper categorization
+# → Confirm and save structured idea
+```
+
+**Traditional Usage:**
+```bash
+/thought "Memory leak in audio processing" --tags=technical-debt,performance
+/idea "Add real-time collaboration" --tags=feature,collaboration --context="user feedback"
 ```
 
 **Key Features:**
@@ -205,11 +249,20 @@ For immediate productivity, start with these essential commands:
 
 ### `/create-task` - Create Detailed Tasks
 
-**Purpose**: Create comprehensive, well-structured tasks in the backlog system with proper planning and breakdown.
+**Purpose**: Create comprehensive, well-structured tasks using **interactive workflows** that guide you through proper planning and breakdown.
 
-**Usage:**
+**Interactive Usage (Recommended):**
 ```bash
-/create-task     # Interactive creation with prompts
+/create-task             # Starts guided task creation workflow
+# → "Please describe the task you'd like to create in your own words..."
+# → AI suggests title, template, priority, type, and assignee
+# → Review and modify suggestions before creating
+# → Creates structured task with proper breakdown
+```
+
+**Traditional Usage:**
+```bash
+/create-task --title="Implement auth middleware" --template=feature --priority=High
 ```
 
 **Key Features:**
@@ -249,11 +302,20 @@ For immediate productivity, start with these essential commands:
 
 ### `/plan` - Plan Major Changes
 
-**Purpose**: Plan significant architectural, technology, or strategic changes across the Loqa ecosystem.
+**Purpose**: Plan significant architectural, technology, or strategic changes using **interactive workflows** that guide you through comprehensive analysis and risk assessment.
 
-**Usage:**
+**Interactive Usage (Recommended):**
 ```bash
-/plan    # Interactive strategic planning
+/plan                    # Starts guided strategic planning workflow
+# → "Please describe the strategic change you're planning..."
+# → AI suggests title, type, risk level, scope, and timeline
+# → Guided questions about drivers, concerns, and constraints
+# → Creates comprehensive 5-phase strategic plan
+```
+
+**Traditional Usage:**
+```bash
+/plan --title="Migrate to gRPC" --type=technology --description="Replace REST with gRPC"
 ```
 
 **Key Features:**
@@ -280,12 +342,21 @@ For immediate productivity, start with these essential commands:
 
 ### `/branch` - Create Feature Branches
 
-**Purpose**: Create properly named feature branches from backlog tasks, following Loqa's git workflow standards.
+**Purpose**: Create properly named feature branches using **interactive workflows** that help you select tasks and target repositories.
 
-**Usage:**
+**Interactive Usage (Recommended):**
 ```bash
-/branch --taskId=21               # Create branch for specific task
-/branch                           # Auto-detect from context
+/branch                  # Starts guided branch creation workflow
+# → "What task or work would you like to create a branch for?"
+# → Shows available tasks if no specific task mentioned
+# → AI suggests branch prefix, repository, and naming
+# → Creates and switches to properly named branch
+```
+
+**Traditional Usage:**
+```bash
+/branch --taskId=21      # Create branch for specific task
+/branch task-21 --repository=loqa-hub --branchPrefix=bugfix
 ```
 
 **Key Features:**
@@ -350,12 +421,20 @@ For immediate productivity, start with these essential commands:
 
 ### `/pr` - Create Pull Requests
 
-**Purpose**: Create structured pull requests with automatic task linking, proper templates, and quality checklists.
+**Purpose**: Create structured pull requests using **interactive workflows** that guide you through comprehensive descriptions and quality checks.
 
-**Usage:**
+**Interactive Usage (Recommended):**
 ```bash
-/pr                               # Auto-detect task from branch
-/pr --taskId=21 --draft=true
+/pr                      # Starts guided PR creation workflow
+# → "Please describe what you've accomplished in this pull request..."
+# → AI suggests title, type, and comprehensive description
+# → Guided quality checklist (tests, docs, breaking changes)
+# → Creates structured PR with proper task linking
+```
+
+**Traditional Usage:**
+```bash
+/pr --taskId=21 --draft=true --title="Implement auth middleware"
 ```
 
 **Key Features:**
@@ -399,12 +478,20 @@ Implements authentication middleware (task-21)
 
 ### `/analyze` - Analyze Protocol Changes
 
-**Purpose**: Analyze the impact of protocol and API changes across all Loqa services with risk assessment and coordination planning.
+**Purpose**: Analyze the impact of protocol and API changes using **interactive workflows** that guide you through comprehensive impact assessment.
 
-**Usage:**
+**Interactive Usage (Recommended):**
 ```bash
-/analyze                         # Analyze recent changes
-/analyze --protoChanges=audio.proto,skills.proto
+/analyze                 # Starts guided protocol analysis workflow
+# → "Please describe the protocol or API changes you're planning..."
+# → AI suggests change type, affected files, and risk level
+# → Guided questions about compatibility and rollout timeline
+# → Provides comprehensive impact analysis and coordination plan
+```
+
+**Traditional Usage:**
+```bash
+/analyze --protoChanges=audio.proto,skills.proto --changeType=breaking
 ```
 
 **Key Features:**
