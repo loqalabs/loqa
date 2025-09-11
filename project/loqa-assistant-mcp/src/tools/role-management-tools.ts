@@ -1,4 +1,5 @@
 import { LoqaRoleManager } from '../managers/index.js';
+import { resolveWorkspaceRoot } from '../utils/workspace-resolver.js';
 
 /**
  * Role Management MCP tools
@@ -90,7 +91,9 @@ export const roleManagementTools = [
 ];
 
 export async function handleRoleManagementTool(name: string, args: any): Promise<any> {
-  const roleManager = new LoqaRoleManager();
+  // Intelligently resolve the workspace root
+  const workspaceRoot = await resolveWorkspaceRoot(args);
+  const roleManager = new LoqaRoleManager(workspaceRoot);
 
   switch (name) {
     case "set_role": {

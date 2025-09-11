@@ -161,7 +161,13 @@ export function getBestRepository(context: WorkspaceContext, preference?: string
  */
 export function getRepositoryPath(context: WorkspaceContext, repository: string): string | null {
   if (context.currentRepository === repository) {
-    // We're already in the target repository
+    // We're already in the target repository - return the repository root, not process.cwd()
+    if (context.workspaceRoot) {
+      return join(context.workspaceRoot, repository);
+    }
+    // If workspaceRoot is not available, this means we have incomplete context detection
+    // Fall back to process.cwd() but this indicates a bug that should be fixed
+    console.warn('Repository path requested but workspaceRoot not available in context - this may indicate incomplete context detection');
     return process.cwd();
   }
   

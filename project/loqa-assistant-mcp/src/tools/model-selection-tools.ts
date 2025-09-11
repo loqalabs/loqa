@@ -1,5 +1,6 @@
 import { LoqaModelSelector } from '../managers/index.js';
 import { ModelSelectionContext } from '../types/index.js';
+import { resolveWorkspaceRoot } from '../utils/workspace-resolver.js';
 
 /**
  * Model Selection MCP tools
@@ -57,7 +58,9 @@ export const modelSelectionTools = [
 ];
 
 export async function handleModelSelectionTool(name: string, args: any): Promise<any> {
-  const modelSelector = new LoqaModelSelector();
+  // Intelligently resolve the workspace root
+  const workspaceRoot = await resolveWorkspaceRoot(args);
+  const modelSelector = new LoqaModelSelector(workspaceRoot);
 
   switch (name) {
     case "select_model": {
