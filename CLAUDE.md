@@ -6,7 +6,18 @@ This project uses **backlog.md** for AI-friendly task management. Claude Code sh
 
 ### Task Management Commands (Claude Code Safe)
 ```bash
-# SAFE - Use these in Claude Code:
+# ⚠️ CRITICAL: Always run backlog commands from TARGET REPOSITORY root directory
+# Examples:
+cd loqa                    # For main orchestration tasks
+cd loqa-hub               # For hub service tasks  
+cd loqa-commander         # For UI tasks
+cd loqa-skills            # For skill development tasks
+
+# RECOMMENDED: Validate context before backlog commands (MCP tool)
+/validate-backlog-context              # Check if current directory is safe
+/validate-backlog-context --target=loqa-hub  # Check for specific target repo
+
+# SAFE - Use these in Claude Code (from target repo root):
 backlog task list                     # List all tasks
 backlog task create "Task title"      # Create new task
 backlog overview                      # Project statistics
@@ -15,6 +26,9 @@ backlog board view --no-interactive   # Non-interactive board view
 # AVOID - These hang in Claude Code:
 # backlog browser                     # Interactive web interface
 # backlog board view                  # Interactive board (without --no-interactive)
+
+# ❌ NEVER run backlog commands from workspace root (/Users/.../loqalabs/)
+# This creates unwanted backlog directories outside of git repositories
 ```
 
 ### Integration Guidelines

@@ -164,6 +164,29 @@ When using the MCP server directly (for Claude Code integration):
 }
 ```
 
+### `validate_backlog_context`
+```json
+{
+  "name": "validate_backlog_context",
+  "arguments": {
+    "targetRepo": "loqa"
+  }
+}
+```
+
+**Purpose**: Validates current directory context is safe for backlog commands and prevents creating unwanted backlog directories.
+
+**Key Features**:
+- ✅ **Directory Validation**: Detects if you're in workspace root (unsafe) vs repository root (safe)
+- ⚠️ **Target Repository Check**: Warns if you're in wrong repository for your intended task
+- 📁 **Backlog Detection**: Checks for existing backlog directories
+- 💡 **Smart Recommendations**: Provides navigation guidance to correct location
+
+**Use Cases**:
+- Before running `backlog task create` commands
+- When unsure which repository you're currently in
+- To prevent accidentally creating backlog directories in workspace root
+
 ## 📁 File Structure
 
 ```

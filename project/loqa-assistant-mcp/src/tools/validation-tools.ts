@@ -85,6 +85,19 @@ export const validationTools = [
       type: "object",
       properties: {}
     }
+  },
+  {
+    name: "validate_backlog_context",
+    description: "Validate current directory context is safe for backlog commands and provide recommendations",
+    inputSchema: {
+      type: "object",
+      properties: {
+        targetRepo: {
+          type: "string",
+          description: "Optional target repository name to validate against (e.g. 'loqa', 'loqa-hub')"
+        }
+      }
+    }
   }
 ];
 
@@ -223,6 +236,121 @@ export async function handleValidationTool(name: string, args: any): Promise<any
           content: [{
             type: "text",
             text: `❌ Failed to diagnose workspace: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }]
+        };
+      }
+    }
+
+    case "validate_backlog_context": {
+      const { targetRepo } = args;
+      try {
+        const { detectWorkspaceContext } = await import('../utils/context-detector.js');
+        const context = await detectWorkspaceContext();
+        const validator = new LoqaRulesValidator();
+        
+        let validation = {
+          safe: false,
+          context: context.type,
+          currentDirectory: process.cwd(),
+          issues: [] as string[],
+          warnings: [] as string[],
+          recommendations: [] as string[]
+        };
+        
+        // Check if we're in workspace root (dangerous for backlog commands)
+        if (context.type === 'workspace-root') {
+          validation.issues.push("❌ Currently in workspace root - backlog commands will create unwanted directories");
+          validation.recommendations.push("Navigate to target repository first (e.g. 'cd loqa', 'cd loqa-hub')");
+        }
+        
+        // Check if we're in a valid git repository
+        if (context.type === 'individual-repo') {
+          const repoInfo = await validator.getRepositoryInfo();
+          
+          // Check if it's a Loqa repository
+          if (!repoInfo.isLoqaRepository) {
+            validation.warnings.push("⚠️ Not in a recognized Loqa repository");
+            validation.recommendations.push("Ensure you're in the correct repository for your task");
+          }
+          
+          // Check target repo if specified
+          if (targetRepo && context.currentRepository !== targetRepo) {
+            validation.warnings.push(`⚠️ Currently in '${context.currentRepository}' but target is '${targetRepo}'`);
+            validation.recommendations.push(`Navigate to target repository: cd ../${targetRepo}`);
+          }
+          
+          // Check for existing backlog
+          const fs = await import('fs/promises');
+          const path = await import('path');
+          
+          try {
+            await fs.access(path.join(process.cwd(), 'backlog'));
+            validation.recommendations.push("✅ Backlog directory exists - safe to create tasks");
+            validation.safe = validation.issues.length === 0;
+          } catch {
+            validation.warnings.push("⚠️ No existing backlog directory - will be created");
+            validation.recommendations.push("First task will initialize backlog in this repository");
+            validation.safe = validation.issues.length === 0;
+          }
+        }
+        
+        // Check if we're in unknown context
+        if (context.type === 'unknown') {
+          validation.issues.push("❌ Could not determine repository context");
+          validation.recommendations.push("Navigate to a Loqa repository root directory");
+        }
+        
+        // Generate status message
+        let message = validation.safe ? "✅ Safe for backlog commands" : "❌ Not safe for backlog commands";
+        if (validation.warnings.length > 0) {
+          message += ` (${validation.warnings.length} warnings)`;
+        }
+        
+        let report = `🔍 **Backlog Context Validation**\n\n`;
+        report += `📂 **Current Directory**: ${validation.currentDirectory}\n`;
+        report += `🏷️ **Context**: ${validation.context}\n`;
+        report += `✅ **Safe for Backlog**: ${validation.safe ? 'Yes' : 'No'}\n\n`;
+        
+        if (context.currentRepository) {
+          report += `📦 **Current Repository**: ${context.currentRepository}\n`;
+          if (targetRepo && targetRepo !== context.currentRepository) {
+            report += `🎯 **Target Repository**: ${targetRepo}\n`;
+          }
+        }
+        
+        if (validation.issues.length > 0) {
+          report += `\n🚨 **Issues**:\n`;
+          validation.issues.forEach(issue => report += `${issue}\n`);
+        }
+        
+        if (validation.warnings.length > 0) {
+          report += `\n⚠️ **Warnings**:\n`;
+          validation.warnings.forEach(warning => report += `${warning}\n`);
+        }
+        
+        if (validation.recommendations.length > 0) {
+          report += `\n💡 **Recommendations**:\n`;
+          validation.recommendations.forEach(rec => report += `${rec}\n`);
+        }
+        
+        report += `\n📋 **Available Repositories**:\n`;
+        context.availableRepositories.forEach(repo => {
+          const isCurrent = repo === context.currentRepository ? ' (current)' : '';
+          const isTarget = repo === targetRepo ? ' (target)' : '';
+          report += `• ${repo}${isCurrent}${isTarget}\n`;
+        });
+        
+        return {
+          content: [{
+            type: "text",
+            text: report
+          }]
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: "text",
+            text: `❌ Failed to validate backlog context: ${error instanceof Error ? error.message : 'Unknown error'}`
           }]
         };
       }
