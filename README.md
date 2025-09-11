@@ -146,6 +146,7 @@ This clones all repositories and builds Docker images locally from source.
 
 Building something with Loqa? Start here:
 
+- **[AI Development Commands](./DEVELOPER_COMMANDS.md)** - Interactive commands for AI-enhanced development workflows
 - **[Developer Guide](./docs/DEVELOPER.md)** - Repository structure, workflows, and contribution
 - **[Architecture Overview](./docs/architecture.md)** - How everything fits together  
 - **[Skills Development](./docs/skills.md)** - Build your own voice commands

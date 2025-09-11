@@ -23,6 +23,15 @@ backlog board view --no-interactive   # Non-interactive board view
 3. **Templates**: Use templates in `/backlog/templates/` for consistent task structure
 4. **Cross-Repo**: Use `cross-repo-work-template.md` for multi-repository coordination
 
+### 🤖 AI Development Commands
+For enhanced development workflows, use the interactive commands in **[DEVELOPER_COMMANDS.md](./DEVELOPER_COMMANDS.md)**:
+- `/work` - Begin working with intelligent task selection
+- `/recommend` - Get AI recommendations for next tasks  
+- `/thought` - Quickly capture technical concerns and insights
+- `/idea` - Quickly capture feature ideas and improvements
+- `/branch` - Create properly named feature branches
+- `/pr` - Generate structured PRs with task linking
+
 ## 🚨 CRITICAL: Git Workflow
 
 ### Feature Branch Creation (ALWAYS FOLLOW)
