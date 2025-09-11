@@ -16,7 +16,7 @@ export class LoqaRoleManager {
    * Load role configurations from files
    */
   async loadRoleConfigurations(): Promise<void> {
-    const roleConfigsPath = join(this.workspaceRoot, 'project', 'role-configs');
+    const roleConfigsPath = join(this.workspaceRoot, '..', 'role-configs');
     
     try {
       // Load role system configuration
@@ -45,16 +45,18 @@ export class LoqaRoleManager {
       }
     } catch (error) {
       console.warn('Failed to load role configurations:', error);
-      // Initialize with basic default role
-      this.roleConfigs.set('general', {
-        role_id: 'general',
-        role_name: 'General Developer',
-        role_description: 'Multi-disciplinary development work',
-        capabilities: ['General development', 'Documentation', 'Basic testing'],
-        detection_patterns: ['general', 'basic', 'documentation'],
-        model_preference: 'haiku',
-        task_templates_preferred: ['general-task-template']
-      });
+      // Initialize with basic default role if no roles were loaded
+      if (this.roleConfigs.size === 0) {
+        this.roleConfigs.set('general', {
+          role_id: 'general',
+          role_name: 'General Developer',
+          role_description: 'Multi-disciplinary development work',
+          capabilities: ['General development', 'Documentation', 'Basic testing'],
+          detection_patterns: ['general', 'basic', 'documentation'],
+          model_preference: 'haiku',
+          task_templates_preferred: ['general-task-template']
+        });
+      }
     }
   }
 

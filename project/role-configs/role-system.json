@@ -31,13 +31,6 @@
       "model_preference": "haiku"
     },
     {
-      "role_id": "github-cli-specialist",
-      "config_file": "github-cli-specialist.claude-code.json",
-      "priority": 8,
-      "complexity_level": "medium",
-      "model_preference": "sonnet-4"
-    },
-    {
       "role_id": "general",
       "config_file": "general.claude-code.json",
       "priority": 1,
@@ -58,9 +51,9 @@
   },
   "model_selection": {
     "sonnet-4": {
-      "use_for": ["architect", "developer", "devops", "github-cli-specialist"],
+      "use_for": ["architect", "developer", "devops"],
       "complexity_threshold": "high",
-      "description": "Use for complex architecture, development, infrastructure, and GitHub coordination tasks"
+      "description": "Use for complex architecture, development, and infrastructure tasks"
     },
     "haiku": {
       "use_for": ["qa", "general"],
@@ -85,7 +78,6 @@
         "architect": ["protocol-change-template", "cross-repo-work-template"],
         "developer": ["feature-template", "bug-fix-template"],
         "devops": ["general-task-template"],
-        "github-cli-specialist": ["cross-repo-work-template", "protocol-change-template", "general-task-template"],
         "qa": ["bug-fix-template", "feature-template"],
         "general": ["general-task-template"]
       }

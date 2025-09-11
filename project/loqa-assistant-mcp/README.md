@@ -114,6 +114,21 @@ ls -la .git/hooks/pre-commit
 grep "Loqa Pre-commit Hook" .git/hooks/pre-commit
 ```
 
+## 🐙 GitHub Integration
+
+For GitHub operations, use the **official GitHub MCP server** instead of custom implementations:
+
+📘 **See [GITHUB_MCP_SETUP.md](./GITHUB_MCP_SETUP.md)** for complete setup instructions.
+
+**Benefits of Official GitHub MCP Server:**
+- ✅ Native GitHub API integration (not CLI command parsing)
+- ✅ Multi-repository workflow support 
+- ✅ Granular tool control (Issues, PRs, Actions, etc.)
+- ✅ Official GitHub support and maintenance
+- ✅ Better Claude Code compatibility
+
+**Migration Note**: The `github-cli-specialist` role has been removed in favor of the official solution.
+
 ## 🏗️ MCP Server Tools
 
 When using the MCP server directly (for Claude Code integration):
