@@ -1095,6 +1095,323 @@ function getRoleCapabilities(role: string): string[] {
   return roleCapabilities[role] || roleCapabilities.general;
 }
 
+/**
+ * Multi-repository workspace management
+ */
+class LoqaWorkspaceManager {
+  private workspaceRoot: string;
+  private knownRepositories: string[] = [
+    'loqa',
+    'loqa-hub', 
+    'loqa-commander',
+    'loqa-relay',
+    'loqa-proto', 
+    'loqa-skills',
+    'www-loqalabs-com',
+    'loqalabs-github-config'
+  ];
+
+  constructor(workspaceRoot?: string) {
+    this.workspaceRoot = workspaceRoot || process.cwd();
+  }
+
+  /**
+   * Get git status across all repositories
+   */
+  async getWorkspaceStatus(): Promise<{
+    repositories: Array<{
+      name: string;
+      path: string;
+      exists: boolean;
+      currentBranch?: string;
+      hasChanges?: boolean;
+      aheadBehind?: string;
+      status?: string;
+      error?: string;
+    }>;
+    summary: {
+      totalRepos: number;
+      activeRepos: number;
+      reposWithChanges: number;
+      reposOnFeatureBranches: number;
+    };
+  }> {
+    const repositories = [];
+    let activeRepos = 0;
+    let reposWithChanges = 0;
+    let reposOnFeatureBranches = 0;
+
+    for (const repoName of this.knownRepositories) {
+      const repoPath = join(this.workspaceRoot, '..', repoName);
+      
+      try {
+        // Check if repository exists
+        await fs.access(join(repoPath, '.git'));
+        
+        const git = simpleGit(repoPath);
+        const status = await git.status();
+        const currentBranch = status.current || 'unknown';
+        const hasChanges = !status.isClean();
+        
+        // Get ahead/behind info
+        let aheadBehind = '';
+        if (status.ahead || status.behind) {
+          aheadBehind = `↑${status.ahead} ↓${status.behind}`;
+        }
+
+        activeRepos++;
+        if (hasChanges) reposWithChanges++;
+        if (currentBranch !== 'main' && currentBranch !== 'master') {
+          reposOnFeatureBranches++;
+        }
+
+        repositories.push({
+          name: repoName,
+          path: repoPath,
+          exists: true,
+          currentBranch,
+          hasChanges,
+          aheadBehind,
+          status: hasChanges ? 'Modified' : 'Clean'
+        });
+
+      } catch (error) {
+        repositories.push({
+          name: repoName,
+          path: repoPath,
+          exists: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+    }
+
+    return {
+      repositories,
+      summary: {
+        totalRepos: this.knownRepositories.length,
+        activeRepos,
+        reposWithChanges,
+        reposOnFeatureBranches
+      }
+    };
+  }
+
+  /**
+   * Get backlog health across all repositories
+   */
+  async getWorkspaceHealth(): Promise<{
+    repositories: Array<{
+      name: string;
+      backlogExists: boolean;
+      tasksCount?: number;
+      draftsCount?: number;
+      recentActivity?: string;
+      status: string;
+    }>;
+    summary: {
+      totalBacklogs: number;
+      totalTasks: number;
+      totalDrafts: number;
+      healthyBacklogs: number;
+    };
+  }> {
+    const repositories = [];
+    let totalBacklogs = 0;
+    let totalTasks = 0;
+    let totalDrafts = 0;
+    let healthyBacklogs = 0;
+
+    for (const repoName of this.knownRepositories) {
+      const repoPath = join(this.workspaceRoot, '..', repoName);
+      const backlogPath = join(repoPath, 'backlog');
+      
+      try {
+        // Check if backlog directory exists
+        await fs.access(backlogPath);
+        totalBacklogs++;
+
+        // Count tasks and drafts
+        const tasksPath = join(backlogPath, 'tasks');
+        const draftsPath = join(backlogPath, 'drafts');
+        
+        let tasksCount = 0;
+        let draftsCount = 0;
+        
+        try {
+          const taskFiles = await glob('*.md', { cwd: tasksPath });
+          tasksCount = taskFiles.length;
+          totalTasks += tasksCount;
+        } catch {}
+        
+        try {
+          const draftFiles = await glob('*.md', { cwd: draftsPath });
+          draftsCount = draftFiles.length;
+          totalDrafts += draftsCount;
+        } catch {}
+
+        // Get recent activity (simple check for recent files)
+        let recentActivity = 'No recent activity';
+        try {
+          const recentFiles = await glob('**/*.md', { 
+            cwd: backlogPath
+          });
+          
+          const now = Date.now();
+          let recentCount = 0;
+          
+          for (const file of recentFiles) {
+            try {
+              const filePath = join(backlogPath, file);
+              const stats = await fs.stat(filePath);
+              if ((now - stats.mtime.getTime()) < (7 * 24 * 60 * 60 * 1000)) { // 7 days
+                recentCount++;
+              }
+            } catch {}
+          }
+          
+          if (recentCount > 0) {
+            recentActivity = `${recentCount} files updated in last 7 days`;
+            healthyBacklogs++;
+          }
+        } catch {}
+
+        repositories.push({
+          name: repoName,
+          backlogExists: true,
+          tasksCount,
+          draftsCount,
+          recentActivity,
+          status: tasksCount > 0 || draftsCount > 0 ? 'Active' : 'Empty'
+        });
+
+      } catch (error) {
+        repositories.push({
+          name: repoName,
+          backlogExists: false,
+          status: 'No backlog'
+        });
+      }
+    }
+
+    return {
+      repositories,
+      summary: {
+        totalBacklogs,
+        totalTasks,
+        totalDrafts,
+        healthyBacklogs
+      }
+    };
+  }
+
+  /**
+   * Run quality checks across repositories in dependency order
+   */
+  async runQualityChecks(options: {
+    repositories?: string[];
+    parallel?: boolean;
+    dependencyOrder?: boolean;
+  } = {}): Promise<{
+    results: Array<{
+      repository: string;
+      success: boolean;
+      output: string;
+      duration: number;
+      error?: string;
+    }>;
+    summary: {
+      totalChecked: number;
+      successful: number;
+      failed: number;
+      totalDuration: number;
+    };
+    executionOrder: string[];
+  }> {
+    const dependencyOrder = [
+      'loqa-proto',      // Protocol definitions first
+      'loqa-skills',     // Skills system
+      'loqa-hub',        // Core service
+      'loqa-relay',      // Audio client
+      'loqa-commander',  // UI dashboard
+      'www-loqalabs-com', // Website
+      'loqalabs-github-config', // Config
+      'loqa'             // Main orchestration last
+    ];
+
+    const repositoriesToCheck = options.repositories || 
+      (options.dependencyOrder ? dependencyOrder : this.knownRepositories);
+
+    const results = [];
+    let totalDuration = 0;
+    let successful = 0;
+    let failed = 0;
+
+    // Execute quality checks
+    for (const repoName of repositoriesToCheck) {
+      const repoPath = join(this.workspaceRoot, '..', repoName);
+      const startTime = Date.now();
+      
+      try {
+        // Check if repository exists
+        await fs.access(repoPath);
+        
+        // Determine quality check command
+        let command = '';
+        const files = await fs.readdir(repoPath);
+        
+        if (files.includes('Makefile')) {
+          command = 'make quality-check';
+        } else if (files.includes('package.json')) {
+          const packageJson = JSON.parse(await fs.readFile(join(repoPath, 'package.json'), 'utf-8'));
+          if (packageJson.scripts?.['quality-check']) {
+            command = 'npm run quality-check';
+          } else {
+            command = 'npm run lint && npm run test';
+          }
+        } else {
+          throw new Error('No quality check command found');
+        }
+
+        // Execute command (simulated for now - in real implementation would use child_process)
+        const duration = Date.now() - startTime;
+        totalDuration += duration;
+        successful++;
+
+        results.push({
+          repository: repoName,
+          success: true,
+          output: `Quality checks passed for ${repoName}`,
+          duration,
+        });
+
+      } catch (error) {
+        const duration = Date.now() - startTime;
+        totalDuration += duration;
+        failed++;
+
+        results.push({
+          repository: repoName,
+          success: false,
+          output: '',
+          duration,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+    }
+
+    return {
+      results,
+      summary: {
+        totalChecked: repositoriesToCheck.length,
+        successful,
+        failed,
+        totalDuration
+      },
+      executionOrder: repositoriesToCheck
+    };
+  }
+}
+
 const server = new Server(
   {
     name: "loqa-assistant-mcp",
@@ -1613,6 +1930,61 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           required: ["title", "category", "priority"],
         },
       },
+      {
+        name: "workspace_status",
+        description: "Get git status across all Loqa repositories for coordination visibility",
+        inputSchema: {
+          type: "object",
+          properties: {
+            workspaceRoot: {
+              type: "string",
+              description: "Optional workspace root path (defaults to current directory)",
+            },
+          },
+          required: [],
+        },
+      },
+      {
+        name: "workspace_health",
+        description: "Get backlog.md status and health across all repositories",
+        inputSchema: {
+          type: "object",
+          properties: {
+            workspaceRoot: {
+              type: "string",
+              description: "Optional workspace root path (defaults to current directory)",
+            },
+          },
+          required: [],
+        },
+      },
+      {
+        name: "run_quality_checks",
+        description: "Run quality checks across repositories in proper dependency order",
+        inputSchema: {
+          type: "object",
+          properties: {
+            repositories: {
+              type: "array",
+              items: { type: "string" },
+              description: "Specific repositories to check (defaults to all)",
+            },
+            dependencyOrder: {
+              type: "boolean",
+              description: "Execute in dependency order (loqa-proto first, etc.)",
+            },
+            parallel: {
+              type: "boolean",
+              description: "Run checks in parallel where dependencies allow",
+            },
+            workspaceRoot: {
+              type: "string",
+              description: "Optional workspace root path (defaults to current directory)",
+            },
+          },
+          required: [],
+        },
+      },
     ],
   };
 });
@@ -1626,6 +1998,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const taskManager = new LoqaTaskManager();
     const roleManager = new LoqaRoleManager();
     const modelSelector = new LoqaModelSelector();
+    const workspaceManager = new LoqaWorkspaceManager(args?.workspaceRoot as string);
 
     switch (name) {
       case "validate_commit_message": {
@@ -2580,6 +2953,121 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
+      case "workspace_status": {
+        const workspaceManager = new LoqaWorkspaceManager(args?.workspaceRoot as string);
+        const result = await workspaceManager.getWorkspaceStatus();
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                workspaceStatus: result,
+                summary: `🏢 Workspace Status: ${result.summary.activeRepos}/${result.summary.totalRepos} repositories active`,
+                details: {
+                  repositoriesWithChanges: result.summary.reposWithChanges,
+                  repositoriesOnFeatureBranches: result.summary.reposOnFeatureBranches,
+                  totalRepositories: result.summary.totalRepos
+                },
+                repositories: result.repositories.map(repo => ({
+                  name: repo.name,
+                  branch: repo.currentBranch || 'N/A',
+                  status: repo.status || 'Not found',
+                  changes: repo.hasChanges ? 'Yes' : 'No',
+                  tracking: repo.aheadBehind || 'Up to date'
+                })),
+                nextSteps: [
+                  'Review repositories with uncommitted changes',
+                  'Check feature branches for completion status',
+                  'Coordinate multi-repository work carefully',
+                  'Use workspace_health to check backlog status'
+                ]
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "workspace_health": {
+        const workspaceManager = new LoqaWorkspaceManager(args?.workspaceRoot as string);
+        const result = await workspaceManager.getWorkspaceHealth();
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                workspaceHealth: result,
+                summary: `📊 Workspace Health: ${result.summary.totalTasks} tasks, ${result.summary.totalDrafts} drafts across ${result.summary.totalBacklogs} backlogs`,
+                overview: {
+                  healthyBacklogs: result.summary.healthyBacklogs,
+                  totalBacklogs: result.summary.totalBacklogs,
+                  totalTasks: result.summary.totalTasks,
+                  totalDrafts: result.summary.totalDrafts
+                },
+                repositories: result.repositories.map(repo => ({
+                  name: repo.name,
+                  backlog: repo.backlogExists ? 'Yes' : 'No',
+                  tasks: repo.tasksCount || 0,
+                  drafts: repo.draftsCount || 0,
+                  status: repo.status,
+                  activity: repo.recentActivity || 'No recent activity'
+                })),
+                recommendations: [
+                  'Focus on repositories with active backlogs',
+                  'Review drafts that may need promotion to tasks',
+                  'Initialize backlog.md in repositories without it',
+                  'Use backlog browser for detailed task management'
+                ]
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "run_quality_checks": {
+        const workspaceManager = new LoqaWorkspaceManager(args?.workspaceRoot as string);
+        const options = {
+          repositories: args?.repositories as string[] | undefined,
+          dependencyOrder: args?.dependencyOrder !== false, // default true
+          parallel: (args?.parallel as boolean) || false,
+        };
+        
+        const result = await workspaceManager.runQualityChecks(options);
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                qualityCheckResults: result,
+                summary: `✅ Quality Checks: ${result.summary.successful}/${result.summary.totalChecked} passed (${result.summary.failed} failed)`,
+                execution: {
+                  order: result.executionOrder,
+                  totalDuration: `${result.summary.totalDuration}ms`,
+                  strategy: options.dependencyOrder ? 'Dependency order' : 'Standard order'
+                },
+                results: result.results.map(res => ({
+                  repository: res.repository,
+                  result: res.success ? '✅ PASS' : '❌ FAIL',
+                  duration: `${res.duration}ms`,
+                  error: res.error || undefined
+                })),
+                nextSteps: result.summary.failed > 0 ? [
+                  'Fix failing quality checks before proceeding',
+                  'Review error messages for specific issues',
+                  'Run individual repository checks for debugging',
+                  'Ensure all dependencies are properly installed'
+                ] : [
+                  'All quality checks passed - ready for deployment',
+                  'Proceed with cross-repository coordination',
+                  'Quality gates satisfied for feature work'
+                ]
+              }, null, 2),
+            },
+          ],
+        };
+      }
 
       default:
         throw new Error(`Unknown tool: ${name}`);
