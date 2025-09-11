@@ -1410,6 +1410,146 @@ class LoqaWorkspaceManager {
       executionOrder: repositoriesToCheck
     };
   }
+
+  /**
+   * Create feature branch from backlog task
+   */
+  async createBranchFromTask(options: {
+    taskId?: string;
+    taskFile?: string;
+    repository?: string;
+    branchPrefix?: string;
+    switchToBranch?: boolean;
+  }): Promise<{
+    success: boolean;
+    branchName: string;
+    repository: string;
+    taskInfo?: {
+      id: string;
+      title: string;
+      file: string;
+    };
+    error?: string;
+  }> {
+    const { taskId, taskFile, repository, branchPrefix = 'feature', switchToBranch = true } = options;
+    
+    // Determine which repository to work in
+    let targetRepo = repository;
+    if (!targetRepo) {
+      // Auto-detect repository based on current directory
+      const currentPath = process.cwd();
+      for (const repoName of this.knownRepositories) {
+        if (currentPath.includes(repoName)) {
+          targetRepo = repoName;
+          break;
+        }
+      }
+      targetRepo = targetRepo || 'loqa'; // Default to main repo
+    }
+
+    const repoPath = join(this.workspaceRoot, '..', targetRepo);
+    
+    try {
+      // Check if repository exists
+      await fs.access(join(repoPath, '.git'));
+      const git = simpleGit(repoPath);
+
+      // Get task information
+      let taskInfo: { id: string; title: string; file: string } | undefined;
+      
+      if (taskId || taskFile) {
+        const backlogPath = join(repoPath, 'backlog', 'tasks');
+        
+        try {
+          let taskFileName = taskFile;
+          
+          if (taskId && !taskFile) {
+            // Find task file by ID
+            const taskFiles = await glob(`task-${taskId}-*.md`, { cwd: backlogPath });
+            if (taskFiles.length === 0) {
+              // Try without padding
+              const altTaskFiles = await glob(`task-${taskId.padStart(3, '0')}-*.md`, { cwd: backlogPath });
+              taskFileName = altTaskFiles[0];
+            } else {
+              taskFileName = taskFiles[0];
+            }
+          }
+          
+          if (taskFileName) {
+            const taskFilePath = join(backlogPath, taskFileName);
+            const taskContent = await fs.readFile(taskFilePath, 'utf-8');
+            
+            // Extract title from task file
+            const titleMatch = taskContent.match(/^#\s+(.+)$/m);
+            const title = titleMatch ? titleMatch[1].replace(/^Task:\s*/, '') : 'unknown-task';
+            
+            // Extract task ID from filename
+            const idMatch = taskFileName.match(/task-(\d+)-/);
+            const id = idMatch ? idMatch[1] : taskId || 'unknown';
+            
+            taskInfo = {
+              id,
+              title,
+              file: taskFileName
+            };
+          }
+        } catch (error) {
+          // Continue without task info if we can't read it
+        }
+      }
+
+      // Generate branch name
+      let branchName: string;
+      if (taskInfo) {
+        // Create branch name from task info
+        const safeBranchName = taskInfo.title
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, '') // Remove special chars except spaces and hyphens
+          .replace(/\s+/g, '-') // Replace spaces with hyphens
+          .replace(/-+/g, '-') // Collapse multiple hyphens
+          .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+          .substring(0, 50); // Limit length
+        
+        branchName = `${branchPrefix}/task-${taskInfo.id}-${safeBranchName}`;
+      } else {
+        // Fallback branch name
+        const timestamp = new Date().toISOString().split('T')[0];
+        branchName = `${branchPrefix}/automated-${timestamp}`;
+      }
+
+      // Ensure we're on main branch and up to date
+      const currentBranch = await git.revparse(['--abbrev-ref', 'HEAD']);
+      if (currentBranch !== 'main' && currentBranch !== 'master') {
+        await git.checkout('main');
+      }
+      
+      // Fetch latest changes
+      await git.fetch('origin', 'main');
+      await git.pull('origin', 'main');
+
+      // Create and optionally switch to new branch
+      if (switchToBranch) {
+        await git.checkoutLocalBranch(branchName);
+      } else {
+        await git.branch([branchName]);
+      }
+
+      return {
+        success: true,
+        branchName,
+        repository: targetRepo,
+        taskInfo
+      };
+
+    } catch (error) {
+      return {
+        success: false,
+        branchName: '',
+        repository: targetRepo,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
 }
 
 const server = new Server(
@@ -1976,6 +2116,40 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             parallel: {
               type: "boolean",
               description: "Run checks in parallel where dependencies allow",
+            },
+            workspaceRoot: {
+              type: "string",
+              description: "Optional workspace root path (defaults to current directory)",
+            },
+          },
+          required: [],
+        },
+      },
+      {
+        name: "create_branch_from_task",
+        description: "Create feature branch from backlog task with consistent naming",
+        inputSchema: {
+          type: "object",
+          properties: {
+            taskId: {
+              type: "string",
+              description: "Backlog task ID (e.g., '21', 'task-21')",
+            },
+            taskFile: {
+              type: "string",
+              description: "Direct path to task file (alternative to taskId)",
+            },
+            repository: {
+              type: "string",
+              description: "Target repository (auto-detected if not provided)",
+            },
+            branchPrefix: {
+              type: "string",
+              description: "Branch prefix (default: 'feature')",
+            },
+            switchToBranch: {
+              type: "boolean",
+              description: "Switch to new branch after creation (default: true)",
             },
             workspaceRoot: {
               type: "string",
@@ -3062,6 +3236,50 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                   'All quality checks passed - ready for deployment',
                   'Proceed with cross-repository coordination',
                   'Quality gates satisfied for feature work'
+                ]
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "create_branch_from_task": {
+        const workspaceManager = new LoqaWorkspaceManager(args?.workspaceRoot as string);
+        const options = {
+          taskId: args?.taskId as string | undefined,
+          taskFile: args?.taskFile as string | undefined,
+          repository: args?.repository as string | undefined,
+          branchPrefix: args?.branchPrefix as string | undefined,
+          switchToBranch: args?.switchToBranch !== false, // default true
+        };
+        
+        const result = await workspaceManager.createBranchFromTask(options);
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                branchCreation: result,
+                summary: result.success 
+                  ? `🌿 Created branch: ${result.branchName} in ${result.repository}`
+                  : `❌ Failed to create branch: ${result.error}`,
+                details: {
+                  success: result.success,
+                  branchName: result.branchName,
+                  repository: result.repository,
+                  taskInfo: result.taskInfo,
+                  error: result.error
+                },
+                nextSteps: result.success ? [
+                  `Branch ${result.branchName} created and switched to`,
+                  result.taskInfo ? `Working on: ${result.taskInfo.title}` : 'Ready for development',
+                  'Start implementing your changes',
+                  'Commit changes and create PR when ready'
+                ] : [
+                  'Check task ID or file path is correct',
+                  'Ensure repository exists and is accessible',
+                  'Verify backlog task file format'
                 ]
               }, null, 2),
             },
