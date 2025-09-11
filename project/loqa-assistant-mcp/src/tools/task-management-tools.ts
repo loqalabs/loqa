@@ -1,4 +1,5 @@
 import { LoqaTaskManager } from '../managers/index.js';
+import { basename, dirname, join } from 'path';
 import { TaskCreationOptions, CapturedThought } from '../types/index.js';
 import { resolveWorkspaceRoot } from '../utils/workspace-resolver.js';
 
@@ -183,16 +184,65 @@ export async function handleTaskManagementTool(name: string, args: any): Promise
       const { repoPath } = args;
       
       try {
-        const result = await taskManager.listTasks(repoPath);
-        const tasksList = result.tasks.map(t => `• ${t}`).join('\n');
-        const draftsList = result.drafts.map(d => `• ${d}`).join('\n');
+        // If specific repo specified, use single repo mode
+        if (repoPath) {
+          const result = await taskManager.listTasks(repoPath);
+          const tasksList = result.tasks.map(t => `• ${t}`).join('\n');
+          const draftsList = result.drafts.map(d => `• ${d}`).join('\n');
+          
+          return {
+            content: [{
+              type: "text",
+              text: `📋 **Current Backlog Status** (${repoPath})\n\n**📝 Tasks (${result.tasks.length}):**\n${tasksList || 'No tasks found'}\n\n**💭 Drafts (${result.drafts.length}):**\n${draftsList || 'No drafts found'}`
+            }]
+          };
+        }
+        
+        // Multi-repository mode: scan all repositories
+        const knownRepositories = [
+          'loqa', 'loqa-hub', 'loqa-commander', 'loqa-relay',
+          'loqa-proto', 'loqa-skills', 'www-loqalabs-com', 'loqalabs-github-config'
+        ];
+        
+        // Determine actual workspace root
+        const actualWorkspaceRoot = knownRepositories.includes(basename(workspaceRoot)) 
+          ? dirname(workspaceRoot) 
+          : workspaceRoot;
+        
+        let allTasks: string[] = [];
+        let allDrafts: string[] = [];
+        let repoSummaries: string[] = [];
+        
+        for (const repoName of knownRepositories) {
+          try {
+            const repoPath = join(actualWorkspaceRoot, repoName);
+            const repoTaskManager = new LoqaTaskManager(repoPath);
+            const result = await repoTaskManager.listTasks();
+            
+            if (result.tasks.length > 0 || result.drafts.length > 0) {
+              repoSummaries.push(`**${repoName}**: ${result.tasks.length} tasks, ${result.drafts.length} drafts`);
+              
+              // Add repo prefix to tasks and drafts
+              allTasks.push(...result.tasks.map(task => `${task} (${repoName})`));
+              allDrafts.push(...result.drafts.map(draft => `${draft} (${repoName})`));
+            }
+          } catch (error) {
+            // Repository doesn't exist or no backlog - skip silently
+            continue;
+          }
+        }
+        
+        const tasksList = allTasks.map(t => `• ${t}`).join('\n');
+        const draftsList = allDrafts.map(d => `• ${d}`).join('\n');
+        const repoSummary = repoSummaries.join('\n');
         
         return {
           content: [{
             type: "text",
-            text: `📋 **Current Backlog Status**\n\n**📝 Tasks (${result.tasks.length}):**\n${tasksList || 'No tasks found'}\n\n**💭 Drafts (${result.drafts.length}):**\n${draftsList || 'No drafts found'}`
+            text: `📋 **Workspace-Wide Backlog Status**\n\n${repoSummary}\n\n**📝 All Tasks (${allTasks.length}):**\n${tasksList || 'No tasks found'}\n\n**💭 All Drafts (${allDrafts.length}):**\n${draftsList || 'No drafts found'}`
           }]
         };
+        
       } catch (error) {
         return {
           content: [{

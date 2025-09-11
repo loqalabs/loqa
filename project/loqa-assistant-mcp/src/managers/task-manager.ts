@@ -63,7 +63,9 @@ export class LoqaTaskManager {
     try {
       await fs.access(backlogPath);
     } catch {
-      throw new Error('Backlog not initialized. Run `backlog init` first.');
+      // Provide more specific error information
+      const repoName = path.split('/').pop() || path;
+      throw new Error(`Backlog not found in ${repoName} (${path}). Expected backlog directory at: ${backlogPath}. Run 'backlog init' in the repository or check if you're in the correct directory.`);
     }
 
     // Get the next task ID
@@ -127,7 +129,9 @@ export class LoqaTaskManager {
     try {
       await fs.access(backlogPath);
     } catch {
-      throw new Error('Backlog not initialized. Run `backlog init` first.');
+      // Provide more specific error information
+      const repoName = path.split('/').pop() || path;
+      throw new Error(`Backlog not found in ${repoName} (${path}). Expected backlog directory at: ${backlogPath}. Run 'backlog init' in the repository or check if you're in the correct directory.`);
     }
 
     // Create thought content

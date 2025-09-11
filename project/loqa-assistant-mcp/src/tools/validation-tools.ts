@@ -77,6 +77,14 @@ export const validationTools = [
         }
       }
     }
+  },
+  {
+    name: "diagnose_workspace",
+    description: "Diagnose workspace context and provide detailed environment information",
+    inputSchema: {
+      type: "object",
+      properties: {}
+    }
   }
 ];
 
@@ -160,6 +168,64 @@ export async function handleValidationTool(name: string, args: any): Promise<any
           }, null, 2)
         }]
       };
+    }
+
+    case "diagnose_workspace": {
+      try {
+        const { detectWorkspaceContext } = await import('../utils/context-detector.js');
+        const context = await detectWorkspaceContext();
+        
+        let diagnostic = `🔍 **Workspace Diagnostic Report**\n\n`;
+        diagnostic += `📂 **Current Directory**: ${process.cwd()}\n`;
+        diagnostic += `🏷️ **Context Type**: ${context.type}\n`;
+        diagnostic += `🏢 **Is Loqa Workspace**: ${context.isLoqaWorkspace ? '✅' : '❌'}\n\n`;
+        
+        if (context.currentRepository) {
+          diagnostic += `📦 **Current Repository**: ${context.currentRepository}\n`;
+          diagnostic += `🌿 **Current Branch**: ${context.currentBranch || 'Unknown'}\n`;
+          diagnostic += `⚠️ **Uncommitted Changes**: ${context.hasUncommittedChanges ? '⚠️ Yes' : '✅ No'}\n\n`;
+        }
+        
+        if (context.workspaceRoot) {
+          diagnostic += `🏠 **Workspace Root**: ${context.workspaceRoot}\n\n`;
+        }
+        
+        diagnostic += `📋 **Available Repositories** (${context.availableRepositories.length}):\n`;
+        if (context.availableRepositories.length > 0) {
+          for (const repo of context.availableRepositories) {
+            const isCurrent = repo === context.currentRepository ? ' (current)' : '';
+            diagnostic += `• ${repo}${isCurrent}\n`;
+          }
+        } else {
+          diagnostic += `❌ No Loqa repositories found\n`;
+        }
+        
+        diagnostic += `\n**Recommendations**:\n`;
+        if (!context.isLoqaWorkspace) {
+          diagnostic += `• Navigate to a directory containing Loqa repositories\n`;
+          diagnostic += `• Clone Loqa repositories if missing\n`;
+        } else if (context.type === 'workspace-root') {
+          diagnostic += `• You're in the workspace root - good for multi-repo operations\n`;
+          diagnostic += `• Navigate to specific repositories for repo-specific tasks\n`;
+        } else if (context.type === 'individual-repo') {
+          diagnostic += `• You're in a specific repository - good for focused work\n`;
+          diagnostic += `• Use workspace tools from here for cross-repo operations\n`;
+        }
+        
+        return {
+          content: [{
+            type: "text",
+            text: diagnostic
+          }]
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: "text",
+            text: `❌ Failed to diagnose workspace: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }]
+        };
+      }
     }
 
     default:

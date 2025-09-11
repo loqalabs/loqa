@@ -216,19 +216,306 @@ export async function handleWorkspaceTool(name: string, args: any, workspaceMana
       }
     }
 
-    case "run_quality_checks":
-    case "create_branch_from_task": 
-    case "run_integration_tests":
-    case "create_pr_from_task":
-    case "analyze_dependency_impact":
+    case "run_quality_checks": {
+      try {
+        const result = await workspaceManager.runQualityChecks(args);
+        
+        let resultText = `🔍 **Quality Checks Results**\n\n`;
+        resultText += `📊 **Summary**: ${result.summary.successful}/${result.summary.totalChecked} repositories passed\n`;
+        resultText += `⏱️ **Duration**: ${result.summary.totalDuration}ms\n`;
+        resultText += `📋 **Execution Order**: ${result.executionOrder.join(' → ')}\n\n`;
+        
+        if (result.results.length > 0) {
+          resultText += `**Repository Results**:\n`;
+          for (const repo of result.results) {
+            const statusIcon = repo.successful ? '✅' : '❌';
+            resultText += `${statusIcon} **${repo.repository}** (${repo.duration}ms)\n`;
+            
+            if (repo.checks && repo.checks.length > 0) {
+              for (const check of repo.checks) {
+                const checkIcon = check.success ? '  ✓' : '  ✗';
+                resultText += `${checkIcon} ${check.check}\n`;
+                if (!check.success && check.error) {
+                  resultText += `    Error: ${check.error}\n`;
+                }
+              }
+            }
+            
+            if (repo.error) {
+              resultText += `  Error: ${repo.error}\n`;
+            }
+            
+            resultText += `\n`;
+          }
+        }
+        
+        return {
+          content: [{
+            type: "text",
+            text: resultText
+          }]
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: "text",
+            text: `❌ Failed to run quality checks: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }]
+        };
+      }
+    }
+
+    case "create_branch_from_task": {
+      try {
+        const result = await workspaceManager.createBranchFromTask(args);
+        
+        if (result.success) {
+          let successText = `✅ **Branch Created Successfully**\n\n`;
+          successText += `🌿 **Branch**: \`${result.branchName}\`\n`;
+          successText += `📁 **Repository**: ${result.repository}\n`;
+          successText += `📝 **Task**: ${result.taskFile}\n`;
+          successText += `📋 **Title**: ${result.taskTitle}\n\n`;
+          successText += `The feature branch has been created and checked out. You can now start working on the task.`;
+          
+          return {
+            content: [{
+              type: "text",
+              text: successText
+            }]
+          };
+        } else {
+          return {
+            content: [{
+              type: "text",
+              text: `❌ **Failed to create branch**: ${result.error}`
+            }]
+          };
+        }
+      } catch (error) {
+        return {
+          content: [{
+            type: "text",
+            text: `❌ Failed to create branch: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }]
+        };
+      }
+    }
+
+    case "run_integration_tests": {
+      try {
+        const result = await workspaceManager.runIntegrationTests(args);
+        
+        let resultText = `🧪 **Integration Tests Results**\n\n`;
+        resultText += `📊 **Summary**: ${result.summary.successful}/${result.summary.totalTests} tests passed\n`;
+        resultText += `🏢 **Repositories**: ${result.summary.successfulRepos}/${result.summary.repositoriesTested} successful\n`;
+        resultText += `⏱️ **Duration**: ${result.summary.totalDuration}ms\n\n`;
+        
+        if (result.results.length > 0) {
+          resultText += `**Repository Results**:\n`;
+          for (const repo of result.results) {
+            const statusIcon = repo.successful ? '✅' : '❌';
+            const testInfo = repo.hasIntegrationTests ? `(${repo.tests.length} integration tests)` : '(standard tests)';
+            resultText += `${statusIcon} **${repo.repository}** ${testInfo} (${repo.duration}ms)\n`;
+            
+            if (!repo.successful && repo.error) {
+              resultText += `  Error: ${repo.error}\n`;
+            }
+            
+            for (const test of repo.tests) {
+              const testIcon = test.success ? '  ✓' : '  ✗';
+              resultText += `${testIcon} ${test.type}\n`;
+              if (!test.success && test.error) {
+                resultText += `    ${test.error}\n`;
+              }
+            }
+            resultText += `\n`;
+          }
+        }
+        
+        return {
+          content: [{
+            type: "text",
+            text: resultText
+          }]
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: "text",
+            text: `❌ Failed to run integration tests: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }]
+        };
+      }
+    }
+
+    case "create_pr_from_task": {
+      try {
+        const result = await workspaceManager.createPullRequestFromTask(args);
+        
+        if (result.success) {
+          let successText = `✅ **Pull Request Created Successfully**\n\n`;
+          successText += `🔗 **URL**: ${result.prUrl}\n`;
+          successText += `🌿 **Branch**: \`${result.branchName}\` → \`${result.baseBranch}\`\n`;
+          successText += `📁 **Repository**: ${result.repository}\n`;
+          successText += `📝 **Task**: ${result.taskFile}\n`;
+          successText += `📋 **Title**: ${result.title}\n`;
+          if (result.draft) {
+            successText += `📝 **Status**: Draft PR\n`;
+          }
+          successText += `\n`;
+          successText += `The pull request has been created and is ready for review.`;
+          
+          return {
+            content: [{
+              type: "text",
+              text: successText
+            }]
+          };
+        } else {
+          return {
+            content: [{
+              type: "text",
+              text: `❌ **Failed to create pull request**: ${result.error}`
+            }]
+          };
+        }
+      } catch (error) {
+        return {
+          content: [{
+            type: "text",
+            text: `❌ Failed to create pull request: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }]
+        };
+      }
+    }
+
+    case "analyze_dependency_impact": {
+      try {
+        const result = await workspaceManager.analyzeDependencyImpact(args);
+        
+        if (result.error) {
+          return {
+            content: [{
+              type: "text",
+              text: `❌ **Analysis failed**: ${result.error}`
+            }]
+          };
+        }
+        
+        let analysisText = `🔍 **Dependency Impact Analysis**\n\n`;
+        analysisText += `📊 **Summary**:\n`;
+        analysisText += `- Changed files: ${result.analysis.changedFiles.length}\n`;
+        analysisText += `- Affected repositories: ${result.summary.highImpactRepos}\n`;
+        analysisText += `- Breaking changes: ${result.summary.breakingChanges}\n`;
+        analysisText += `- Coordination required: ${result.summary.coordinationRequired ? '⚠️ Yes' : '✅ No'}\n\n`;
+        
+        if (result.analysis.affectedRepositories.length > 0) {
+          analysisText += `🏢 **Affected Repositories**:\n`;
+          for (const repo of result.analysis.affectedRepositories) {
+            analysisText += `- ${repo}\n`;
+          }
+          analysisText += `\n`;
+        }
+        
+        if (result.analysis.breakingChanges.length > 0) {
+          analysisText += `⚠️ **Breaking Changes**:\n`;
+          for (const change of result.analysis.breakingChanges) {
+            analysisText += `- ${change}\n`;
+          }
+          analysisText += `\n`;
+        }
+        
+        const protocolChanges = result.analysis.protocolChanges;
+        const hasProtocolChanges = protocolChanges.addedServices.length > 0 || 
+                                  protocolChanges.removedServices.length > 0 ||
+                                  protocolChanges.addedMethods.length > 0 ||
+                                  protocolChanges.removedMethods.length > 0;
+        
+        if (hasProtocolChanges) {
+          analysisText += `🔌 **Protocol Changes**:\n`;
+          if (protocolChanges.addedServices.length > 0) {
+            analysisText += `- Added services: ${protocolChanges.addedServices.join(', ')}\n`;
+          }
+          if (protocolChanges.removedServices.length > 0) {
+            analysisText += `- Removed services: ${protocolChanges.removedServices.join(', ')}\n`;
+          }
+          if (protocolChanges.addedMethods.length > 0) {
+            analysisText += `- Added methods: ${protocolChanges.addedMethods.join(', ')}\n`;
+          }
+          if (protocolChanges.removedMethods.length > 0) {
+            analysisText += `- Removed methods: ${protocolChanges.removedMethods.join(', ')}\n`;
+          }
+          analysisText += `\n`;
+        }
+        
+        if (result.analysis.recommendations.length > 0) {
+          analysisText += `💡 **Recommendations**:\n`;
+          for (const rec of result.analysis.recommendations) {
+            analysisText += `- ${rec}\n`;
+          }
+        }
+        
+        return {
+          content: [{
+            type: "text",
+            text: analysisText
+          }]
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: "text",
+            text: `❌ Failed to analyze dependency impact: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }]
+        };
+      }
+    }
+
     case "intelligent_task_prioritization": {
-      // These would be implemented with the full workspace manager
-      return {
-        content: [{
-          type: "text",
-          text: `🚧 **${name}** is not yet implemented in the current workspace manager.\n\nThis advanced feature requires the full workspace management implementation. The basic workspace status and health checks are available.`
-        }]
-      };
+      try {
+        const result = await workspaceManager.intelligentTaskPrioritization(args);
+        
+        let priorityText = `🎯 **Intelligent Task Prioritization**\n\n`;
+        priorityText += `📊 **Analysis Summary**:\n`;
+        priorityText += `- Total tasks found: ${result.analysis.totalTasks}\n`;
+        priorityText += `- Eligible tasks: ${result.analysis.eligibleTasks}\n`;
+        priorityText += `- Context: ${result.analysis.context.role} role, ${result.analysis.context.timeAvailable} time, ${result.analysis.context.repositoryFocus} repository focus\n\n`;
+        
+        if (result.recommendedTask) {
+          priorityText += `⭐ **Recommended Task**:\n`;
+          priorityText += `- **${result.recommendedTask.title}** (${result.recommendedTask.repository})\n`;
+          priorityText += `- Priority: ${result.recommendedTask.priority}\n`;
+          priorityText += `- Status: ${result.recommendedTask.status}\n`;
+          priorityText += `- Score: ${result.recommendedTask.score}/10\n\n`;
+        }
+        
+        if (result.alternativeTasks.length > 0) {
+          priorityText += `🔄 **Alternative Tasks**:\n`;
+          for (const task of result.alternativeTasks) {
+            priorityText += `- **${task.title}** (${task.repository}) - Score: ${task.score}/10\n`;
+          }
+        }
+        
+        if (result.analysis.totalTasks === 0) {
+          priorityText += `📝 **No tasks found**. Consider:\n`;
+          priorityText += `- Initializing backlogs in repositories: \`backlog init\`\n`;
+          priorityText += `- Creating tasks: \`/add-todo "Task title"\`\n`;
+        }
+        
+        return {
+          content: [{
+            type: "text",
+            text: priorityText
+          }]
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: "text",
+            text: `❌ Failed to get task prioritization: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }]
+        };
+      }
     }
 
     default:
