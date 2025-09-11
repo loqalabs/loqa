@@ -35,23 +35,39 @@ For enhanced development workflows, use the interactive commands in **[DEVELOPER
 ## 🚨 CRITICAL: Git Workflow
 
 ### Smart Git Detection (RECOMMENDED)
-Use the smart git detection system for reliable repository operations from any subdirectory:
+Use the enhanced smart git system for reliable repository operations from any subdirectory:
 
 ```bash
 # Install once per developer:
 ./tools/install-smart-git.sh
 
-# Use instead of manual git commands:
-./tools/smart-git status           # Works from any subdirectory
-./tools/smart-git branch feat-x    # Automatic repo detection
-./tools/smart-git commit "msg"     # Always from correct root
-./tools/smart-git <any-git-cmd>    # Any git command
+# Enhanced commands with rich output:
+./tools/smart-git status                    # Enhanced status with context
+./tools/smart-git branch feature/new-ui    # Create feature branch
+./tools/smart-git commit "Fix bug"          # Smart commit from anywhere
+
+# Common git commands (auto-executed from repo root):
+./tools/smart-git add .                     # Stage all changes
+./tools/smart-git push origin main          # Push to remote
+./tools/smart-git pull origin main          # Pull from remote
+./tools/smart-git log --oneline -5          # View commit history
+./tools/smart-git diff --cached             # Show staged changes
+
+# Get comprehensive help:
+./tools/smart-git help                      # Show all available commands
 ```
+
+**Enhanced Features:**
+- 📋 **3 Enhanced Commands**: `status`, `branch`, `commit` with rich formatting
+- 🔧 **14 Common Commands**: `add`, `push`, `pull`, `fetch`, `checkout`, `log`, `diff`, `merge`, `rebase`, `reset`, `stash`, `tag`, `remote`, `show`, `blame`
+- 🎯 **Universal Fallback**: Any other git command executed from repository root
+- 📁 **Repository Context**: Always shows which repo and path commands execute from
 
 **Benefits for Claude Code:**
 - ✅ **Eliminates directory confusion** - works from any subdirectory
 - ✅ **Prevents git command failures** due to wrong working directory
-- ✅ **Workspace boundary aware** - stops at appropriate project boundaries
+- ✅ **Enhanced user experience** with emojis and clear formatting
+- ✅ **Comprehensive git coverage** - handles all common git operations
 - ✅ **Consistent behavior** regardless of current directory
 
 ### Feature Branch Creation (ALWAYS FOLLOW)
