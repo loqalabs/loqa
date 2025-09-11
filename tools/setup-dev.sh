@@ -71,6 +71,24 @@ download_file() {
 # STT service will be provided via Docker container
 echo "✅ STT service will be provided via faster-whisper-server container"
 
+# Setup MCP server for Claude Code integration
+echo "🤖 Setting up MCP server for Claude Code integration..."
+if [[ -d "project/loqa-assistant-mcp" ]]; then
+    echo "📦 Building MCP server and installing pre-commit hooks..."
+    cd project/loqa-assistant-mcp
+    if [[ -f "install-hooks.sh" ]]; then
+        ./install-hooks.sh
+        echo "✅ MCP server and pre-commit hooks installed"
+    else
+        echo "⚠️  MCP install script not found, running manual setup..."
+        npm install && npm run build
+        echo "✅ MCP server built manually"
+    fi
+    cd ../..
+else
+    echo "⚠️  MCP server directory not found, skipping MCP setup"
+fi
+
 echo "🐳 Starting Loqa services with development build..."
 docker-compose -f docker-compose.dev.yml up -d
 
@@ -119,3 +137,16 @@ echo "For more information, see:"
 echo "  📖 Documentation: loqa/README.md"
 echo "  🚀 Quickstart: loqa/docs/quickstart.md"
 echo "  🔧 Health check: ./loqa/tools/health-check.sh"
+echo ""
+echo "🤖 Claude Code MCP Integration:"
+echo "  Add this to your ~/.mcp.json:"
+echo "  {"
+echo "    \"mcpServers\": {"
+echo "      \"loqa-assistant\": {"
+echo "        \"command\": \"$(pwd)/project/loqa-assistant-mcp/start-mcp.sh\","
+echo "        \"args\": [],"
+echo "        \"env\": {}"
+echo "      }"
+echo "    }"
+echo "  }"
+echo "  Then restart Claude Code to activate MCP tools."

@@ -770,29 +770,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 async function main() {
   const transport = new StdioServerTransport();
   
-  // Handle stdio close events for graceful shutdown
-  process.stdin.on('close', () => {
-    console.error("Stdin closed, shutting down gracefully...");
-    process.exit(0);
-  });
-  
-  process.stdin.on('end', () => {
-    console.error("Stdin ended, shutting down gracefully...");
-    process.exit(0);
-  });
-  
-  process.stdin.on('error', (error) => {
-    console.error("Stdin error:", error);
-    process.exit(1);
-  });
-  
-  await server.connect(transport);
-  console.error("Loqa Assistant MCP server running on stdio");
-
-  // Graceful shutdown handling for signals
+  // Graceful shutdown function following MCP best practices
   const gracefulShutdown = async (signal: string) => {
     console.error(`Received ${signal}, shutting down gracefully...`);
     try {
+      // Close transport first, then server (per MCP spec)
+      if (transport) {
+        await transport.close();
+      }
       await server.close();
       console.error("MCP server closed successfully");
       process.exit(0);
@@ -801,8 +786,27 @@ async function main() {
       process.exit(1);
     }
   };
-
-  // Handle termination signals
+  
+  // Handle stdio close events for graceful shutdown
+  process.stdin.on('close', () => {
+    console.error("Stdin closed, shutting down gracefully...");
+    gracefulShutdown('stdin-close');
+  });
+  
+  process.stdin.on('end', () => {
+    console.error("Stdin ended, shutting down gracefully...");
+    gracefulShutdown('stdin-end');
+  });
+  
+  process.stdin.on('error', (error) => {
+    console.error("Stdin error:", error);
+    gracefulShutdown('stdin-error');
+  });
+  
+  await server.connect(transport);
+  console.error("Loqa Assistant MCP server running on stdio");
+  
+  // Handle termination signals with graceful shutdown
   process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
   process.on('SIGINT', () => gracefulShutdown('SIGINT'));
   process.on('SIGQUIT', () => gracefulShutdown('SIGQUIT'));
@@ -810,7 +814,7 @@ async function main() {
   // Handle stdio pipe breaks (parent process exit)
   process.on('SIGPIPE', () => {
     console.error("SIGPIPE received, parent process likely closed");
-    process.exit(0);
+    gracefulShutdown('SIGPIPE');
   });
   
   // Handle uncaught exceptions and unhandled rejections
