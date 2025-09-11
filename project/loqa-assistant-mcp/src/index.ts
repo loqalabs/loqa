@@ -18,6 +18,7 @@ import { LoqaRulesValidator } from './validators/index.js';
 import { LoqaWorkspaceManager } from './managers/index.js';
 import { LoqaTaskManager } from './managers/task-manager.js';
 import { getToolsForRepository, handleToolCall } from './tools/index.js';
+import { DEPENDENCY_ORDER, TESTABLE_REPOSITORIES, getDefaultRepository } from './config/repositories.js';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -175,8 +176,8 @@ class MCPWorkspaceManager extends LoqaWorkspaceManager {
     const results: any[] = [];
     const repositoriesToCheck = options.repository ? [options.repository] : this.knownRepositories;
     
-    // Define dependency order for Loqa repositories
-    const dependencyOrder = ['loqa-proto', 'loqa-skills', 'loqa-hub', 'loqa-relay', 'loqa-commander', 'www-loqalabs-com'];
+    // Use centralized dependency order for Loqa repositories
+    const dependencyOrder = DEPENDENCY_ORDER;
     const orderedRepos = dependencyOrder.filter(repo => repositoriesToCheck.includes(repo))
       .concat(repositoriesToCheck.filter(repo => !dependencyOrder.includes(repo)));
     
@@ -377,7 +378,7 @@ class MCPWorkspaceManager extends LoqaWorkspaceManager {
     const results: any[] = [];
     
     // Define repositories that have integration tests
-    const testableRepos = ['loqa-hub', 'loqa-relay', 'loqa-commander'];
+    const testableRepos = TESTABLE_REPOSITORIES;
     
     for (const repoName of testableRepos) {
       const repoPath = join(this.workspaceRoot, '..', repoName);
@@ -743,7 +744,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       if (!context.isLoqaWorkspace) {
         errorMessage += '\n\n💡 **Context**: You don\'t appear to be in a Loqa workspace. Many MCP tools require being in a Loqa repository or the workspace root containing multiple Loqa repositories.';
         errorMessage += '\n\n**Suggestions**:';
-        errorMessage += '\n• Navigate to a Loqa repository (e.g., `cd loqa-hub`)';
+        errorMessage += `\n• Navigate to a Loqa repository (e.g., \`cd ${getDefaultRepository('development')}\` for development or \`cd ${getDefaultRepository('documentation')}\` for docs)`;
         errorMessage += '\n• Navigate to the workspace root containing Loqa repositories';
         errorMessage += '\n• Use the `repository` parameter to specify which repo to operate on';
       } else if (context.type === 'unknown') {

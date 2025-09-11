@@ -1,5 +1,6 @@
 import { ModelSelectionContext, ModelRecommendation } from '../types/index.js';
 import { LoqaRoleManager } from './role-manager.js';
+import { REPOSITORIES } from '../config/repositories.js';
 
 export class LoqaModelSelector {
   private workspaceRoot: string;
@@ -201,40 +202,38 @@ export class LoqaModelSelector {
    * Get repository-specific model preferences
    */
   private getRepositoryModelPreference(repositoryType: string): { preferredModel: string; reasoning: string } {
-    const repoPreferences: Record<string, { preferredModel: string; reasoning: string }> = {
-      'loqa': {
-        preferredModel: 'sonnet-4',
-        reasoning: 'Main orchestration repo requires architectural understanding'
-      },
-      'loqa-proto': {
-        preferredModel: 'sonnet-4', 
-        reasoning: 'Protocol design requires careful API considerations'
-      },
-      'loqa-hub': {
-        preferredModel: 'sonnet-4',
-        reasoning: 'Core service with complex business logic and integrations'
-      },
-      'loqa-skills': {
-        preferredModel: 'sonnet-4',
-        reasoning: 'Plugin system requires architectural understanding'
-      },
-      'loqa-relay': {
-        preferredModel: 'sonnet-4',
-        reasoning: 'Audio processing and real-time communication complexity'
-      },
-      'loqa-commander': {
-        preferredModel: 'haiku',
-        reasoning: 'UI components generally have lower complexity requirements'
-      },
-      'www-loqalabs-com': {
-        preferredModel: 'haiku',
-        reasoning: 'Website content and styling work is typically straightforward'
-      },
-      'loqalabs-github-config': {
-        preferredModel: 'haiku',
-        reasoning: 'Configuration and template work is generally simple'
+    // Build preferences from centralized repository configuration
+    const repoPreferences: Record<string, { preferredModel: string; reasoning: string }> = {};
+    
+    // Define model preferences based on repository types
+    Object.keys(REPOSITORIES).forEach(repoName => {
+      const repo = REPOSITORIES[repoName];
+      switch (repo.type) {
+        case 'core':
+        case 'protocol':
+        case 'service':
+          repoPreferences[repoName] = {
+            preferredModel: 'sonnet-4',
+            reasoning: `${repo.description} requires architectural understanding`
+          };
+          break;
+        case 'client':
+          repoPreferences[repoName] = {
+            preferredModel: 'sonnet-4',
+            reasoning: `${repo.description} involves complex real-time processing`
+          };
+          break;
+        case 'ui':
+        case 'website':
+        case 'config':
+        default:
+          repoPreferences[repoName] = {
+            preferredModel: 'haiku',
+            reasoning: `${repo.description} typically has lower complexity requirements`
+          };
+          break;
       }
-    };
+    });
 
     return repoPreferences[repositoryType] || { 
       preferredModel: 'haiku', 

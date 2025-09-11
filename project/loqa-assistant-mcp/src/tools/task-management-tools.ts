@@ -2,6 +2,7 @@ import { LoqaTaskManager } from '../managers/index.js';
 import { basename, dirname, join } from 'path';
 import { TaskCreationOptions, CapturedThought } from '../types/index.js';
 import { resolveWorkspaceRoot } from '../utils/workspace-resolver.js';
+import { KNOWN_REPOSITORIES_LIST } from '../config/repositories.js';
 
 /**
  * Task Management MCP tools
@@ -199,10 +200,7 @@ export async function handleTaskManagementTool(name: string, args: any): Promise
         }
         
         // Multi-repository mode: scan all repositories
-        const knownRepositories = [
-          'loqa', 'loqa-hub', 'loqa-commander', 'loqa-relay',
-          'loqa-proto', 'loqa-skills', 'www-loqalabs-com', 'loqalabs-github-config'
-        ];
+        const knownRepositories = KNOWN_REPOSITORIES_LIST;
         
         // Determine actual workspace root
         const actualWorkspaceRoot = knownRepositories.includes(basename(workspaceRoot)) 

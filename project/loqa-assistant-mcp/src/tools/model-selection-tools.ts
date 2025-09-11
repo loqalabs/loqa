@@ -37,7 +37,7 @@ export const modelSelectionTools = [
         },
         repositoryType: {
           type: "string",
-          description: "Type of repository (loqa, loqa-hub, etc.)"
+          description: "Type of repository (see repositories.ts for valid options)"
         },
         manualOverride: {
           type: "string",

@@ -6,6 +6,10 @@
 import { promises as fs } from 'fs';
 import { join, basename, dirname } from 'path';
 import { simpleGit } from 'simple-git';
+import { 
+  KNOWN_REPOSITORIES_LIST, 
+  WORKSPACE_DETECTION_ORDER
+} from '../config/repositories.js';
 
 export interface WorkspaceContext {
   type: 'workspace-root' | 'individual-repo' | 'unknown';
@@ -17,16 +21,8 @@ export interface WorkspaceContext {
   hasUncommittedChanges?: boolean;
 }
 
-const KNOWN_LOQA_REPOS = [
-  'loqa',
-  'loqa-hub', 
-  'loqa-commander',
-  'loqa-relay',
-  'loqa-proto', 
-  'loqa-skills',
-  'www-loqalabs-com',
-  'loqalabs-github-config'
-];
+// Use centralized repository configuration
+const KNOWN_LOQA_REPOS = KNOWN_REPOSITORIES_LIST;
 
 /**
  * Detect the current workspace context
@@ -148,7 +144,7 @@ export function getBestRepository(context: WorkspaceContext, preference?: string
   }
   
   // Priority order for default repository selection
-  const priority = ['loqa-hub', 'loqa', 'loqa-commander', 'loqa-relay', 'loqa-proto', 'loqa-skills'];
+  const priority = WORKSPACE_DETECTION_ORDER;
   
   for (const repo of priority) {
     if (context.availableRepositories.includes(repo)) {
@@ -226,7 +222,7 @@ export async function resolveWorkspaceRootWithContext(args: any = {}): Promise<{
  */
 async function findRepositoryWithBacklog(workspaceRoot: string, repositories: string[]): Promise<string | null> {
   // Priority order for repositories with backlogs
-  const priority = ['loqa-hub', 'loqa', 'loqa-commander', 'loqa-relay', 'loqa-proto', 'loqa-skills'];
+  const priority = WORKSPACE_DETECTION_ORDER;
   
   // Check priority repositories first
   for (const repo of priority) {

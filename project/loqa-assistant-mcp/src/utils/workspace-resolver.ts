@@ -4,6 +4,12 @@
  */
 
 import { resolveWorkspaceRootWithContext } from './context-detector.js';
+import { 
+  KNOWN_REPOSITORIES_LIST, 
+  WORKSPACE_DETECTION_ORDER, 
+  isLoqaRepository, 
+  getDefaultRepository 
+} from '../config/repositories.js';
 
 export async function resolveWorkspaceRoot(args: any = {}): Promise<string> {
   // Use the new context-aware resolver
@@ -40,7 +46,7 @@ export async function resolveWorkspaceRootLegacy(args: any = {}): Promise<string
       const repoRoot = await git.revparse(['--show-toplevel']);
       const repoName = basename(repoRoot);
       
-      const knownRepos = ['loqa', 'loqa-hub', 'loqa-commander', 'loqa-relay', 'loqa-proto', 'loqa-skills', 'www-loqalabs-com', 'loqalabs-github-config'];
+      const knownRepos = KNOWN_REPOSITORIES_LIST;
       
       if (knownRepos.includes(repoName)) {
         console.log(`Currently in Loqa repository: ${repoName}`);
@@ -62,7 +68,7 @@ export async function resolveWorkspaceRootLegacy(args: any = {}): Promise<string
       
       // Check which Loqa repositories exist in this directory
       for (const entry of entries) {
-        if (entry.startsWith('loqa') || entry === 'www-loqalabs-com') {
+        if (isLoqaRepository(entry)) {
           try {
             const stats = await fs.stat(join(searchDir, entry));
             if (stats.isDirectory()) {
@@ -107,7 +113,7 @@ export async function resolveWorkspaceRootLegacy(args: any = {}): Promise<string
     const entries = await fs.readdir(workspaceRoot);
     
     // Priority order for default repository selection
-    const repoPreference = ['loqa-hub', 'loqa', 'loqa-commander', 'loqa-relay', 'loqa-proto', 'loqa-skills'];
+    const repoPreference = WORKSPACE_DETECTION_ORDER;
     
     for (const prefRepo of repoPreference) {
       if (entries.includes(prefRepo)) {
@@ -124,7 +130,7 @@ export async function resolveWorkspaceRootLegacy(args: any = {}): Promise<string
     
     // Fallback: use any Loqa repository found
     for (const entry of entries) {
-      if (entry.startsWith('loqa') || entry === 'www-loqalabs-com') {
+      if (isLoqaRepository(entry)) {
         try {
           const entryPath = join(workspaceRoot, entry);
           await fs.access(join(entryPath, '.git'));
@@ -147,7 +153,7 @@ export async function resolveWorkspaceRootLegacy(args: any = {}): Promise<string
       const potentialWorkspace = parts.slice(0, loqalabsIndex + 1).join('/');
       try {
         const entries = await fs.readdir(potentialWorkspace);
-        const targetRepo = repository || 'loqa-hub';
+        const targetRepo = repository || getDefaultRepository('configuration'); // MCP server context usually involves setup/config
         
         if (entries.includes(targetRepo)) {
           const targetPath = join(potentialWorkspace, targetRepo);

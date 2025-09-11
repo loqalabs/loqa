@@ -46,7 +46,7 @@ export const roleManagementTools = [
         },
         repositoryType: {
           type: "string",
-          description: "Type of repository (loqa, loqa-hub, loqa-relay, etc.)"
+          description: "Type of repository (see repositories.ts for valid options)"
         }
       }
     }

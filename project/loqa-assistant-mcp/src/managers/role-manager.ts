@@ -1,6 +1,7 @@
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { RoleConfig, RoleDetectionResult } from '../types/index.js';
+import { getRepositoriesByType } from '../config/repositories.js';
 
 export class LoqaRoleManager {
   private workspaceRoot: string;
@@ -89,15 +90,19 @@ export class LoqaRoleManager {
         }
       }
 
-      // Bonus scoring for repository-specific patterns
+      // Bonus scoring for repository-specific patterns using centralized config
       if (context.repositoryType) {
-        if (roleId === 'architect' && ['loqa-proto', 'loqa'].includes(context.repositoryType)) {
+        const architectRepos = [...getRepositoriesByType('protocol'), ...getRepositoriesByType('core')];
+        const developerRepos = [...getRepositoriesByType('service'), ...getRepositoriesByType('client')];
+        const coreRepos = getRepositoriesByType('core');
+        
+        if (roleId === 'architect' && architectRepos.includes(context.repositoryType)) {
           scores[roleId].score += 2;
         }
-        if (roleId === 'developer' && ['loqa-hub', 'loqa-relay', 'loqa-skills'].includes(context.repositoryType)) {
+        if (roleId === 'developer' && developerRepos.includes(context.repositoryType)) {
           scores[roleId].score += 2;
         }
-        if (roleId === 'devops' && context.repositoryType === 'loqa') {
+        if (roleId === 'devops' && coreRepos.includes(context.repositoryType)) {
           scores[roleId].score += 2;
         }
         if (roleId === 'qa' && text.includes('test')) {

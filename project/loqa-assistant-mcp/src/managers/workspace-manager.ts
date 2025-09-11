@@ -2,20 +2,12 @@ import { simpleGit } from 'simple-git';
 import { promises as fs } from 'fs';
 import { join, dirname, basename } from 'path';
 import { glob } from 'glob';
+import { KNOWN_REPOSITORIES_LIST } from '../config/repositories.js';
 
 export class LoqaWorkspaceManager {
   protected workspaceRoot: string;
   protected actualWorkspaceRoot: string;
-  protected knownRepositories: string[] = [
-    'loqa',
-    'loqa-hub', 
-    'loqa-commander',
-    'loqa-relay',
-    'loqa-proto', 
-    'loqa-skills',
-    'www-loqalabs-com',
-    'loqalabs-github-config'
-  ];
+  protected knownRepositories: string[] = KNOWN_REPOSITORIES_LIST;
 
   constructor(workspaceRoot?: string) {
     this.workspaceRoot = workspaceRoot || process.cwd();
