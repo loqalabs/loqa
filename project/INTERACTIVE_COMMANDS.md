@@ -12,14 +12,27 @@ The following interactive commands replace the old prompt templates:
 | `/plan-strategic-shift` | `STRATEGIC_SHIFT_PROMPT.md` | Strategic planning with phase-by-phase guidance |
 | `/capture-comprehensive-thought` | Enhanced thought capture | Full workflow thought processing |
 | `/start-complex-todo` | Enhanced task creation | Complex backlog task planning and breakdown |
+| **🚀 Phase 4 Automation Commands** |
+| `/create-branch-from-task` | Manual branch creation | Automated feature branch creation from backlog tasks |
+| `/run-integration-tests` | Manual testing coordination | Cross-service integration testing with Docker orchestration |
+| `/create-pr-from-task` | Manual PR creation | Automated PR creation with task linking and templates |
+| `/analyze-dependency-impact` | Manual impact assessment | Protocol change impact analysis across repositories |
 
 ## 🎯 **Key Benefits**
 
+### **Core Interactive Features:**
 - **✅ Interactive**: Prompts for missing information instead of copy-paste
 - **✅ Role-Aware**: Automatically detects and applies role specializations
 - **✅ Integrated**: Directly creates files, issues, and updates projects
 - **✅ Comprehensive**: Includes all workflow guidance and best practices
 - **✅ Consistent**: Ensures proper branching, testing, and quality gates
+
+### **Phase 4 Automation Enhancements:**
+- **✅ End-to-End Automation**: Complete workflow from branch creation to PR management
+- **✅ Cross-Repository Coordination**: Intelligent multi-repository awareness and coordination
+- **✅ Quality Assurance Integration**: Automated testing with Docker orchestration
+- **✅ Impact Analysis**: Proactive protocol change impact assessment
+- **✅ Zero Manual Coordination**: Eliminates repetitive workflow tasks
 
 ## 📋 **Detailed Command Reference**
 
@@ -150,6 +163,166 @@ Enhanced backlog task creation with comprehensive planning and role optimization
 /start-complex-todo --title="Implement collision detection" --category=feature --priority=P1 --breakdown=true
 ```
 
+## 🚀 **Phase 4 Automation Commands**
+
+### `/create-branch-from-task` - Automated Branch Creation
+
+Creates feature branches from backlog tasks with consistent naming and proper git workflow.
+
+**Usage:**
+```bash
+/create-branch-from-task                           # Auto-detect task from current context
+/create-branch-from-task --taskId=21              # Create branch for specific task
+/create-branch-from-task --taskId=5 --repository=loqa-hub  # Cross-repository branch creation
+```
+
+**Key Parameters:**
+- `taskId`: Backlog task ID (e.g., '21', 'task-21') - auto-detected if not provided
+- `taskFile`: Direct path to task file (alternative to taskId)
+- `repository`: Target repository (auto-detected from current directory if not provided)
+- `branchPrefix`: Branch prefix (default: 'feature')
+- `switchToBranch`: Switch to new branch after creation (default: true)
+
+**Features:**
+- ✅ Smart branch naming: `feature/task-21-descriptive-title`
+- ✅ Task file parsing for automatic title extraction
+- ✅ Cross-repository support with auto-detection
+- ✅ Git workflow integration (fetch, pull, create, switch)
+- ✅ Comprehensive error handling and guidance
+
+**Examples:**
+```bash
+/create-branch-from-task --taskId=21                # feature/task-21-plugin-based-widgets
+/create-branch-from-task --taskFile=task-005-auth.md --branchPrefix=bugfix
+/create-branch-from-task --taskId=12 --repository=loqa-commander --switchToBranch=false
+```
+
+### `/run-integration-tests` - Cross-Service Testing Automation
+
+Runs integration tests with Docker Compose orchestration across multiple repositories.
+
+**Usage:**
+```bash
+/run-integration-tests                             # Run all integration tests with Docker
+/run-integration-tests --repositories=loqa-hub,loqa-relay  # Test specific services
+/run-integration-tests --testSuites=e2e --cleanup=false   # Custom test configuration
+```
+
+**Key Parameters:**
+- `repositories`: Specific repositories to test (defaults to core integration repos)
+- `testSuites`: Test suites to run: integration, e2e (defaults to both)
+- `dockerCompose`: Use Docker Compose orchestration (default: true)
+- `cleanup`: Cleanup Docker services after testing (default: true)
+
+**Features:**
+- ✅ Docker Compose service orchestration (loqa-hub, stt, tts, ollama, nats)
+- ✅ Multi-repository test execution in proper dependency order
+- ✅ Flexible test suite selection (integration, e2e, custom)
+- ✅ Service health monitoring and automatic cleanup
+- ✅ Comprehensive reporting with timing and error analysis
+
+**Examples:**
+```bash
+/run-integration-tests                             # Full integration test suite
+/run-integration-tests --repositories=loqa-hub --testSuites=integration
+/run-integration-tests --dockerCompose=false      # Skip Docker orchestration
+```
+
+### `/create-pr-from-task` - Automated PR Creation with Task Linking
+
+Creates pull requests from feature branches with automatic task linking and structured templates.
+
+**Usage:**
+```bash
+/create-pr-from-task                               # Auto-detect task from current branch
+/create-pr-from-task --taskId=21 --draft=true     # Create draft PR for specific task
+/create-pr-from-task --title="Custom Title" --baseBranch=develop  # Custom PR configuration
+```
+
+**Key Parameters:**
+- `repository`: Target repository (auto-detected if not provided)
+- `taskId`: Backlog task ID for linking (auto-detected from branch if not provided)
+- `taskFile`: Direct path to task file (alternative to taskId)
+- `title`: PR title (auto-generated from task if not provided)
+- `branchName`: Source branch name (uses current branch if not provided)
+- `baseBranch`: Target branch for PR (default: 'main')
+- `draft`: Create as draft PR (default: false)
+
+**Features:**
+- ✅ Intelligent task detection from branch names (`feature/task-21-description`)
+- ✅ Auto-generated PR titles and comprehensive body templates
+- ✅ Automatic backlog task linking with relative URLs
+- ✅ Structured checklists (changes, testing, task completion, quality gates)
+- ✅ Cross-repository support with context awareness
+
+**Examples:**
+```bash
+/create-pr-from-task                               # Auto-detect everything from context
+/create-pr-from-task --taskId=21 --draft=true     # Draft PR with specific task link
+/create-pr-from-task --title="Emergency Hotfix" --baseBranch=main --draft=false
+```
+
+### `/analyze-dependency-impact` - Protocol Change Impact Analysis
+
+Analyzes impact of protocol changes across consuming repositories with risk assessment.
+
+**Usage:**
+```bash
+/analyze-dependency-impact                         # Analyze recent proto changes
+/analyze-dependency-impact --protoChanges=audio.proto,skills.proto  # Specific files
+/analyze-dependency-impact --repository=loqa-proto --checkBreaking=true  # Custom analysis
+```
+
+**Key Parameters:**
+- `protoChanges`: Specific proto files changed (auto-detected from git if not provided)
+- `repository`: Protocol repository to analyze (default: 'loqa-proto')
+- `checkBreaking`: Check for breaking changes (default: true)
+- `analyzeDownstream`: Analyze impact on consuming repositories (default: true)
+
+**Features:**
+- ✅ Automatic protocol change detection from git history
+- ✅ Cross-service impact mapping (loqa-hub, loqa-relay, loqa-skills, loqa-commander)
+- ✅ Breaking change identification with risk assessment
+- ✅ Effort estimation and coordination recommendations
+- ✅ Build system specific change requirements (Go, Node.js)
+
+**Examples:**
+```bash
+/analyze-dependency-impact                         # Analyze recent changes
+/analyze-dependency-impact --protoChanges=audio.proto --checkBreaking=true
+/analyze-dependency-impact --repository=loqa-proto --analyzeDownstream=false
+```
+
+## 🔄 **Complete Automation Workflow**
+
+### **End-to-End Development Automation:**
+```bash
+# 1. Create feature branch from backlog task
+/create-branch-from-task --taskId=21
+
+# 2. Develop features with quality assurance
+/run-integration-tests --testSuites=integration,e2e
+
+# 3. Create PR with automatic task linking
+/create-pr-from-task  # Auto-detects task from branch
+
+# 4. Analyze protocol change impact (if applicable)
+/analyze-dependency-impact --protoChanges=audio.proto
+```
+
+### **Cross-Repository Coordination:**
+```bash
+# Multi-repository branch creation
+/create-branch-from-task --taskId=15 --repository=loqa-hub
+/create-branch-from-task --taskId=15 --repository=loqa-proto
+
+# Coordinated testing across services
+/run-integration-tests --repositories=loqa-hub,loqa-relay,loqa-skills
+
+# Impact analysis for breaking changes
+/analyze-dependency-impact --checkBreaking=true --analyzeDownstream=true
+```
+
 ## 🎭 **Role Specialization**
 
 All commands support automatic role detection or manual role selection:
@@ -261,18 +434,20 @@ backlog/
     └── general-task-template.md
 ```
 
-## 📊 **Benefits Over Templates**
+## 📊 **Benefits Over Manual Processes**
 
-| Aspect | Templates | Interactive Commands |
-|--------|-----------|---------------------|
-| **User Experience** | Copy-paste, manual editing | Interactive prompts |
-| **Role Optimization** | Generic guidance | Role-specific specialization |
-| **Integration** | Manual file creation | Automatic project integration |
-| **Consistency** | Relies on user discipline | Enforced best practices |
-| **Maintenance** | Update multiple files | Single command enhancement |
-| **Discovery** | Must know template exists | Commands are discoverable |
-| **Validation** | No validation | Parameter validation |
-| **Context Aware** | Static content | Dynamic, context-aware guidance |
+| Aspect | Manual Process | Interactive Commands | Phase 4 Automation |
+|--------|----------------|---------------------|-------------------|
+| **User Experience** | Copy-paste, manual editing | Interactive prompts | Intelligent automation |
+| **Role Optimization** | Generic guidance | Role-specific specialization | Context-aware optimization |
+| **Integration** | Manual file creation | Automatic project integration | End-to-end workflow automation |
+| **Consistency** | Relies on user discipline | Enforced best practices | Automated consistency |
+| **Maintenance** | Update multiple files | Single command enhancement | Self-maintaining automation |
+| **Discovery** | Must know process exists | Commands are discoverable | Proactive suggestions |
+| **Validation** | No validation | Parameter validation | Intelligent validation |
+| **Context Awareness** | Static content | Dynamic, context-aware guidance | Multi-repository awareness |
+| **Coordination** | Manual cross-repo work | Guided coordination | Automated coordination |
+| **Quality Assurance** | Manual testing | Guided testing strategy | Automated testing orchestration |
 
 ## 🚨 **Migration Notes**
 
