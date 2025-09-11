@@ -25,6 +25,16 @@ const commands: Record<string, CommandHandler> = {
         console.log(`📍 Current path: ${result.relativePath || '(root)'}`);
         console.log(`🌿 Branch: ${result.currentBranch}`);
         console.log(`📝 Has changes: ${result.hasChanges ? 'Yes' : 'No'}`);
+        
+        // Check if main is behind when we're on main branch
+        if (result.currentBranch === 'main') {
+          const mainStatus = await SmartGitHelpers.checkMainStatus();
+          if (mainStatus.success && mainStatus.isBehind) {
+            console.log(`\n⚠️  Main is ${mainStatus.commitsBeind} commits behind origin/main`);
+            console.log(`💡 Run 'smart-git sync' to pull updates and cleanup merged branches`);
+          }
+        }
+        
         if (result.status) {
           console.log('\n📋 Changes:');
           console.log(result.status);
@@ -167,6 +177,84 @@ const commands: Record<string, CommandHandler> = {
     description: 'Show line-by-line history (executes from repo root)',
     usage: 'smart-git blame <file>',
     handler: gitCommandHandler(['blame'])
+  },
+
+  // Smart sync command
+  'sync': {
+    description: 'Pull main and cleanup merged branches safely',
+    usage: 'smart-git sync',
+    handler: async (_args) => {
+      const result = await SmartGitHelpers.smartSync();
+      if (result.success) {
+        console.log(`📁 Repository: ${result.repoRoot}`);
+        
+        if (result.pulledCommits > 0) {
+          console.log(`✅ Pulled ${result.pulledCommits} new commits to main`);
+        } else {
+          console.log(`✅ Main is up to date`);
+        }
+        
+        if (result.cleanupResult) {
+          const { deleted, kept } = result.cleanupResult;
+          
+          if (deleted.length > 0) {
+            console.log(`\n🧹 Branch cleanup:`);
+            deleted.forEach(branch => {
+              console.log(`  ✅ ${branch} - deleted (merged and no local changes)`);
+            });
+          }
+          
+          if (kept.length > 0) {
+            console.log(`\n⚠️  Branches kept:`);
+            kept.forEach(({branch, reason}) => {
+              console.log(`  🔒 ${branch} - ${reason}`);
+            });
+          }
+          
+          if (deleted.length === 0 && kept.length === 0) {
+            console.log(`\n🧹 No feature branches to clean up`);
+          }
+        }
+      } else {
+        console.error(`❌ Error: ${result.error}`);
+        process.exit(1);
+      }
+    }
+  },
+
+  // Manual branch cleanup command
+  'cleanup': {
+    description: 'Clean up merged branches safely (without pulling)',
+    usage: 'smart-git cleanup',
+    handler: async (_args) => {
+      const result = await SmartGitHelpers.smartBranchCleanup();
+      if (result.success) {
+        console.log(`📁 Repository: ${result.repoRoot}`);
+        
+        const { deleted, kept } = result;
+        
+        if (deleted.length > 0) {
+          console.log(`\n🧹 Branch cleanup:`);
+          deleted.forEach(branch => {
+            console.log(`  ✅ ${branch} - deleted (merged and no local changes)`);
+          });
+        }
+        
+        if (kept.length > 0) {
+          console.log(`\n⚠️  Branches kept:`);
+          kept.forEach(({branch, reason}) => {
+            console.log(`  🔒 ${branch} - ${reason}`);
+          });
+        }
+        
+        if (deleted.length === 0 && kept.length === 0) {
+          console.log(`\n🧹 No feature branches to clean up`);
+        }
+      } else {
+        console.error(`❌ Error: ${result.error}`);
+        process.exit(1);
+      }
+    }
   }
 };
 
@@ -196,17 +284,20 @@ async function main() {
     console.log('  status              - Show smart git status with repository context');
     console.log('  branch <name>       - Create feature branch (fetches latest main)');
     console.log('  commit <msg> [files]- Smart commit from any subdirectory');
+    console.log('  sync                - Pull main and cleanup merged branches safely');
+    console.log('  cleanup             - Clean up merged branches (without pulling)');
     console.log('');
     console.log('🔧 Common Git Commands (executed from repo root):');
     console.log('  add, push, pull, fetch, checkout, log, diff, merge,');
     console.log('  rebase, reset, stash, tag, remote, show, blame');
     console.log('');
     console.log('💡 Examples:');
-    console.log('  smart-git status                    # Enhanced status');
+    console.log('  smart-git status                    # Enhanced status with sync detection');
+    console.log('  smart-git sync                      # Pull main + cleanup merged branches');
     console.log('  smart-git branch feature/new-ui    # Create feature branch');
     console.log('  smart-git add .                     # Stage all changes');
     console.log('  smart-git commit "Fix bug"          # Commit from anywhere');
-    console.log('  smart-git push origin main          # Push to remote');
+    console.log('  smart-git cleanup                   # Cleanup branches without pulling');
     console.log('');
     console.log('🎯 Any other git command will be executed from the repository root');
     process.exit(0);
