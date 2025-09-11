@@ -1,6 +1,7 @@
 import { LoqaTaskManager, LoqaRoleManager, LoqaModelSelector } from '../managers/index.js';
 import { TaskCreationOptions, CapturedThought } from '../types/index.js';
 import { resolveWorkspaceRoot } from '../utils/workspace-resolver.js';
+import { SmartGitHelpers } from '../utils/smart-git-helpers.js';
 
 /**
  * Advanced Workflow MCP tools
@@ -182,6 +183,30 @@ export async function handleWorkflowTool(name: string, args: any): Promise<any> 
       const { taskTitle, taskDescription, filePaths = [], repository, priority = "Medium", category = "feature", updateStatus = true } = args;
       
       try {
+        // Step 0: Ensure we have the latest code state before starting work
+        let syncMessage = '';
+        try {
+          const mainStatus = await SmartGitHelpers.checkMainStatus();
+          if (mainStatus.success && mainStatus.isBehind) {
+            syncMessage = `🔄 Syncing with latest changes (${mainStatus.commitsBeind} commits behind)...\n`;
+            const syncResult = await SmartGitHelpers.smartSync();
+            if (syncResult.success) {
+              if (syncResult.pulledCommits > 0) {
+                syncMessage += `✅ Pulled ${syncResult.pulledCommits} commits to main\n`;
+              }
+              if (syncResult.cleanupResult?.deleted.length) {
+                syncMessage += `🧹 Cleaned up ${syncResult.cleanupResult.deleted.length} merged branches\n`;
+              }
+              syncMessage += '\n';
+            } else {
+              syncMessage += `⚠️ Sync failed: ${syncResult.error}\n\n`;
+            }
+          }
+        } catch (error) {
+          // Continue without sync if it fails - don't block the workflow
+          syncMessage = `⚠️ Could not check for updates, continuing with current state\n\n`;
+        }
+
         // Step 1: Detect appropriate role
         const roleDetection = await roleManager.detectRole({
           title: taskTitle,
@@ -212,7 +237,7 @@ export async function handleWorkflowTool(name: string, args: any): Promise<any> 
 
         const task = await taskManager.createTaskFromTemplate(taskOptions);
 
-        let responseText = `🚀 **Task Work Initiated**\n\n`;
+        let responseText = `${syncMessage}🚀 **Task Work Initiated**\n\n`;
         responseText += `📋 **Task**: ${taskTitle}\n`;
         responseText += `📁 **File**: ${task.filePath}\n`;
         responseText += `🎯 **Role**: ${roleConfig?.role_name || roleDetection.detectedRole} (${(roleDetection.confidence * 100).toFixed(0)}% confidence)\n`;
@@ -251,6 +276,19 @@ export async function handleWorkflowTool(name: string, args: any): Promise<any> 
       const { shiftTitle, description, scope = [], timeline, stakeholders = [], riskLevel = "medium" } = args;
       
       try {
+        // Ensure we have the latest code state for accurate impact analysis
+        let syncMessage = '';
+        try {
+          const mainStatus = await SmartGitHelpers.checkMainStatus();
+          if (mainStatus.success && mainStatus.isBehind) {
+            const syncResult = await SmartGitHelpers.smartSync();
+            if (syncResult.success && syncResult.pulledCommits > 0) {
+              syncMessage = `🔄 Updated to latest main (${syncResult.pulledCommits} commits) for accurate impact analysis\n\n`;
+            }
+          }
+        } catch (error) {
+          // Continue without sync if it fails
+        }
         // Create a comprehensive thought for the strategic shift
         const thought: CapturedThought = {
           content: `Strategic Shift: ${shiftTitle}\n\nDescription: ${description}\n\nScope: ${scope.join(', ')}\nTimeline: ${timeline || 'TBD'}\nStakeholders: ${stakeholders.join(', ')}\nRisk Level: ${riskLevel}`,
@@ -261,7 +299,7 @@ export async function handleWorkflowTool(name: string, args: any): Promise<any> 
 
         const thoughtResult = await taskManager.captureThought(thought);
         
-        let planText = `📈 **Strategic Shift Plan Created**\n\n`;
+        let planText = `${syncMessage}📈 **Strategic Shift Plan Created**\n\n`;
         planText += `🎯 **Title**: ${shiftTitle}\n`;
         planText += `📝 **Description**: ${description}\n`;
         planText += `🔍 **Scope**: ${scope.join(', ') || 'To be defined'}\n`;
