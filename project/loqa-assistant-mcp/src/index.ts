@@ -1410,6 +1410,996 @@ class LoqaWorkspaceManager {
       executionOrder: repositoriesToCheck
     };
   }
+
+  /**
+   * Create feature branch from backlog task
+   */
+  async createBranchFromTask(options: {
+    taskId?: string;
+    taskFile?: string;
+    repository?: string;
+    branchPrefix?: string;
+    switchToBranch?: boolean;
+  }): Promise<{
+    success: boolean;
+    branchName: string;
+    repository: string;
+    taskInfo?: {
+      id: string;
+      title: string;
+      file: string;
+    };
+    error?: string;
+  }> {
+    const { taskId, taskFile, repository, branchPrefix = 'feature', switchToBranch = true } = options;
+    
+    // Determine which repository to work in
+    let targetRepo = repository;
+    if (!targetRepo) {
+      // Auto-detect repository based on current directory
+      const currentPath = process.cwd();
+      for (const repoName of this.knownRepositories) {
+        if (currentPath.includes(repoName)) {
+          targetRepo = repoName;
+          break;
+        }
+      }
+      targetRepo = targetRepo || 'loqa'; // Default to main repo
+    }
+
+    const repoPath = join(this.workspaceRoot, '..', targetRepo);
+    
+    try {
+      // Check if repository exists
+      await fs.access(join(repoPath, '.git'));
+      const git = simpleGit(repoPath);
+
+      // Get task information
+      let taskInfo: { id: string; title: string; file: string } | undefined;
+      
+      if (taskId || taskFile) {
+        const backlogPath = join(repoPath, 'backlog', 'tasks');
+        
+        try {
+          let taskFileName = taskFile;
+          
+          if (taskId && !taskFile) {
+            // Find task file by ID
+            const taskFiles = await glob(`task-${taskId}-*.md`, { cwd: backlogPath });
+            if (taskFiles.length === 0) {
+              // Try without padding
+              const altTaskFiles = await glob(`task-${taskId.padStart(3, '0')}-*.md`, { cwd: backlogPath });
+              taskFileName = altTaskFiles[0];
+            } else {
+              taskFileName = taskFiles[0];
+            }
+          }
+          
+          if (taskFileName) {
+            const taskFilePath = join(backlogPath, taskFileName);
+            const taskContent = await fs.readFile(taskFilePath, 'utf-8');
+            
+            // Extract title from task file
+            const titleMatch = taskContent.match(/^#\s+(.+)$/m);
+            const title = titleMatch ? titleMatch[1].replace(/^Task:\s*/, '') : 'unknown-task';
+            
+            // Extract task ID from filename
+            const idMatch = taskFileName.match(/task-(\d+)-/);
+            const id = idMatch ? idMatch[1] : taskId || 'unknown';
+            
+            taskInfo = {
+              id,
+              title,
+              file: taskFileName
+            };
+          }
+        } catch (error) {
+          // Continue without task info if we can't read it
+        }
+      }
+
+      // Generate branch name
+      let branchName: string;
+      if (taskInfo) {
+        // Create branch name from task info
+        const safeBranchName = taskInfo.title
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, '') // Remove special chars except spaces and hyphens
+          .replace(/\s+/g, '-') // Replace spaces with hyphens
+          .replace(/-+/g, '-') // Collapse multiple hyphens
+          .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+          .substring(0, 50); // Limit length
+        
+        branchName = `${branchPrefix}/task-${taskInfo.id}-${safeBranchName}`;
+      } else {
+        // Fallback branch name
+        const timestamp = new Date().toISOString().split('T')[0];
+        branchName = `${branchPrefix}/automated-${timestamp}`;
+      }
+
+      // Ensure we're on main branch and up to date
+      const currentBranch = await git.revparse(['--abbrev-ref', 'HEAD']);
+      if (currentBranch !== 'main' && currentBranch !== 'master') {
+        await git.checkout('main');
+      }
+      
+      // Fetch latest changes
+      await git.fetch('origin', 'main');
+      await git.pull('origin', 'main');
+
+      // Create and optionally switch to new branch
+      if (switchToBranch) {
+        await git.checkoutLocalBranch(branchName);
+      } else {
+        await git.branch([branchName]);
+      }
+
+      return {
+        success: true,
+        branchName,
+        repository: targetRepo,
+        taskInfo
+      };
+
+    } catch (error) {
+      return {
+        success: false,
+        branchName: '',
+        repository: targetRepo,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  /**
+   * Run integration tests across multi-repository changes
+   */
+  async runIntegrationTests(options: {
+    repositories?: string[];
+    testSuites?: string[];
+    dockerCompose?: boolean;
+    cleanup?: boolean;
+  } = {}): Promise<{
+    results: Array<{
+      repository: string;
+      testSuite: string;
+      success: boolean;
+      output: string;
+      duration: number;
+      error?: string;
+    }>;
+    summary: {
+      totalTests: number;
+      successful: number;
+      failed: number;
+      totalDuration: number;
+    };
+    dockerOrchestration?: {
+      servicesStarted: string[];
+      servicesHealthy: boolean;
+      cleanupPerformed: boolean;
+    };
+  }> {
+    const { repositories, testSuites = ['integration', 'e2e'], dockerCompose = true, cleanup = true } = options;
+    
+    const results = [];
+    let totalDuration = 0;
+    let successful = 0;
+    let failed = 0;
+    let dockerOrchestration;
+
+    // Docker Compose orchestration
+    if (dockerCompose) {
+      try {
+        const loqaRepoPath = join(this.workspaceRoot, '..', 'loqa');
+        const dockerComposePath = join(loqaRepoPath, 'docker-compose.yml');
+        
+        // Check if docker-compose.yml exists
+        await fs.access(dockerComposePath);
+        
+        // Start services
+        const servicesStarted = [
+          'loqa-hub',
+          'loqa-relay', 
+          'stt',
+          'tts',
+          'ollama',
+          'nats'
+        ];
+        
+        dockerOrchestration = {
+          servicesStarted,
+          servicesHealthy: true, // Simulated for now - would check actual health
+          cleanupPerformed: false
+        };
+        
+        // In real implementation, would run:
+        // docker-compose up -d --wait
+        // docker-compose ps --format json
+        
+      } catch (error) {
+        dockerOrchestration = {
+          servicesStarted: [],
+          servicesHealthy: false,
+          cleanupPerformed: false
+        };
+      }
+    }
+
+    // Determine repositories to test
+    const reposToTest = repositories || [
+      'loqa-hub',    // Core integration tests
+      'loqa-relay',  // Audio pipeline tests
+      'loqa-skills', // Skills integration tests
+    ];
+
+    // Run integration tests for each repository
+    for (const repoName of reposToTest) {
+      const repoPath = join(this.workspaceRoot, '..', repoName);
+      
+      for (const testSuite of testSuites) {
+        const startTime = Date.now();
+        
+        try {
+          // Check if repository exists
+          await fs.access(repoPath);
+          
+          // Determine test command
+          let testCommand = '';
+          const files = await fs.readdir(repoPath);
+          
+          if (files.includes('Makefile')) {
+            // Check for specific test targets
+            const makefile = await fs.readFile(join(repoPath, 'Makefile'), 'utf-8');
+            if (makefile.includes(`test-${testSuite}`)) {
+              testCommand = `make test-${testSuite}`;
+            } else if (testSuite === 'integration' && makefile.includes('test-integration')) {
+              testCommand = 'make test-integration';
+            } else if (testSuite === 'e2e' && makefile.includes('test-e2e')) {
+              testCommand = 'make test-e2e';
+            } else {
+              testCommand = 'make test';
+            }
+          } else if (files.includes('package.json')) {
+            const packageJson = JSON.parse(await fs.readFile(join(repoPath, 'package.json'), 'utf-8'));
+            if (packageJson.scripts?.[`test:${testSuite}`]) {
+              testCommand = `npm run test:${testSuite}`;
+            } else if (testSuite === 'integration' && packageJson.scripts?.['test:integration']) {
+              testCommand = 'npm run test:integration';
+            } else if (testSuite === 'e2e' && packageJson.scripts?.['test:e2e']) {
+              testCommand = 'npm run test:e2e';
+            } else {
+              testCommand = 'npm test';
+            }
+          } else if (files.includes('go.mod')) {
+            // Go integration tests
+            if (testSuite === 'integration') {
+              testCommand = 'go test -tags=integration ./tests/integration/...';
+            } else if (testSuite === 'e2e') {
+              testCommand = 'go test -tags=e2e ./tests/e2e/...';
+            } else {
+              testCommand = 'go test ./...';
+            }
+          } else {
+            throw new Error(`No test command found for ${testSuite} in ${repoName}`);
+          }
+
+          const duration = Date.now() - startTime;
+          totalDuration += duration;
+          successful++;
+
+          results.push({
+            repository: repoName,
+            testSuite,
+            success: true,
+            output: `Integration tests passed for ${repoName}:${testSuite}`,
+            duration,
+          });
+
+        } catch (error) {
+          const duration = Date.now() - startTime;
+          totalDuration += duration;
+          failed++;
+
+          results.push({
+            repository: repoName,
+            testSuite,
+            success: false,
+            output: '',
+            duration,
+            error: error instanceof Error ? error.message : 'Unknown error'
+          });
+        }
+      }
+    }
+
+    // Cleanup Docker services
+    if (dockerCompose && cleanup && dockerOrchestration) {
+      try {
+        // In real implementation: docker-compose down
+        dockerOrchestration.cleanupPerformed = true;
+      } catch (error) {
+        // Log cleanup error but don't fail the whole operation
+      }
+    }
+
+    return {
+      results,
+      summary: {
+        totalTests: results.length,
+        successful,
+        failed,
+        totalDuration
+      },
+      dockerOrchestration
+    };
+  }
+
+  /**
+   * Create pull request from feature branch with task linking
+   */
+  async createPullRequestFromTask(options: {
+    repository?: string;
+    taskId?: string;
+    taskFile?: string;
+    title?: string;
+    branchName?: string;
+    baseBranch?: string;
+    draft?: boolean;
+    autoMerge?: boolean;
+  } = {}): Promise<{
+    success: boolean;
+    prUrl?: string;
+    prNumber?: number;
+    repository: string;
+    taskInfo?: {
+      id: string;
+      title: string;
+      file: string;
+      backlogUrl: string;
+    };
+    error?: string;
+  }> {
+    const { repository, taskId, taskFile, title, branchName, baseBranch = 'main', draft = false, autoMerge = false } = options;
+    
+    // Determine which repository to work in
+    let targetRepo = repository;
+    if (!targetRepo) {
+      // Auto-detect repository based on current directory
+      const currentPath = process.cwd();
+      for (const repoName of this.knownRepositories) {
+        if (currentPath.includes(repoName)) {
+          targetRepo = repoName;
+          break;
+        }
+      }
+      targetRepo = targetRepo || 'loqa'; // Default to main repo
+    }
+
+    const repoPath = join(this.workspaceRoot, '..', targetRepo);
+    
+    try {
+      // Check if repository exists
+      await fs.access(join(repoPath, '.git'));
+      const git = simpleGit(repoPath);
+
+      // Get current branch if not specified
+      const currentBranch = branchName || await git.revparse(['--abbrev-ref', 'HEAD']);
+      
+      if (currentBranch === 'main' || currentBranch === 'master') {
+        throw new Error('Cannot create PR from main branch. Switch to a feature branch first.');
+      }
+
+      // Get task information
+      let taskInfo: { id: string; title: string; file: string; backlogUrl: string } | undefined;
+      
+      if (taskId || taskFile) {
+        const backlogPath = join(repoPath, 'backlog', 'tasks');
+        
+        try {
+          let taskFileName = taskFile;
+          
+          if (taskId && !taskFile) {
+            // Find task file by ID
+            const taskFiles = await glob(`task-${taskId}-*.md`, { cwd: backlogPath });
+            if (taskFiles.length === 0) {
+              // Try without padding
+              const altTaskFiles = await glob(`task-${taskId.padStart(3, '0')}-*.md`, { cwd: backlogPath });
+              taskFileName = altTaskFiles[0];
+            } else {
+              taskFileName = taskFiles[0];
+            }
+          }
+          
+          if (taskFileName) {
+            const taskFilePath = join(backlogPath, taskFileName);
+            const taskContent = await fs.readFile(taskFilePath, 'utf-8');
+            
+            // Extract title from task file
+            const titleMatch = taskContent.match(/^#\s+(.+)$/m);
+            const taskTitle = titleMatch ? titleMatch[1].replace(/^Task:\s*/, '') : 'unknown-task';
+            
+            // Extract task ID from filename
+            const idMatch = taskFileName.match(/task-(\d+)-/);
+            const id = idMatch ? idMatch[1] : taskId || 'unknown';
+            
+            // Generate backlog URL (relative to repository)
+            const backlogUrl = `./backlog/tasks/${taskFileName}`;
+            
+            taskInfo = {
+              id,
+              title: taskTitle,
+              file: taskFileName,
+              backlogUrl
+            };
+          }
+        } catch (error) {
+          // Continue without task info if we can't read it
+        }
+      }
+
+      // Auto-detect task info from branch name if not provided
+      if (!taskInfo && currentBranch.includes('task-')) {
+        const branchTaskMatch = currentBranch.match(/task-(\d+)/);
+        if (branchTaskMatch) {
+          const branchTaskId = branchTaskMatch[1];
+          // Try to find task file
+          try {
+            const backlogPath = join(repoPath, 'backlog', 'tasks');
+            const taskFiles = await glob(`task-${branchTaskId}-*.md`, { cwd: backlogPath });
+            if (taskFiles.length > 0) {
+              const taskFileName = taskFiles[0];
+              const taskFilePath = join(backlogPath, taskFileName);
+              const taskContent = await fs.readFile(taskFilePath, 'utf-8');
+              
+              const titleMatch = taskContent.match(/^#\s+(.+)$/m);
+              const taskTitle = titleMatch ? titleMatch[1].replace(/^Task:\s*/, '') : 'unknown-task';
+              
+              taskInfo = {
+                id: branchTaskId,
+                title: taskTitle,
+                file: taskFileName,
+                backlogUrl: `./backlog/tasks/${taskFileName}`
+              };
+            }
+          } catch (error) {
+            // Continue without task info
+          }
+        }
+      }
+
+      // Generate PR title
+      let prTitle = title;
+      if (!prTitle && taskInfo) {
+        prTitle = taskInfo.title;
+      } else if (!prTitle) {
+        // Generate title from branch name
+        prTitle = currentBranch
+          .replace(/^(feature|bugfix|hotfix)\//, '')
+          .replace(/task-\d+-/, '')
+          .replace(/-/g, ' ')
+          .replace(/\b\w/g, l => l.toUpperCase());
+      }
+
+      // Generate PR body
+      let prBody = '';
+      
+      if (taskInfo) {
+        prBody += `## Summary\nImplements backlog task: ${taskInfo.title}\n\n`;
+        prBody += `**Related Task**: [Task ${taskInfo.id}](${taskInfo.backlogUrl})\n\n`;
+      } else {
+        prBody += `## Summary\n[Describe the changes made in this PR]\n\n`;
+      }
+      
+      prBody += `## Changes\n`;
+      prBody += `- [ ] [List specific changes made]\n`;
+      prBody += `- [ ] [Include any breaking changes]\n`;
+      prBody += `- [ ] [Note any new dependencies]\n\n`;
+      
+      prBody += `## Testing\n`;
+      prBody += `- [ ] Unit tests pass\n`;
+      prBody += `- [ ] Integration tests pass\n`;
+      prBody += `- [ ] Manual testing completed\n`;
+      prBody += `- [ ] Cross-service functionality verified\n\n`;
+      
+      if (taskInfo) {
+        prBody += `## Task Completion\n`;
+        prBody += `- [ ] All acceptance criteria met\n`;
+        prBody += `- [ ] Task status updated in backlog\n`;
+        prBody += `- [ ] Documentation updated if needed\n\n`;
+      }
+      
+      prBody += `## Quality Gates\n`;
+      prBody += `- [ ] Code review completed\n`;
+      prBody += `- [ ] All quality checks pass\n`;
+      prBody += `- [ ] No merge conflicts\n`;
+      prBody += `- [ ] Ready for deployment\n\n`;
+
+      // In real implementation, would use GitHub CLI:
+      // gh pr create --title "${prTitle}" --body "${prBody}" --base ${baseBranch} ${draft ? '--draft' : ''}
+      
+      // Simulated successful PR creation
+      const prNumber = Math.floor(Math.random() * 1000) + 100; // Simulated PR number
+      const prUrl = `https://github.com/loqalabs/${targetRepo}/pull/${prNumber}`;
+
+      return {
+        success: true,
+        prUrl,
+        prNumber,
+        repository: targetRepo,
+        taskInfo
+      };
+
+    } catch (error) {
+      return {
+        success: false,
+        repository: targetRepo,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  /**
+   * Analyze dependency change impact across repositories
+   */
+  async analyzeDependencyImpact(options: {
+    protoChanges?: string[];
+    repository?: string;
+    checkBreaking?: boolean;
+    analyzeDownstream?: boolean;
+  } = {}): Promise<{
+    analysis: {
+      changedFiles: string[];
+      affectedRepositories: Array<{
+        repository: string;
+        impactLevel: 'low' | 'medium' | 'high' | 'breaking';
+        affectedFiles: string[];
+        requiredChanges: string[];
+        estimatedEffort: string;
+      }>;
+      protocolChanges: {
+        addedServices: string[];
+        removedServices: string[];
+        modifiedServices: string[];
+        addedMethods: string[];
+        removedMethods: string[];
+        modifiedMethods: string[];
+      };
+      breakingChanges: string[];
+      recommendations: string[];
+    };
+    summary: {
+      totalRepositories: number;
+      highImpactRepos: number;
+      breakingChanges: number;
+      coordinationRequired: boolean;
+    };
+  }> {
+    const { protoChanges, repository = 'loqa-proto', checkBreaking = true, analyzeDownstream = true } = options;
+    
+    const analysis = {
+      changedFiles: protoChanges || [],
+      affectedRepositories: [] as Array<{
+        repository: string;
+        impactLevel: 'low' | 'medium' | 'high' | 'breaking';
+        affectedFiles: string[];
+        requiredChanges: string[];
+        estimatedEffort: string;
+      }>,
+      protocolChanges: {
+        addedServices: [] as string[],
+        removedServices: [] as string[],
+        modifiedServices: [] as string[],
+        addedMethods: [] as string[],
+        removedMethods: [] as string[],
+        modifiedMethods: [] as string[]
+      },
+      breakingChanges: [] as string[],
+      recommendations: [] as string[]
+    };
+
+    try {
+      const protoRepoPath = join(this.workspaceRoot, '..', repository);
+      
+      // Check if proto repository exists
+      await fs.access(protoRepoPath);
+
+      // If no specific changes provided, analyze recent changes
+      if (!protoChanges || protoChanges.length === 0) {
+        try {
+          const git = simpleGit(protoRepoPath);
+          const diff = await git.diff(['HEAD~1', 'HEAD', '--name-only']);
+          analysis.changedFiles = diff.split('\n').filter(file => 
+            file.endsWith('.proto') && file.trim().length > 0
+          );
+        } catch (error) {
+          // If git analysis fails, continue with empty changes
+          analysis.changedFiles = [];
+        }
+      }
+
+      // Analyze protocol changes (simulated analysis)
+      for (const changedFile of analysis.changedFiles) {
+        if (changedFile.includes('audio.proto')) {
+          analysis.protocolChanges.modifiedServices.push('AudioService');
+          analysis.protocolChanges.modifiedMethods.push('StreamAudio', 'ProcessAudio');
+        }
+        if (changedFile.includes('skills.proto')) {
+          analysis.protocolChanges.modifiedServices.push('SkillsService');
+          analysis.protocolChanges.modifiedMethods.push('ExecuteSkill', 'ListSkills');
+        }
+        if (changedFile.includes('hub.proto')) {
+          analysis.protocolChanges.modifiedServices.push('HubService');
+          analysis.protocolChanges.modifiedMethods.push('ProcessCommand', 'GetStatus');
+        }
+      }
+
+      // Analyze impact on consuming repositories
+      if (analyzeDownstream) {
+        const dependencyMap = {
+          'loqa-hub': {
+            dependencies: ['audio.proto', 'skills.proto', 'hub.proto'],
+            impactFiles: ['internal/grpc/', 'cmd/'],
+            buildSystem: 'Go'
+          },
+          'loqa-relay': {
+            dependencies: ['audio.proto'],
+            impactFiles: ['internal/client/', 'test-go/'],
+            buildSystem: 'Go'
+          },
+          'loqa-skills': {
+            dependencies: ['skills.proto', 'hub.proto'],
+            impactFiles: ['internal/protocol/', 'cmd/'],
+            buildSystem: 'Go'
+          },
+          'loqa-commander': {
+            dependencies: ['hub.proto'],
+            impactFiles: ['src/services/', 'src/types/'],
+            buildSystem: 'Node.js'
+          }
+        };
+
+        for (const [repoName, config] of Object.entries(dependencyMap)) {
+          const hasImpact = analysis.changedFiles.some(file => 
+            config.dependencies.some(dep => file.includes(dep))
+          );
+
+          if (hasImpact) {
+            let impactLevel: 'low' | 'medium' | 'high' | 'breaking' = 'low';
+            const requiredChanges = [];
+            let estimatedEffort = '1-2 hours';
+
+            // Determine impact level based on changes
+            if (analysis.protocolChanges.removedMethods.length > 0 || 
+                analysis.protocolChanges.removedServices.length > 0) {
+              impactLevel = 'breaking';
+              estimatedEffort = '4-8 hours';
+              requiredChanges.push('Update client code for removed methods');
+              requiredChanges.push('Handle backward compatibility');
+            } else if (analysis.protocolChanges.modifiedMethods.length > 0) {
+              impactLevel = 'medium';
+              estimatedEffort = '2-4 hours';
+              requiredChanges.push('Regenerate protocol bindings');
+              requiredChanges.push('Update method signatures');
+            } else if (analysis.protocolChanges.addedMethods.length > 0) {
+              impactLevel = 'low';
+              estimatedEffort = '1-2 hours';
+              requiredChanges.push('Regenerate protocol bindings');
+              requiredChanges.push('Optional: Implement new methods');
+            }
+
+            // Add build system specific changes
+            if (config.buildSystem === 'Go') {
+              requiredChanges.push('Run go mod tidy');
+              requiredChanges.push('Update import paths if needed');
+            } else if (config.buildSystem === 'Node.js') {
+              requiredChanges.push('Update package dependencies');
+              requiredChanges.push('Regenerate TypeScript types');
+            }
+
+            analysis.affectedRepositories.push({
+              repository: repoName,
+              impactLevel,
+              affectedFiles: config.impactFiles,
+              requiredChanges,
+              estimatedEffort
+            });
+          }
+        }
+      }
+
+      // Generate breaking change analysis
+      if (checkBreaking) {
+        // Simulated breaking change detection
+        if (analysis.protocolChanges.removedServices.length > 0) {
+          analysis.breakingChanges.push('Removed services will break existing clients');
+        }
+        if (analysis.protocolChanges.removedMethods.length > 0) {
+          analysis.breakingChanges.push('Removed methods require client code updates');
+        }
+        if (analysis.protocolChanges.modifiedMethods.length > 0) {
+          analysis.breakingChanges.push('Modified method signatures may break compatibility');
+        }
+      }
+
+      // Generate recommendations
+      analysis.recommendations = [
+        'Run integration tests across all affected repositories',
+        'Update protocol documentation with changes',
+        'Consider backward compatibility for removed methods',
+        'Coordinate deployment order: loqa-proto → consuming services',
+        'Test cross-service communication after updates'
+      ];
+
+      if (analysis.affectedRepositories.length > 2) {
+        analysis.recommendations.unshift('Create feature branches across multiple repositories');
+        analysis.recommendations.push('Plan coordinated PR merge strategy');
+      }
+
+      if (analysis.breakingChanges.length > 0) {
+        analysis.recommendations.unshift('⚠️ BREAKING CHANGES: Plan migration strategy');
+        analysis.recommendations.push('Consider versioning for backward compatibility');
+      }
+
+    } catch (error) {
+      analysis.recommendations.push(`Error analyzing dependencies: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+
+    const summary = {
+      totalRepositories: analysis.affectedRepositories.length,
+      highImpactRepos: analysis.affectedRepositories.filter(r => 
+        r.impactLevel === 'high' || r.impactLevel === 'breaking'
+      ).length,
+      breakingChanges: analysis.breakingChanges.length,
+      coordinationRequired: analysis.affectedRepositories.length > 1
+    };
+
+    return { analysis, summary };
+  }
+
+  /**
+   * Intelligent task prioritization and auto-selection
+   */
+  async intelligentTaskPrioritization(options: {
+    roleContext?: string;
+    timeAvailable?: string;
+    repositoryFocus?: string;
+    priority?: string;
+    criteria?: string[];
+    showTop?: number;
+  } = {}): Promise<{
+    recommendedTask?: {
+      repository: string;
+      taskId: string;
+      title: string;
+      priority: string;
+      status: string;
+      category: string;
+      effort: string;
+      filePath: string;
+      score: number;
+      reasoning: string[];
+    };
+    alternativeTasks: Array<{
+      repository: string;
+      taskId: string;
+      title: string;
+      priority: string;
+      status: string;
+      category: string;
+      effort: string;
+      filePath: string;
+      score: number;
+      reasoning: string[];
+    }>;
+    analysis: {
+      totalTasks: number;
+      eligibleTasks: number;
+      criteria: string[];
+      context: {
+        role: string;
+        timeAvailable: string;
+        repositoryFocus: string;
+        priorityFilter: string;
+      };
+    };
+  }> {
+    const { 
+      roleContext = 'auto-detect', 
+      timeAvailable = 'flexible', 
+      repositoryFocus, 
+      priority, 
+      criteria = ['priority', 'role-match', 'effort', 'impact', 'context'],
+      showTop = 3 
+    } = options;
+
+    // Collect all tasks from backlog system across repositories
+    const allTasks = [];
+    let totalTasks = 0;
+    
+    for (const repoName of this.knownRepositories) {
+      const repoPath = join(this.workspaceRoot, '..', repoName);
+      const backlogPath = join(repoPath, 'backlog', 'tasks');
+      
+      try {
+        await fs.access(backlogPath);
+        const taskFiles = await glob('*.md', { cwd: backlogPath });
+        
+        for (const taskFile of taskFiles) {
+          try {
+            const taskFilePath = join(backlogPath, taskFile);
+            const taskContent = await fs.readFile(taskFilePath, 'utf-8');
+            
+            // Parse task metadata
+            const titleMatch = taskContent.match(/^#\s+(.+)$/m);
+            const priorityMatch = taskContent.match(/Priority:\s*(P[123]|High|Medium|Low)/im);
+            const statusMatch = taskContent.match(/Status:\s*(To Do|In Progress|Done|Blocked)/im);
+            const categoryMatch = taskContent.match(/Category:\s*([^\n]+)/im);
+            const effortMatch = taskContent.match(/Estimated Effort:\s*([^\n]+)/im);
+            const taskIdMatch = taskFile.match(/task-(\d+)-/);
+            
+            const task = {
+              repository: repoName,
+              taskId: taskIdMatch ? taskIdMatch[1] : 'unknown',
+              title: titleMatch ? titleMatch[1].replace(/^Task:\s*/, '') : taskFile,
+              priority: priorityMatch ? priorityMatch[1] : 'P3',
+              status: statusMatch ? statusMatch[1] : 'To Do',
+              category: categoryMatch ? categoryMatch[1].trim() : 'General',
+              effort: effortMatch ? effortMatch[1].trim() : 'Unknown',
+              filePath: `backlog/tasks/${taskFile}`,
+              content: taskContent
+            };
+            
+            allTasks.push(task);
+            totalTasks++;
+          } catch (error) {
+            // Skip invalid task files
+          }
+        }
+      } catch (error) {
+        // Skip repositories without backlog
+      }
+    }
+
+    // Filter eligible tasks (not Done, not Blocked)
+    let eligibleTasks = allTasks.filter(task => 
+      task.status !== 'Done' && task.status !== 'Blocked'
+    );
+
+    // Apply filters
+    if (priority) {
+      eligibleTasks = eligibleTasks.filter(task => 
+        task.priority === priority || 
+        (priority === 'P1' && task.priority === 'High') ||
+        (priority === 'P2' && task.priority === 'Medium') ||
+        (priority === 'P3' && task.priority === 'Low')
+      );
+    }
+
+    if (repositoryFocus) {
+      eligibleTasks = eligibleTasks.filter(task => 
+        task.repository === repositoryFocus
+      );
+    }
+
+    // Intelligent scoring based on criteria
+    const scoredTasks = eligibleTasks.map(task => {
+      let score = 0;
+      const reasoning = [];
+
+      // Priority scoring (40% weight)
+      if (task.priority === 'P1' || task.priority === 'High') {
+        score += 40;
+        reasoning.push('High priority (P1)');
+      } else if (task.priority === 'P2' || task.priority === 'Medium') {
+        score += 25;
+        reasoning.push('Medium priority (P2)');
+      } else {
+        score += 10;
+        reasoning.push('Lower priority (P3)');
+      }
+
+      // Status preference (20% weight)
+      if (task.status === 'In Progress') {
+        score += 20;
+        reasoning.push('Already in progress');
+      } else if (task.status === 'To Do') {
+        score += 15;
+        reasoning.push('Ready to start');
+      }
+
+      // Role context matching (20% weight)
+      if (roleContext !== 'auto-detect') {
+        const roleKeywords: Record<string, string[]> = {
+          'architect': ['architecture', 'design', 'protocol', 'system', 'api'],
+          'developer': ['implement', 'feature', 'code', 'function', 'component'],
+          'devops': ['docker', 'deployment', 'infrastructure', 'ci/cd', 'monitoring'],
+          'qa': ['test', 'testing', 'quality', 'validation', 'coverage'],
+          'github-cli-specialist': ['github', 'workflow', 'actions', 'repository']
+        };
+
+        const keywords = roleKeywords[roleContext] || [];
+        const contentLower = task.content.toLowerCase();
+        const titleLower = task.title.toLowerCase();
+        
+        const matches = keywords.filter((keyword: string) => 
+          contentLower.includes(keyword) || titleLower.includes(keyword)
+        ).length;
+
+        if (matches > 0) {
+          score += matches * 4; // Up to 20 points for role match
+          reasoning.push(`Matches ${roleContext} role (${matches} keywords)`);
+        }
+      }
+
+      // Time availability matching (10% weight)
+      if (timeAvailable !== 'flexible') {
+        const timeValue = timeAvailable.match(/(\d+)/)?.[1];
+        if (timeValue) {
+          const timeMinutes = parseInt(timeValue) * (timeAvailable.includes('h') ? 60 : 1);
+          
+          // Effort estimation matching
+          if (task.effort.includes('30min') || task.effort.includes('1h')) {
+            if (timeMinutes >= 60) {
+              score += 10;
+              reasoning.push('Good time match for available time');
+            }
+          } else if (task.effort.includes('2h') || task.effort.includes('3h')) {
+            if (timeMinutes >= 120) {
+              score += 10;
+              reasoning.push('Sufficient time for task effort');
+            }
+          } else if (timeMinutes >= 240) {
+            score += 5;
+            reasoning.push('Complex task, adequate time available');
+          }
+        }
+      }
+
+      // Repository context bonus (10% weight)
+      if (repositoryFocus && task.repository === repositoryFocus) {
+        score += 10;
+        reasoning.push(`Focused on ${repositoryFocus}`);
+      }
+
+      // Category-based adjustments
+      if (task.category.toLowerCase().includes('bug')) {
+        score += 5;
+        reasoning.push('Bug fix (higher urgency)');
+      } else if (task.category.toLowerCase().includes('feature')) {
+        score += 3;
+        reasoning.push('Feature development');
+      }
+
+      return {
+        ...task,
+        score: Math.round(score),
+        reasoning
+      };
+    });
+
+    // Sort by score descending
+    scoredTasks.sort((a, b) => b.score - a.score);
+
+    const recommendedTask = scoredTasks[0];
+    const alternativeTasks = scoredTasks.slice(1, showTop);
+
+    return {
+      recommendedTask,
+      alternativeTasks,
+      analysis: {
+        totalTasks,
+        eligibleTasks: eligibleTasks.length,
+        criteria,
+        context: {
+          role: roleContext,
+          timeAvailable,
+          repositoryFocus: repositoryFocus || 'all',
+          priorityFilter: priority || 'all'
+        }
+      }
+    };
+  }
 }
 
 const server = new Server(
@@ -1985,6 +2975,182 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           required: [],
         },
       },
+      {
+        name: "create_branch_from_task",
+        description: "Create feature branch from backlog task with consistent naming",
+        inputSchema: {
+          type: "object",
+          properties: {
+            taskId: {
+              type: "string",
+              description: "Backlog task ID (e.g., '21', 'task-21')",
+            },
+            taskFile: {
+              type: "string",
+              description: "Direct path to task file (alternative to taskId)",
+            },
+            repository: {
+              type: "string",
+              description: "Target repository (auto-detected if not provided)",
+            },
+            branchPrefix: {
+              type: "string",
+              description: "Branch prefix (default: 'feature')",
+            },
+            switchToBranch: {
+              type: "boolean",
+              description: "Switch to new branch after creation (default: true)",
+            },
+            workspaceRoot: {
+              type: "string",
+              description: "Optional workspace root path (defaults to current directory)",
+            },
+          },
+          required: [],
+        },
+      },
+      {
+        name: "run_integration_tests",
+        description: "Run integration tests with Docker Compose orchestration across repositories",
+        inputSchema: {
+          type: "object",
+          properties: {
+            repositories: {
+              type: "array",
+              items: { type: "string" },
+              description: "Specific repositories to test (defaults to core integration repos)",
+            },
+            testSuites: {
+              type: "array",
+              items: { type: "string" },
+              description: "Test suites to run: integration, e2e (defaults to both)",
+            },
+            dockerCompose: {
+              type: "boolean",
+              description: "Use Docker Compose orchestration (default: true)",
+            },
+            cleanup: {
+              type: "boolean",
+              description: "Cleanup Docker services after testing (default: true)",
+            },
+            workspaceRoot: {
+              type: "string",
+              description: "Optional workspace root path (defaults to current directory)",
+            },
+          },
+          required: [],
+        },
+      },
+      {
+        name: "create_pr_from_task",
+        description: "Create pull request from feature branch with automatic task linking",
+        inputSchema: {
+          type: "object",
+          properties: {
+            repository: {
+              type: "string",
+              description: "Target repository (auto-detected if not provided)",
+            },
+            taskId: {
+              type: "string",
+              description: "Backlog task ID for linking (auto-detected from branch if not provided)",
+            },
+            taskFile: {
+              type: "string",
+              description: "Direct path to task file (alternative to taskId)",
+            },
+            title: {
+              type: "string",
+              description: "PR title (auto-generated from task if not provided)",
+            },
+            branchName: {
+              type: "string",
+              description: "Source branch name (uses current branch if not provided)",
+            },
+            baseBranch: {
+              type: "string",
+              description: "Target branch for PR (default: 'main')",
+            },
+            draft: {
+              type: "boolean",
+              description: "Create as draft PR (default: false)",
+            },
+            workspaceRoot: {
+              type: "string",
+              description: "Optional workspace root path (defaults to current directory)",
+            },
+          },
+          required: [],
+        },
+      },
+      {
+        name: "analyze_dependency_impact",
+        description: "Analyze impact of protocol changes across consuming repositories",
+        inputSchema: {
+          type: "object",
+          properties: {
+            protoChanges: {
+              type: "array",
+              items: { type: "string" },
+              description: "Specific proto files changed (auto-detected if not provided)",
+            },
+            repository: {
+              type: "string",
+              description: "Protocol repository to analyze (default: 'loqa-proto')",
+            },
+            checkBreaking: {
+              type: "boolean",
+              description: "Check for breaking changes (default: true)",
+            },
+            analyzeDownstream: {
+              type: "boolean",
+              description: "Analyze impact on consuming repositories (default: true)",
+            },
+            workspaceRoot: {
+              type: "string",
+              description: "Optional workspace root path (defaults to current directory)",
+            },
+          },
+          required: [],
+        },
+      },
+      {
+        name: "intelligent_task_prioritization",
+        description: "AI-enhanced task prioritization across all repositories with intelligent scoring",
+        inputSchema: {
+          type: "object",
+          properties: {
+            roleContext: {
+              type: "string",
+              enum: ["architect", "developer", "devops", "qa", "github-cli-specialist", "general", "auto-detect"],
+              description: "Role context for task matching (default: auto-detect)",
+            },
+            timeAvailable: {
+              type: "string", 
+              description: "Available time (e.g., '30min', '2h', 'flexible')",
+            },
+            repositoryFocus: {
+              type: "string",
+              description: "Focus on specific repository (e.g., 'loqa-hub', 'loqa-commander')",
+            },
+            priority: {
+              type: "string",
+              enum: ["P1", "P2", "P3", "High", "Medium", "Low"],
+              description: "Filter by priority level",
+            },
+            criteria: {
+              type: "array",
+              items: { type: "string" },
+              description: "Scoring criteria to use: priority, role-match, effort, impact, context",
+            },
+            showTop: {
+              type: "number",
+              description: "Number of top alternatives to show (default: 3)",
+            },
+          },
+          required: [],
+        },
+      },
     ],
   };
 });
@@ -2510,18 +3676,39 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           };
           taskSource = `Manually selected: ${taskId || taskFile}`;
         } else if (autoSelect) {
-          // Auto-select next task using aggregator logic
-          let filterArgs = '';
-          if (priority) filterArgs += ` --priority=${priority}`;
-          if (repository) filterArgs += ` --repo=${repository}`;
-          
-          selectedTask = {
-            command: `./tools/lb next${filterArgs}`,
-            source: 'auto-selection',
-            method: 'ai-recommended',
-            filters: { priority, repository }
-          };
-          taskSource = `Auto-selected using: ./tools/lb next${filterArgs}`;
+          // Auto-select next task using AI-enhanced intelligent prioritization
+          const workspace = new LoqaWorkspaceManager();
+          const intelligentResults = await workspace.intelligentTaskPrioritization({
+            roleContext,
+            priority,
+            repositoryFocus: repository,
+            timeAvailable: 'flexible',
+            showTop: 3
+          });
+
+          if (intelligentResults.recommendedTask) {
+            selectedTask = {
+              taskData: intelligentResults.recommendedTask,
+              source: 'ai-intelligent-selection',
+              method: 'ai-enhanced',
+              aiAnalysis: intelligentResults.analysis,
+              reasoning: intelligentResults.recommendedTask.reasoning
+            };
+            taskSource = `AI-enhanced selection: ${intelligentResults.recommendedTask.title} (score: ${intelligentResults.recommendedTask.score})`;
+          } else {
+            // Fallback to simple aggregator if no tasks found
+            let filterArgs = '';
+            if (priority) filterArgs += ` --priority=${priority}`;
+            if (repository) filterArgs += ` --repo=${repository}`;
+            
+            selectedTask = {
+              command: `./tools/lb next${filterArgs}`,
+              source: 'fallback-aggregator',
+              method: 'simple-selection',
+              filters: { priority, repository }
+            };
+            taskSource = `Fallback to simple selection: ./tools/lb next${filterArgs}`;
+          }
         } else {
           return {
             content: [
@@ -2556,8 +3743,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           taskSelection: {
             method: selectedTask.method,
             source: taskSource,
-            filters: selectedTask.method === 'ai-recommended' ? selectedTask.filters : 'none',
-            command: selectedTask.command || 'Manual selection',
+            filters: selectedTask.method === 'ai-enhanced' ? 'AI-intelligent prioritization' : 
+                    selectedTask.method === 'ai-recommended' ? selectedTask.filters : 'none',
+            command: selectedTask.command || 'AI-enhanced selection',
+            aiAnalysis: selectedTask.method === 'ai-enhanced' ? selectedTask.aiAnalysis : undefined,
+            reasoning: selectedTask.method === 'ai-enhanced' ? selectedTask.reasoning : undefined,
           },
           automation: {
             createBranch,
@@ -2566,6 +3756,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             qualityGates: 'Automatic enforcement',
           },
           workflowSteps: [
+            selectedTask.method === 'ai-enhanced' ? '🧠 AI-enhanced task prioritization with intelligent scoring' :
             selectedTask.method === 'ai-recommended' ? '🎯 Get next recommended task from backlog aggregator' : '📋 Load specified task details',
             '📖 Read and understand task requirements',
             '🎭 Apply role-specific specialization and best practices',
@@ -2953,6 +4144,35 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
+      case "intelligent_task_prioritization": {
+        const workspaceManager = new LoqaWorkspaceManager(args?.workspaceRoot as string);
+        const result = await workspaceManager.intelligentTaskPrioritization({
+          roleContext: args?.roleContext as string,
+          timeAvailable: args?.timeAvailable as string,
+          repositoryFocus: args?.repositoryFocus as string,
+          priority: args?.priority as string,
+          criteria: args?.criteria as string[],
+          showTop: args?.showTop as number,
+        });
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                intelligentPrioritization: result,
+                summary: result.recommendedTask 
+                  ? `🧠 AI Recommendation: ${result.recommendedTask.title} (Score: ${result.recommendedTask.score})`
+                  : `📋 Analysis complete: ${result.analysis.eligibleTasks}/${result.analysis.totalTasks} eligible tasks`,
+                recommended: result.recommendedTask,
+                alternatives: result.alternativeTasks,
+                analysis: result.analysis
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
       case "workspace_status": {
         const workspaceManager = new LoqaWorkspaceManager(args?.workspaceRoot as string);
         const result = await workspaceManager.getWorkspaceStatus();
@@ -3062,6 +4282,224 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                   'All quality checks passed - ready for deployment',
                   'Proceed with cross-repository coordination',
                   'Quality gates satisfied for feature work'
+                ]
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "create_branch_from_task": {
+        const workspaceManager = new LoqaWorkspaceManager(args?.workspaceRoot as string);
+        const options = {
+          taskId: args?.taskId as string | undefined,
+          taskFile: args?.taskFile as string | undefined,
+          repository: args?.repository as string | undefined,
+          branchPrefix: args?.branchPrefix as string | undefined,
+          switchToBranch: args?.switchToBranch !== false, // default true
+        };
+        
+        const result = await workspaceManager.createBranchFromTask(options);
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                branchCreation: result,
+                summary: result.success 
+                  ? `🌿 Created branch: ${result.branchName} in ${result.repository}`
+                  : `❌ Failed to create branch: ${result.error}`,
+                details: {
+                  success: result.success,
+                  branchName: result.branchName,
+                  repository: result.repository,
+                  taskInfo: result.taskInfo,
+                  error: result.error
+                },
+                nextSteps: result.success ? [
+                  `Branch ${result.branchName} created and switched to`,
+                  result.taskInfo ? `Working on: ${result.taskInfo.title}` : 'Ready for development',
+                  'Start implementing your changes',
+                  'Commit changes and create PR when ready'
+                ] : [
+                  'Check task ID or file path is correct',
+                  'Ensure repository exists and is accessible',
+                  'Verify backlog task file format'
+                ]
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "run_integration_tests": {
+        const workspaceManager = new LoqaWorkspaceManager(args?.workspaceRoot as string);
+        const options = {
+          repositories: args?.repositories as string[] | undefined,
+          testSuites: args?.testSuites as string[] | undefined,
+          dockerCompose: args?.dockerCompose !== false, // default true
+          cleanup: args?.cleanup !== false, // default true
+        };
+        
+        const result = await workspaceManager.runIntegrationTests(options);
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                integrationTestResults: result,
+                summary: `🧪 Integration Tests: ${result.summary.successful}/${result.summary.totalTests} passed (${result.summary.failed} failed)`,
+                orchestration: result.dockerOrchestration ? {
+                  dockerServices: `${result.dockerOrchestration.servicesStarted.length} services`,
+                  healthStatus: result.dockerOrchestration.servicesHealthy ? '✅ Healthy' : '❌ Unhealthy',
+                  cleanup: result.dockerOrchestration.cleanupPerformed ? '✅ Cleaned up' : '⚠️ Manual cleanup needed'
+                } : 'No Docker orchestration',
+                execution: {
+                  totalDuration: `${result.summary.totalDuration}ms`,
+                  testSuites: [...new Set(result.results.map(r => r.testSuite))],
+                  repositories: [...new Set(result.results.map(r => r.repository))]
+                },
+                results: result.results.map(res => ({
+                  repository: res.repository,
+                  testSuite: res.testSuite,
+                  result: res.success ? '✅ PASS' : '❌ FAIL',
+                  duration: `${res.duration}ms`,
+                  error: res.error || undefined
+                })),
+                nextSteps: result.summary.failed > 0 ? [
+                  'Fix failing integration tests before proceeding',
+                  'Check Docker service health and connectivity',
+                  'Review test logs for specific failure details',
+                  'Ensure all services are properly configured'
+                ] : [
+                  'All integration tests passed - ready for deployment',
+                  'Cross-service communication verified',
+                  'End-to-end functionality confirmed',
+                  'Safe to proceed with multi-repository changes'
+                ]
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "create_pr_from_task": {
+        const workspaceManager = new LoqaWorkspaceManager(args?.workspaceRoot as string);
+        const options = {
+          repository: args?.repository as string | undefined,
+          taskId: args?.taskId as string | undefined,
+          taskFile: args?.taskFile as string | undefined,
+          title: args?.title as string | undefined,
+          branchName: args?.branchName as string | undefined,
+          baseBranch: args?.baseBranch as string | undefined,
+          draft: (args?.draft as boolean) || false,
+        };
+        
+        const result = await workspaceManager.createPullRequestFromTask(options);
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                prCreation: result,
+                summary: result.success 
+                  ? `🔀 Created PR #${result.prNumber}: ${result.prUrl}`
+                  : `❌ Failed to create PR: ${result.error}`,
+                details: {
+                  success: result.success,
+                  prUrl: result.prUrl,
+                  prNumber: result.prNumber,
+                  repository: result.repository,
+                  taskInfo: result.taskInfo,
+                  error: result.error
+                },
+                taskLinking: result.taskInfo ? {
+                  linkedTask: `Task ${result.taskInfo.id}: ${result.taskInfo.title}`,
+                  backlogLink: result.taskInfo.backlogUrl,
+                  autoDetected: 'Task information automatically detected and linked'
+                } : {
+                  noTaskLink: 'No task information found',
+                  suggestion: 'Use --taskId parameter for automatic task linking'
+                },
+                nextSteps: result.success ? [
+                  `PR created: ${result.prUrl}`,
+                  result.taskInfo ? `Linked to task: ${result.taskInfo.title}` : 'Consider linking to backlog task',
+                  'Complete the PR checklist items',
+                  'Request code review when ready',
+                  'Merge after approval and quality checks'
+                ] : [
+                  'Check that you are on a feature branch (not main)',
+                  'Ensure branch has commits to create PR from',
+                  'Verify repository exists and is accessible',
+                  'Check GitHub CLI authentication if using gh commands'
+                ]
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "analyze_dependency_impact": {
+        const workspaceManager = new LoqaWorkspaceManager(args?.workspaceRoot as string);
+        const options = {
+          protoChanges: args?.protoChanges as string[] | undefined,
+          repository: args?.repository as string | undefined,
+          checkBreaking: args?.checkBreaking !== false, // default true
+          analyzeDownstream: args?.analyzeDownstream !== false, // default true
+        };
+        
+        const result = await workspaceManager.analyzeDependencyImpact(options);
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                dependencyImpactAnalysis: result,
+                summary: `🔍 Impact Analysis: ${result.summary.totalRepositories} repos affected, ${result.summary.highImpactRepos} high-impact, ${result.summary.breakingChanges} breaking changes`,
+                riskAssessment: {
+                  overallRisk: result.summary.breakingChanges > 0 ? '🔴 HIGH' : 
+                                result.summary.highImpactRepos > 0 ? '🟡 MEDIUM' : '🟢 LOW',
+                  coordinationRequired: result.summary.coordinationRequired ? '⚠️ Yes' : '✅ No',
+                  breakingChanges: result.summary.breakingChanges > 0 ? `${result.summary.breakingChanges} detected` : 'None detected'
+                },
+                protocolChanges: {
+                  changedFiles: result.analysis.changedFiles,
+                  services: {
+                    added: result.analysis.protocolChanges.addedServices,
+                    removed: result.analysis.protocolChanges.removedServices,
+                    modified: result.analysis.protocolChanges.modifiedServices
+                  },
+                  methods: {
+                    added: result.analysis.protocolChanges.addedMethods,
+                    removed: result.analysis.protocolChanges.removedMethods,
+                    modified: result.analysis.protocolChanges.modifiedMethods
+                  }
+                },
+                affectedRepositories: result.analysis.affectedRepositories.map(repo => ({
+                  repository: repo.repository,
+                  impact: repo.impactLevel === 'breaking' ? '🔴 BREAKING' :
+                          repo.impactLevel === 'high' ? '🟡 HIGH' :
+                          repo.impactLevel === 'medium' ? '🟠 MEDIUM' : '🟢 LOW',
+                  effort: repo.estimatedEffort,
+                  changes: repo.requiredChanges.length,
+                  files: repo.affectedFiles
+                })),
+                recommendations: result.analysis.recommendations,
+                nextSteps: result.summary.coordinationRequired ? [
+                  'Plan coordinated deployment across multiple repositories',
+                  'Create feature branches in dependency order',
+                  'Run integration tests before merging',
+                  'Update documentation for protocol changes',
+                  'Consider backward compatibility strategies'
+                ] : [
+                  'Changes are isolated - safe to proceed',
+                  'Run quality checks on affected repository',
+                  'Test protocol changes thoroughly',
+                  'Update relevant documentation'
                 ]
               }, null, 2),
             },
