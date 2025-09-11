@@ -33,7 +33,7 @@ echo -e "${YELLOW}🔍 Validating commit message for AI attribution...${NC}"
 # Check for AI attribution patterns
 AI_ATTRIBUTION_FOUND=false
 
-if echo "$COMMIT_MESSAGE" | grep -qi "🤖.*generated\|generated.*with.*claude\|co-authored-by.*claude\|claude.*code\|anthropic\.com"; then
+if echo "$COMMIT_MESSAGE" | grep -qi "🤖.*generated\|generated.*with.*claude\|co-authored-by.*claude\|claude[[:space:]]code\|anthropic\.com"; then
     AI_ATTRIBUTION_FOUND=true
 fi
 
@@ -45,7 +45,7 @@ if [ "$AI_ATTRIBUTION_FOUND" = true ]; then
     echo -e "  Rule: NEVER use AI attribution in commit messages"
     echo ""
     echo -e "${YELLOW}Detected patterns:${NC}"
-    echo "$COMMIT_MESSAGE" | grep -i "🤖\|generated.*with.*claude\|co-authored-by.*claude\|claude.*code\|anthropic\.com" || true
+    echo "$COMMIT_MESSAGE" | grep -i "🤖\|generated.*with.*claude\|co-authored-by.*claude\|claude[[:space:]]code\|anthropic\.com" || true
     echo ""
     echo -e "${YELLOW}💡 To fix:${NC}"
     echo -e "  • Remove AI attribution from your commit message"

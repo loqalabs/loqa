@@ -2,6 +2,13 @@
 
 Comprehensive development workflow assistance for the Loqa ecosystem. This system provides interactive commands, task management, role-based specialization, and automated rule enforcement to streamline development across all repositories.
 
+## ✨ Recent Updates
+
+**September 2025**: 
+- ✅ **Fixed AI Attribution False Positives**: Updated pattern detection to avoid false positives with "claude-code-commands"
+- ✅ **Cleaned Up Development Files**: Removed obsolete test scripts and development documentation
+- ✅ **Streamlined Hook Management**: Enhanced `update-hooks.sh` for force-updating hooks across all repositories
+
 ## 🚀 Quick Start
 
 ### Prerequisites
