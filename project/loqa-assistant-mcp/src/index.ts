@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { Server } from "@modelcontextprotocol/sdk/server";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
   CallToolRequestSchema,
@@ -711,7 +711,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 });
 
 // Handle tool calls
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
+server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
   const { name, arguments: args } = request.params;
 
   try {
