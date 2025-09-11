@@ -1,5 +1,6 @@
 import { LoqaTaskManager } from '../managers/index.js';
 import { TaskCreationOptions, CapturedThought } from '../types/index.js';
+import { resolveWorkspaceRoot } from '../utils/workspace-resolver.js';
 
 /**
  * Task Management MCP tools
@@ -92,7 +93,10 @@ export const taskManagementTools = [
 ];
 
 export async function handleTaskManagementTool(name: string, args: any): Promise<any> {
-  const taskManager = new LoqaTaskManager();
+  // Intelligently resolve the workspace root
+  const workspaceRoot = await resolveWorkspaceRoot(args);
+  
+  const taskManager = new LoqaTaskManager(workspaceRoot);
 
   switch (name) {
     case "add_todo": {

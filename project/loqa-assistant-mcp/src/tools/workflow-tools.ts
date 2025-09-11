@@ -1,5 +1,6 @@
 import { LoqaTaskManager, LoqaRoleManager, LoqaModelSelector } from '../managers/index.js';
 import { TaskCreationOptions, CapturedThought } from '../types/index.js';
+import { resolveWorkspaceRoot } from '../utils/workspace-resolver.js';
 
 /**
  * Advanced Workflow MCP tools
@@ -169,7 +170,10 @@ export const workflowTools = [
 ];
 
 export async function handleWorkflowTool(name: string, args: any): Promise<any> {
-  const taskManager = new LoqaTaskManager();
+  // Intelligently resolve the workspace root
+  const workspaceRoot = await resolveWorkspaceRoot(args);
+  
+  const taskManager = new LoqaTaskManager(workspaceRoot);
   const roleManager = new LoqaRoleManager();
   const modelSelector = new LoqaModelSelector();
 
