@@ -59,8 +59,8 @@ for repo in "${REPOSITORIES[@]}"; do
         continue
     fi
     
-    # Check if the current hook has the old pattern
-    if [ -f "$COMMIT_MSG_TARGET" ] && grep -q "claude\.\*code" "$COMMIT_MSG_TARGET" 2>/dev/null; then
+    # Check if the current hook has the old patterns (both versions we need to update)
+    if [ -f "$COMMIT_MSG_TARGET" ] && (grep -q "claude\.\*code\|claude\[" "$COMMIT_MSG_TARGET" 2>/dev/null); then
         # Backup the current hook
         BACKUP_NAME="$COMMIT_MSG_TARGET.backup.$(date +%Y%m%d-%H%M%S)"
         cp "$COMMIT_MSG_TARGET" "$BACKUP_NAME"
@@ -72,8 +72,8 @@ for repo in "${REPOSITORIES[@]}"; do
         echo -e "${GREEN}   ✅ Updated commit-msg hook with fixed pattern${NC}"
         ((UPDATED_COUNT++))
         
-    elif [ -f "$COMMIT_MSG_TARGET" ] && grep -q "claude\[" "$COMMIT_MSG_TARGET" 2>/dev/null; then
-        echo -e "${GREEN}   ✅ Hook already has fixed pattern${NC}"
+    elif [ -f "$COMMIT_MSG_TARGET" ] && grep -q "\\\\(generated\\\\|created\\\\|made\\\\).*with.*claude.*code" "$COMMIT_MSG_TARGET" 2>/dev/null; then
+        echo -e "${GREEN}   ✅ Hook already has the refined pattern${NC}"
         
     elif [ ! -f "$COMMIT_MSG_TARGET" ]; then
         # Install the hook if it doesn't exist
