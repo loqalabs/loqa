@@ -769,8 +769,60 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
 async function main() {
   const transport = new StdioServerTransport();
+  
+  // Handle stdio close events for graceful shutdown
+  process.stdin.on('close', () => {
+    console.error("Stdin closed, shutting down gracefully...");
+    process.exit(0);
+  });
+  
+  process.stdin.on('end', () => {
+    console.error("Stdin ended, shutting down gracefully...");
+    process.exit(0);
+  });
+  
+  process.stdin.on('error', (error) => {
+    console.error("Stdin error:", error);
+    process.exit(1);
+  });
+  
   await server.connect(transport);
   console.error("Loqa Assistant MCP server running on stdio");
+
+  // Graceful shutdown handling for signals
+  const gracefulShutdown = async (signal: string) => {
+    console.error(`Received ${signal}, shutting down gracefully...`);
+    try {
+      await server.close();
+      console.error("MCP server closed successfully");
+      process.exit(0);
+    } catch (error) {
+      console.error("Error during shutdown:", error);
+      process.exit(1);
+    }
+  };
+
+  // Handle termination signals
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+  process.on('SIGQUIT', () => gracefulShutdown('SIGQUIT'));
+  
+  // Handle stdio pipe breaks (parent process exit)
+  process.on('SIGPIPE', () => {
+    console.error("SIGPIPE received, parent process likely closed");
+    process.exit(0);
+  });
+  
+  // Handle uncaught exceptions and unhandled rejections
+  process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+    gracefulShutdown('uncaughtException');
+  });
+  
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    gracefulShutdown('unhandledRejection');
+  });
 }
 
 main().catch((error) => {
