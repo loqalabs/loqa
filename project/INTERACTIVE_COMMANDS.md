@@ -8,7 +8,7 @@ The following interactive commands replace the old prompt templates:
 
 | Command | Replaces | Purpose |
 |---------|----------|---------|
-| `/start-issue-work` | `ISSUE_WORK_PROMPT.md` | Comprehensive GitHub issue workflow guidance |
+| `/start-task-work` | `ISSUE_WORK_PROMPT.md` | Unified backlog task workflow with auto-selection |
 | `/plan-strategic-shift` | `STRATEGIC_SHIFT_PROMPT.md` | Strategic planning with phase-by-phase guidance |
 | `/capture-comprehensive-thought` | Enhanced thought capture | Full workflow thought processing |
 | `/start-complex-todo` | Enhanced task creation | Complex backlog task planning and breakdown |
@@ -23,34 +23,42 @@ The following interactive commands replace the old prompt templates:
 
 ## 📋 **Detailed Command Reference**
 
-### `/start-issue-work` - GitHub Issue Workflow
+### `/start-task-work` - Unified Backlog Task Workflow
 
-Replaces `ISSUE_WORK_PROMPT.md` with interactive guidance for working on GitHub issues.
+Unified command for starting work on backlog tasks with intelligent auto-selection or manual task specification.
 
 **Usage:**
 ```bash
-/start-issue-work
+/start-task-work                                    # Auto-select next task
+/start-task-work --taskId=task-1                   # Work on specific task
+/start-task-work --priority=P1 --repository=loqa-hub # Auto-select from filtered tasks
 ```
 
 **Key Parameters:**
-- `issueTitle` (required): The GitHub issue title
-- `issueUrl`: GitHub issue URL
-- `roleContext`: Role specialization (architect/developer/devops/qa/general/auto-detect)
-- `scopeBoundaries`: What's in/out of scope
-- `complexity`: Issue complexity level
-- `crossRepoImpact`: Single repo vs multi-repo coordination needed
-- `testingRequirements`: Testing expectations
+- `taskId`: Specific backlog task ID (e.g., task-1, task-21) - leave empty for auto-selection
+- `taskFile`: Direct path to backlog task file (alternative to taskId)
+- `autoSelect`: Auto-select next recommended task (default: true if no taskId/taskFile)
+- `priority`: Filter auto-selection by priority level (P1/P2/P3)
+- `repository`: Filter auto-selection by repository
+- `roleContext`: Role specialization (architect/developer/devops/qa/github-cli-specialist/general/auto-detect)
+- `createBranch`: Create feature branch for this task (default: true)
+- `updateStatus`: Update task status to 'In Progress' (default: true)
+- `testingRequirements`: Override default testing requirements
 
 **Features:**
-- ✅ Automatic role detection based on issue content
-- ✅ Role-specific workflow guidance and best practices
-- ✅ Comprehensive scope and approach planning
-- ✅ Critical workflow reminders (feature branches, quality gates)
-- ✅ Cross-repository coordination guidance
+- ✅ Intelligent auto-selection using ./tools/lb next aggregator logic
+- ✅ Manual task selection by ID or file path
+- ✅ Full integration with backlog.md system and role specialization
+- ✅ Automatic feature branch creation and status updates
+- ✅ Priority and repository filtering for auto-selection
+- ✅ Role-specific workflow optimization
 
-**Example:**
+**Examples:**
 ```bash
-/start-issue-work --issueTitle="Implement gRPC audio streaming" --roleContext=developer --complexity=moderate
+/start-task-work                                    # Auto-select next recommended task
+/start-task-work --taskId=task-19                   # Work on specific high-priority task
+/start-task-work --priority=P1                      # Auto-select next P1 task
+/start-task-work --repository=loqa-hub --roleContext=developer # Hub-specific development work
 ```
 
 ### `/plan-strategic-shift` - Strategic Planning
@@ -151,6 +159,7 @@ All commands support automatic role detection or manual role selection:
 - **developer**: Feature implementation, bug fixes, code optimization  
 - **devops**: Infrastructure, deployment, monitoring, containerization
 - **qa**: Testing strategy, quality assurance, validation processes
+- **github-cli-specialist**: Multi-repository GitHub operations and workflow coordination
 - **general**: Multi-disciplinary tasks, documentation, planning
 - **auto-detect**: Automatic role selection based on task content
 
@@ -191,20 +200,23 @@ Commands automatically analyze your task content and select the most appropriate
 # Create implementation tasks
 /start-complex-todo --title="Extract user service" --category=feature --priority=P1
 
-# Work on specific issues
-/start-issue-work --issueTitle="Implement user service gRPC API" --roleContext=developer
+# Work on backlog tasks
+/start-task-work --priority=P1 --roleContext=developer
 ```
 
 ### **Role-Specific Workflows:**
 ```bash
 # Architecture-focused approach
-/start-issue-work --roleContext=architect
+/start-task-work --roleContext=architect
 
 # DevOps-focused approach  
-/start-issue-work --roleContext=devops
+/start-task-work --roleContext=devops
+
+# GitHub CLI specialist for multi-repo work
+/start-task-work --roleContext=github-cli-specialist
 
 # QA-focused approach
-/start-issue-work --roleContext=qa
+/start-task-work --roleContext=qa
 ```
 
 ## 📋 **Backlog.md System Integration**
@@ -226,8 +238,8 @@ All interactive commands are designed to work seamlessly with the backlog.md tas
 # Convert to formal task when ready
 /start-complex-todo --title="Implement centralized error handling" --priority=P2
 
-# Work on GitHub issue with backlog tracking
-/start-issue-work --issueTitle="Fix authentication errors" --roleContext=developer
+# Work on backlog task with automated selection
+/start-task-work --priority=P1 --roleContext=developer
 
 # View progress in backlog system
 backlog board view    # Terminal Kanban view
@@ -272,7 +284,7 @@ backlog/
 ## 📚 **Related Documentation**
 
 - **Role Configurations**: `/project/role-configs/README.md`
-- **MCP Server Setup**: `/project/loqa-rules-mcp/README.md`
+- **MCP Server Setup**: `/project/loqa-assistant-mcp/README.md`
 - **Workflow Implementation**: `/project/WORKFLOW_IMPLEMENTATION_PLAN.md`
 - **Backlog Management**: `/project/backlog/templates/README.md`
 

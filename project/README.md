@@ -14,7 +14,7 @@ This directory contains project management and planning files:
 
 ## 🚀 **Interactive Workflow Commands**
 - **INTERACTIVE_COMMANDS.md** - Comprehensive guide to interactive MCP commands
-- Use `/start-issue-work` for GitHub issue workflows (replaces copy-paste templates)
+- Use `/start-task-work` for backlog task workflows with intelligent auto-selection (replaces copy-paste templates)
 - Use `/plan-strategic-shift` for strategic planning and major changes
 - Use `/capture-comprehensive-thought` for idea capture and processing
 - Use `/start-complex-todo` for advanced task creation and planning
@@ -24,7 +24,7 @@ This directory contains project management and planning files:
 - **role-configs/prompt-libraries/** - Role-specific best practices and methodologies
 
 ## 🛠️ **Development Tools**
-- **loqa-rules-mcp/** - MCP server for workflow automation and rule enforcement
+- **loqa-assistant-mcp/** - MCP server for development workflow assistance and task management
 - **backlog/** - Backlog.md CLI integration and task templates
 
 These files guide the development roadmap and strategic direction of the Loqa project through interactive, role-aware workflows.

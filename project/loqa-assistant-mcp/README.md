@@ -1,6 +1,6 @@
-# Loqa Workflow Rules MCP Server & Pre-commit Hooks
+# Loqa Assistant MCP Server & Pre-commit Hooks
 
-Automated workflow rule enforcement for the Loqa ecosystem. This system prevents common violations like AI attribution in commits and ensures consistent development practices across all repositories.
+Comprehensive development workflow assistance for the Loqa ecosystem. This system provides interactive commands, task management, role-based specialization, and automated rule enforcement to streamline development across all repositories.
 
 ## 🚀 Quick Start
 
@@ -14,7 +14,7 @@ Automated workflow rule enforcement for the Loqa ecosystem. This system prevents
 
 **One-Command Setup** (handles everything automatically):
 ```bash
-cd loqa/project/loqa-rules-mcp
+cd loqa/project/loqa-assistant-mcp
 ./install-hooks.sh
 ```
 
@@ -28,7 +28,7 @@ This automatically:
 
 **Manual Setup** (if you prefer step-by-step):
 ```bash
-cd loqa/project/loqa-rules-mcp
+cd loqa/project/loqa-assistant-mcp
 npm install          # Install dependencies
 npm run build        # Build MCP server  
 ./install-hooks.sh   # Install hooks
@@ -63,10 +63,10 @@ npm run build        # Build MCP server
 - **Dependencies**: None - uses only standard shell tools
 
 ### MCP Server
-- **Purpose**: Advanced validation tools for Claude Code sessions
-- **Location**: `loqa/project/loqa-rules-mcp/dist/index.js`  
-- **Capabilities**: Full repository analysis, quality gate checking, advanced validation
-- **When**: Used during Claude Code development sessions for comprehensive analysis
+- **Purpose**: Comprehensive development workflow assistance for Claude Code sessions
+- **Location**: `loqa/project/loqa-assistant-mcp/dist/index.js`  
+- **Capabilities**: Interactive commands, task management, role specialization, validation tools
+- **When**: Used during Claude Code development sessions for workflow automation and assistance
 
 ## 🛠️ Developer Usage
 
@@ -93,7 +93,7 @@ echo "fix(auth): resolve validation bug" > /tmp/test-msg
 If you need to update or reinstall hooks:
 
 ```bash
-cd loqa/project/loqa-rules-mcp
+cd loqa/project/loqa-assistant-mcp
 ./install-hooks.sh  # Automatically detects and updates all repositories
 ```
 
@@ -145,7 +145,7 @@ When using the MCP server directly (for Claude Code integration):
 ## 📁 File Structure
 
 ```
-loqa/project/loqa-rules-mcp/
+loqa/project/loqa-assistant-mcp/
 ├── README.md                    # This file
 ├── package.json                 # Node.js dependencies  
 ├── tsconfig.json               # TypeScript configuration
@@ -169,13 +169,13 @@ chmod +x .git/hooks/pre-commit
 
 ### Hook Can't Find MCP Server
 The hook searches these locations automatically:
-- `../loqa/project/loqa-rules-mcp/dist/index.js`
-- `../../loqa/project/loqa-rules-mcp/dist/index.js`  
+- `../loqa/project/loqa-assistant-mcp/dist/index.js`
+- `../../loqa/project/loqa-assistant-mcp/dist/index.js`  
 
 If still not found:
 ```bash
 # Rebuild MCP server
-cd loqa/project/loqa-rules-mcp
+cd loqa/project/loqa-assistant-mcp
 npm run build
 ```
 

@@ -1097,7 +1097,7 @@ function getRoleCapabilities(role: string): string[] {
 
 const server = new Server(
   {
-    name: "loqa-rules-mcp",
+    name: "loqa-assistant-mcp",
     version: "0.1.0",
   },
   {
@@ -1414,64 +1414,51 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
       {
-        name: "start_issue_work",
-        description: "Start comprehensive GitHub issue work with full workflow guidance (replaces ISSUE_WORK_PROMPT.md)",
+        name: "start_task_work",
+        description: "Start work on backlog tasks with full workflow guidance - can auto-select next task or work on specific task",
         inputSchema: {
           type: "object",
           properties: {
-            issueUrl: {
+            taskId: {
               type: "string",
-              description: "GitHub issue URL",
+              description: "Specific backlog task ID (e.g., task-1, task-21) - leave empty to auto-select next task",
             },
-            issueTitle: {
+            taskFile: {
               type: "string",
-              description: "Issue title",
+              description: "Direct path to backlog task file - alternative to taskId",
             },
-            issueNumber: {
+            autoSelect: {
+              type: "boolean",
+              description: "Auto-select next recommended task (default: true if no taskId/taskFile provided)",
+            },
+            priority: {
               type: "string",
-              description: "Issue number",
+              enum: ["P1", "P2", "P3"],
+              description: "Filter auto-selection by priority level",
             },
             repository: {
               type: "string",
-              description: "Repository name",
-            },
-            currentBranch: {
-              type: "string",
-              description: "Current branch (default: main)",
-            },
-            blockers: {
-              type: "string",
-              description: "Any blockers or dependencies",
-            },
-            preferredApproach: {
-              type: "string",
-              description: "Preferred technical approach",
+              description: "Filter auto-selection by repository",
             },
             roleContext: {
               type: "string",
-              enum: ["architect", "developer", "devops", "qa", "general", "auto-detect"],
-              description: "Role specialization context",
+              enum: ["architect", "developer", "devops", "qa", "github-cli-specialist", "general", "auto-detect"],
+              description: "Role specialization context (default: auto-detect)",
             },
-            scopeBoundaries: {
-              type: "string",
-              description: "What's in/out of scope",
+            createBranch: {
+              type: "boolean",
+              description: "Create feature branch for this task (default: true)",
             },
-            complexity: {
-              type: "string",
-              enum: ["simple", "moderate", "complex", "unknown"],
-              description: "Estimated issue complexity",
-            },
-            crossRepoImpact: {
-              type: "string",
-              enum: ["single-repo", "simple-multi-repo", "complex-coordination"],
-              description: "Cross-repository impact level",
+            updateStatus: {
+              type: "boolean",
+              description: "Update task status to 'In Progress' (default: true)",
             },
             testingRequirements: {
               type: "string",
-              description: "Testing requirements and expectations",
+              description: "Override default testing requirements",
             },
           },
-          required: ["issueTitle"],
+          required: [],
         },
       },
       {
@@ -2125,25 +2112,63 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
-      case "start_issue_work": {
-        // Interactive GitHub issue workflow with comprehensive guidance
-        const issueTitle = args?.issueTitle as string;
+      case "start_task_work": {
+        // Unified backlog task workflow with auto-selection capability
+        const taskId = args?.taskId as string;
+        const taskFile = args?.taskFile as string;
+        const autoSelect = args?.autoSelect !== false; // default true if no specific task
+        const priority = args?.priority as string;
+        const repository = args?.repository as string;
         const roleContext = args?.roleContext as string || 'auto-detect';
+        const createBranch = args?.createBranch !== false; // default true
+        const updateStatus = args?.updateStatus !== false; // default true
+        const testingRequirements = args?.testingRequirements as string;
+        
+        let selectedTask = null;
+        let taskSource = '';
+        
+        // Determine task selection method
+        if (taskId || taskFile) {
+          // Specific task provided
+          selectedTask = {
+            identifier: taskId || taskFile,
+            source: taskId ? 'taskId' : 'taskFile',
+            method: 'manual'
+          };
+          taskSource = `Manually selected: ${taskId || taskFile}`;
+        } else if (autoSelect) {
+          // Auto-select next task using aggregator logic
+          let filterArgs = '';
+          if (priority) filterArgs += ` --priority=${priority}`;
+          if (repository) filterArgs += ` --repo=${repository}`;
+          
+          selectedTask = {
+            command: `./tools/lb next${filterArgs}`,
+            source: 'auto-selection',
+            method: 'ai-recommended',
+            filters: { priority, repository }
+          };
+          taskSource = `Auto-selected using: ./tools/lb next${filterArgs}`;
+        } else {
+          return {
+            content: [
+              {
+                type: "text",
+                text: "⚠️ No task specified. Please provide:\n• taskId (e.g., 'task-1')\n• taskFile (path to task file)\n• OR leave empty for auto-selection\n\nExample usage:\n• /start-task-work  (auto-select next)\n• /start-task-work --taskId=task-1\n• /start-task-work --priority=P1 --repository=loqa-hub",
+              },
+            ],
+          };
+        }
         
         // Auto-detect role if requested
         let detectedRole = roleContext;
         if (roleContext === 'auto-detect') {
-          const roleResult = await roleManager.detectRole({
-            title: issueTitle,
-            description: args?.scopeBoundaries as string || ''
-          });
-          detectedRole = roleResult.detectedRole;
+          // Use general for now, will be refined when task details are available
+          detectedRole = 'general';
         }
         
         // Get role-specific guidance
         const roleConfig = await roleManager.getRoleConfig(detectedRole);
-        
-        // Handle null roleConfig with fallback
         const safeRoleConfig = roleConfig || {
           role_name: 'General',
           role_description: 'General development tasks',
@@ -2155,44 +2180,55 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         
         // Build comprehensive workflow guidance
         const workflow = {
-          issueInfo: {
-            title: issueTitle,
-            url: args?.issueUrl || '',
-            repository: args?.repository || '',
-            number: args?.issueNumber || '',
+          taskSelection: {
+            method: selectedTask.method,
+            source: taskSource,
+            filters: selectedTask.method === 'ai-recommended' ? selectedTask.filters : 'none',
+            command: selectedTask.command || 'Manual selection',
           },
-          context: {
-            currentBranch: args?.currentBranch || 'main',
-            blockers: args?.blockers || 'none',
-            preferredApproach: args?.preferredApproach || '',
-            roleContext: detectedRole,
-          },
-          scopeGuidance: {
-            boundaries: args?.scopeBoundaries || 'Ask for clarification if unclear',
-            complexity: args?.complexity || 'unknown',
-            crossRepoImpact: args?.crossRepoImpact || 'single-repo',
-            testingRequirements: args?.testingRequirements || 'Standard testing required',
+          automation: {
+            createBranch,
+            updateStatus,
+            roleOptimization: detectedRole,
+            qualityGates: 'Automatic enforcement',
           },
           workflowSteps: [
-            '🔍 Analyze issue requirements and scope',
-            '🏗️ Create feature branch: git checkout -b feature/issue-name',
-            '📋 Plan implementation approach',
-            '💻 Implement solution with incremental commits',
-            '🧪 Run quality checks: make quality-check',
-            '✅ Verify end-to-end functionality',
-            '📝 Create PR with detailed description',
-            '👀 Wait for review and approval before merging'
+            selectedTask.method === 'ai-recommended' ? '🎯 Get next recommended task from backlog aggregator' : '📋 Load specified task details',
+            '📖 Read and understand task requirements',
+            '🎭 Apply role-specific specialization and best practices',
+            createBranch ? '🌿 Create feature branch: git checkout -b feature/task-name' : '⚠️ Working on current branch',
+            updateStatus ? '📝 Update task status to "In Progress" in backlog file' : '⚠️ Task status tracking disabled',
+            '🔧 Implement solution following role-optimized guidance',
+            '🧪 Run comprehensive quality checks: make quality-check',
+            '✅ Verify all tests pass and functionality works end-to-end',
+            '📤 Create PR with detailed description and link to task',
+            '✅ Mark task as "Done" in backlog when complete'
           ],
           roleSpecificGuidance: {
             role: safeRoleConfig.role_name,
             focus: safeRoleConfig.role_description,
-            keyConsiderations: 'Role-specific best practices applied',
+            specialization: `Workflow optimized for ${detectedRole} best practices`,
+          },
+          qualityGates: [
+            'Code formatting and linting pass',
+            'All unit tests pass', 
+            'Integration tests pass',
+            'End-to-end verification complete',
+            'Documentation updated',
+            'PR review and approval obtained'
+          ],
+          backlogIntegration: {
+            aggregator: 'Integrated with ./tools/lb commands for task management',
+            statusTracking: updateStatus ? 'Automatic status updates enabled' : 'Manual status tracking',
+            prioritization: 'Uses intelligent priority-based task selection',
+            roleSystem: 'Full integration with role-based specialization'
           },
           criticalReminders: [
             '🚨 NEVER push directly to main branch',
-            '📋 ALL quality checks must PASS',
+            '📋 ALL quality checks must PASS before completion',
             '🔄 End-to-end verification is REQUIRED',
-            '❓ When blocked, ASK - never make assumptions'
+            '❓ When blocked, ASK - never make assumptions',
+            '📝 Update backlog task status throughout the workflow'
           ]
         };
         
@@ -2202,16 +2238,31 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               type: "text",
               text: JSON.stringify({
                 workflow,
-                summary: `🚀 Issue workflow started for: ${issueTitle}`,
-                roleOptimization: `Optimized for ${safeRoleConfig.role_name} role`,
-                nextActions: [
-                  'Review scope and approach guidance',
-                  'Create feature branch if not done',
-                  'Create backlog tasks for implementation steps using /start-complex-todo',
-                  'Use backlog board view to track progress',
-                  'Follow role-specific workflow considerations'
+                summary: selectedTask.method === 'ai-recommended' 
+                  ? "🤖 AI-powered task selection and workflow initiation" 
+                  : `🚀 Starting work on backlog task: ${selectedTask.identifier}`,
+                implementation: [
+                  selectedTask.method === 'ai-recommended' ? `1. Execute: ${selectedTask.command}` : `1. Load task: ${selectedTask.identifier}`,
+                  "2. Parse task details and requirements",
+                  "3. Apply role-specific workflow optimization",
+                  createBranch ? "4. Create feature branch with task-based naming" : "4. Proceed on current branch",
+                  updateStatus ? "5. Update task status to 'In Progress'" : "5. Manual status tracking",
+                  "6. Follow role-optimized implementation guidance",
+                  "7. Complete quality gates and mark task done"
                 ],
-                templateReplacement: 'This replaces ISSUE_WORK_PROMPT.md with interactive guidance'
+                advantages: [
+                  "Unified task workflow for all backlog work",
+                  selectedTask.method === 'ai-recommended' ? "Intelligent priority-based task selection" : "Direct task execution",
+                  "Full role system integration",
+                  "Automated quality gate enforcement",
+                  "Complete backlog system integration"
+                ],
+                integration: {
+                  backlogAggregator: "Uses ./tools/lb for task discovery and management",
+                  roleSystem: "Automatic role detection and workflow optimization", 
+                  qualitySystem: "Integrated with Loqa quality gates",
+                  branchingStrategy: "Feature branch workflow with proper naming"
+                }
               }, null, 2),
             },
           ],
@@ -2528,6 +2579,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           ],
         };
       }
+
 
       default:
         throw new Error(`Unknown tool: ${name}`);

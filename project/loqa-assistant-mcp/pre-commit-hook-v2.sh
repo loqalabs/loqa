@@ -13,11 +13,11 @@ NC='\033[0m' # No Color
 # Find the MCP server relative to the Loqa workspace
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
 WORKSPACE_ROOT=$(dirname "$REPO_ROOT")
-MCP_SERVER_PATH="$WORKSPACE_ROOT/loqa/project/loqa-rules-mcp/dist/index.js"
+MCP_SERVER_PATH="$WORKSPACE_ROOT/loqa/project/loqa-assistant-mcp/dist/index.js"
 
 # Check if MCP server exists
 if [ ! -f "$MCP_SERVER_PATH" ]; then
-    echo -e "${YELLOW}⚠️  Loqa Rules MCP server not found - skipping validation${NC}"
+    echo -e "${YELLOW}⚠️  Loqa Assistant MCP server not found - skipping validation${NC}"
     echo -e "${YELLOW}Expected at: $MCP_SERVER_PATH${NC}"
     exit 0  # Don't fail the commit, just skip validation
 fi

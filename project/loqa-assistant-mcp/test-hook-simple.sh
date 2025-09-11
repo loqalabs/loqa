@@ -13,7 +13,7 @@ NC='\033[0m'
 # Find MCP server
 REPO_ROOT=$(git rev-parse --show-toplevel)
 WORKSPACE_ROOT=$(dirname "$REPO_ROOT")
-MCP_SERVER_PATH="$WORKSPACE_ROOT/loqa/project/loqa-rules-mcp/dist/index.js"
+MCP_SERVER_PATH="$WORKSPACE_ROOT/loqa/project/loqa-assistant-mcp/dist/index.js"
 
 echo -e "${YELLOW}Debug Info:${NC}"
 echo "Repo root: $REPO_ROOT"
