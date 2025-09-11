@@ -1097,7 +1097,7 @@ function getRoleCapabilities(role: string): string[] {
 
 const server = new Server(
   {
-    name: "loqa-rules-mcp",
+    name: "loqa-assistant-mcp",
     version: "0.1.0",
   },
   {

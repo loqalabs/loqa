@@ -1,7 +1,7 @@
 {
-  "name": "loqa-rules-mcp",
+  "name": "loqa-assistant-mcp",
   "version": "0.1.0",
-  "description": "MCP server for Loqa workflow rule validation and enforcement",
+  "description": "MCP server for Loqa development workflow assistance and task management",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {

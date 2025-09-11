@@ -119,7 +119,7 @@ Each role has preferred task templates from the backlog.md system:
 ## Integration Points
 
 ### MCP Server Integration
-- Extended `loqa-rules-mcp` server with role management
+- Extended `loqa-assistant-mcp` server with role management
 - Commands: `/set-role`, `/detect-role`, `/list-roles`
 - Session persistence and context switching
 

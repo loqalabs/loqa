@@ -284,7 +284,7 @@ backlog/
 ## 📚 **Related Documentation**
 
 - **Role Configurations**: `/project/role-configs/README.md`
-- **MCP Server Setup**: `/project/loqa-rules-mcp/README.md`
+- **MCP Server Setup**: `/project/loqa-assistant-mcp/README.md`
 - **Workflow Implementation**: `/project/WORKFLOW_IMPLEMENTATION_PLAN.md`
 - **Backlog Management**: `/project/backlog/templates/README.md`
 
