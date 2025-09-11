@@ -3,6 +3,7 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 import { glob } from 'glob';
 import { TaskTemplate, TaskCreationOptions, CapturedThought } from '../types/index.js';
+import { executeGitCommand } from '../utils/git-repo-detector.js';
 
 export class LoqaTaskManager {
   private workspaceRoot: string;
@@ -110,6 +111,9 @@ export class LoqaTaskManager {
     const filePath = join(tasksPath, fileName);
     await fs.writeFile(filePath, content);
 
+    // Auto-commit the new task
+    await this.autoCommitBacklogChange(filePath, 'add', options.title, path);
+
     return {
       taskId,
       filePath,
@@ -155,6 +159,10 @@ export class LoqaTaskManager {
     const filePath = join(draftsPath, fileName);
     await fs.writeFile(filePath, content);
 
+    // Auto-commit the captured thought
+    const thoughtSummary = thought.content.substring(0, 50).replace(/\n/g, ' ') + (thought.content.length > 50 ? '...' : '');
+    await this.autoCommitBacklogChange(filePath, 'capture', thoughtSummary, path);
+
     return {
       filePath,
       content
@@ -178,6 +186,53 @@ export class LoqaTaskManager {
       return String(maxId + 1).padStart(3, '0');
     } catch {
       return '001';
+    }
+  }
+
+  /**
+   * Auto-commit backlog changes to git using smart git helpers
+   */
+  private async autoCommitBacklogChange(filePath: string, action: 'add' | 'capture' | 'update', description: string, repoPath?: string): Promise<void> {
+    const path = repoPath || this.workspaceRoot;
+    
+    try {
+      // Convert absolute path to relative path from repository root
+      const relativePath = filePath.startsWith(path) 
+        ? filePath.substring(path.length + 1) 
+        : filePath;
+      
+      // Create standardized commit message
+      let commitMessage = '';
+      switch (action) {
+        case 'add':
+          commitMessage = `feat(backlog): add task - ${description}`;
+          break;
+        case 'capture':
+          commitMessage = `feat(backlog): capture thought - ${description}`;
+          break;
+        case 'update':
+          commitMessage = `feat(backlog): update - ${description}`;
+          break;
+      }
+      
+      // Stage the specific file using smart git helpers
+      const addResult = await executeGitCommand(['add', relativePath], path);
+      if (!addResult.success) {
+        console.warn(`Auto-commit: Failed to stage ${relativePath}:`, addResult.stderr);
+        return;
+      }
+      
+      // Commit using smart git helpers
+      const commitResult = await executeGitCommand(['commit', '-m', commitMessage], path);
+      if (!commitResult.success) {
+        console.warn(`Auto-commit: Failed to commit ${relativePath}:`, commitResult.stderr);
+        return;
+      }
+      
+      console.log(`Auto-committed backlog change: ${commitMessage}`);
+    } catch (error) {
+      console.warn(`Auto-commit failed for ${filePath}:`, error);
+      // Don't throw error - backlog operation should still succeed even if commit fails
     }
   }
 
