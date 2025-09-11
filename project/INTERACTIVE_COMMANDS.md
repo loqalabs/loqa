@@ -17,6 +17,7 @@ The following interactive commands replace the old prompt templates:
 | `/run-integration-tests` | Manual testing coordination | Cross-service integration testing with Docker orchestration |
 | `/create-pr-from-task` | Manual PR creation | Automated PR creation with task linking and templates |
 | `/analyze-dependency-impact` | Manual impact assessment | Protocol change impact analysis across repositories |
+| `/intelligent_task_prioritization` | Manual task selection | AI-enhanced task prioritization with multi-criteria scoring |
 
 ## 🎯 **Key Benefits**
 
@@ -59,12 +60,12 @@ Unified command for starting work on backlog tasks with intelligent auto-selecti
 - `testingRequirements`: Override default testing requirements
 
 **Features:**
-- ✅ Intelligent auto-selection using ./tools/lb next aggregator logic
+- ✅ **AI-Enhanced Auto-Selection**: Multi-criteria intelligent scoring with role matching, time availability, and context analysis
 - ✅ Manual task selection by ID or file path
 - ✅ Full integration with backlog.md system and role specialization
 - ✅ Automatic feature branch creation and status updates
 - ✅ Priority and repository filtering for auto-selection
-- ✅ Role-specific workflow optimization
+- ✅ Role-specific workflow optimization with intelligent reasoning
 
 **Examples:**
 ```bash
@@ -293,20 +294,57 @@ Analyzes impact of protocol changes across consuming repositories with risk asse
 /analyze-dependency-impact --repository=loqa-proto --analyzeDownstream=false
 ```
 
+### `/intelligent_task_prioritization` - AI-Enhanced Task Selection
+
+Provides intelligent task prioritization across all repositories using multi-criteria AI scoring.
+
+**Usage:**
+```bash
+/intelligent_task_prioritization                      # Get AI recommendations
+/intelligent_task_prioritization --roleContext=developer --timeAvailable=2h  # Role-specific recommendations
+/intelligent_task_prioritization --priority=P1 --repositoryFocus=loqa-hub     # Filtered analysis
+```
+
+**Key Parameters:**
+- `roleContext`: Role specialization (architect/developer/devops/qa/github-cli-specialist/general/auto-detect)
+- `timeAvailable`: Available time constraint (e.g., '30min', '2h', 'flexible')
+- `repositoryFocus`: Focus on specific repository (e.g., 'loqa-hub', 'loqa-commander')
+- `priority`: Filter by priority level (P1/P2/P3/High/Medium/Low)
+- `criteria`: Custom scoring criteria array (priority, role-match, effort, impact, context)
+- `showTop`: Number of alternative recommendations to show (default: 3)
+
+**Features:**
+- ✅ **Multi-Criteria AI Scoring**: Priority (40%), Status (20%), Role Match (20%), Time (10%), Context (10%)
+- ✅ **Cross-Repository Analysis**: Scans all 8 Loqa repositories simultaneously
+- ✅ **Intelligent Reasoning**: Provides detailed explanations for recommendations
+- ✅ **Role-Based Keyword Matching**: Matches tasks to developer specializations
+- ✅ **Time-Effort Correlation**: Recommends tasks that fit available time windows
+- ✅ **Comprehensive Context Analysis**: Considers task content, category, and repository focus
+
+**Examples:**
+```bash
+/intelligent_task_prioritization                      # General AI recommendations
+/intelligent_task_prioritization --roleContext=architect --timeAvailable=flexible
+/intelligent_task_prioritization --priority=P1 --repositoryFocus=loqa-hub --showTop=5
+```
+
 ## 🔄 **Complete Automation Workflow**
 
 ### **End-to-End Development Automation:**
 ```bash
-# 1. Create feature branch from backlog task
+# 1. Get AI-enhanced task recommendations
+/intelligent_task_prioritization --roleContext=developer --timeAvailable=2h
+
+# 2. Create feature branch from recommended task
 /create-branch-from-task --taskId=21
 
-# 2. Develop features with quality assurance
+# 3. Develop features with quality assurance
 /run-integration-tests --testSuites=integration,e2e
 
-# 3. Create PR with automatic task linking
+# 4. Create PR with automatic task linking
 /create-pr-from-task  # Auto-detects task from branch
 
-# 4. Analyze protocol change impact (if applicable)
+# 5. Analyze protocol change impact (if applicable)
 /analyze-dependency-impact --protoChanges=audio.proto
 ```
 
@@ -448,6 +486,7 @@ backlog/
 | **Context Awareness** | Static content | Dynamic, context-aware guidance | Multi-repository awareness |
 | **Coordination** | Manual cross-repo work | Guided coordination | Automated coordination |
 | **Quality Assurance** | Manual testing | Guided testing strategy | Automated testing orchestration |
+| **Task Selection** | Manual priority sorting | Simple aggregator logic | AI-enhanced multi-criteria scoring |
 
 ## 🚨 **Migration Notes**
 

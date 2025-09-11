@@ -2156,6 +2156,250 @@ class LoqaWorkspaceManager {
 
     return { analysis, summary };
   }
+
+  /**
+   * Intelligent task prioritization and auto-selection
+   */
+  async intelligentTaskPrioritization(options: {
+    roleContext?: string;
+    timeAvailable?: string;
+    repositoryFocus?: string;
+    priority?: string;
+    criteria?: string[];
+    showTop?: number;
+  } = {}): Promise<{
+    recommendedTask?: {
+      repository: string;
+      taskId: string;
+      title: string;
+      priority: string;
+      status: string;
+      category: string;
+      effort: string;
+      filePath: string;
+      score: number;
+      reasoning: string[];
+    };
+    alternativeTasks: Array<{
+      repository: string;
+      taskId: string;
+      title: string;
+      priority: string;
+      status: string;
+      category: string;
+      effort: string;
+      filePath: string;
+      score: number;
+      reasoning: string[];
+    }>;
+    analysis: {
+      totalTasks: number;
+      eligibleTasks: number;
+      criteria: string[];
+      context: {
+        role: string;
+        timeAvailable: string;
+        repositoryFocus: string;
+        priorityFilter: string;
+      };
+    };
+  }> {
+    const { 
+      roleContext = 'auto-detect', 
+      timeAvailable = 'flexible', 
+      repositoryFocus, 
+      priority, 
+      criteria = ['priority', 'role-match', 'effort', 'impact', 'context'],
+      showTop = 3 
+    } = options;
+
+    // Collect all tasks from backlog system across repositories
+    const allTasks = [];
+    let totalTasks = 0;
+    
+    for (const repoName of this.knownRepositories) {
+      const repoPath = join(this.workspaceRoot, '..', repoName);
+      const backlogPath = join(repoPath, 'backlog', 'tasks');
+      
+      try {
+        await fs.access(backlogPath);
+        const taskFiles = await glob('*.md', { cwd: backlogPath });
+        
+        for (const taskFile of taskFiles) {
+          try {
+            const taskFilePath = join(backlogPath, taskFile);
+            const taskContent = await fs.readFile(taskFilePath, 'utf-8');
+            
+            // Parse task metadata
+            const titleMatch = taskContent.match(/^#\s+(.+)$/m);
+            const priorityMatch = taskContent.match(/Priority:\s*(P[123]|High|Medium|Low)/im);
+            const statusMatch = taskContent.match(/Status:\s*(To Do|In Progress|Done|Blocked)/im);
+            const categoryMatch = taskContent.match(/Category:\s*([^\n]+)/im);
+            const effortMatch = taskContent.match(/Estimated Effort:\s*([^\n]+)/im);
+            const taskIdMatch = taskFile.match(/task-(\d+)-/);
+            
+            const task = {
+              repository: repoName,
+              taskId: taskIdMatch ? taskIdMatch[1] : 'unknown',
+              title: titleMatch ? titleMatch[1].replace(/^Task:\s*/, '') : taskFile,
+              priority: priorityMatch ? priorityMatch[1] : 'P3',
+              status: statusMatch ? statusMatch[1] : 'To Do',
+              category: categoryMatch ? categoryMatch[1].trim() : 'General',
+              effort: effortMatch ? effortMatch[1].trim() : 'Unknown',
+              filePath: `backlog/tasks/${taskFile}`,
+              content: taskContent
+            };
+            
+            allTasks.push(task);
+            totalTasks++;
+          } catch (error) {
+            // Skip invalid task files
+          }
+        }
+      } catch (error) {
+        // Skip repositories without backlog
+      }
+    }
+
+    // Filter eligible tasks (not Done, not Blocked)
+    let eligibleTasks = allTasks.filter(task => 
+      task.status !== 'Done' && task.status !== 'Blocked'
+    );
+
+    // Apply filters
+    if (priority) {
+      eligibleTasks = eligibleTasks.filter(task => 
+        task.priority === priority || 
+        (priority === 'P1' && task.priority === 'High') ||
+        (priority === 'P2' && task.priority === 'Medium') ||
+        (priority === 'P3' && task.priority === 'Low')
+      );
+    }
+
+    if (repositoryFocus) {
+      eligibleTasks = eligibleTasks.filter(task => 
+        task.repository === repositoryFocus
+      );
+    }
+
+    // Intelligent scoring based on criteria
+    const scoredTasks = eligibleTasks.map(task => {
+      let score = 0;
+      const reasoning = [];
+
+      // Priority scoring (40% weight)
+      if (task.priority === 'P1' || task.priority === 'High') {
+        score += 40;
+        reasoning.push('High priority (P1)');
+      } else if (task.priority === 'P2' || task.priority === 'Medium') {
+        score += 25;
+        reasoning.push('Medium priority (P2)');
+      } else {
+        score += 10;
+        reasoning.push('Lower priority (P3)');
+      }
+
+      // Status preference (20% weight)
+      if (task.status === 'In Progress') {
+        score += 20;
+        reasoning.push('Already in progress');
+      } else if (task.status === 'To Do') {
+        score += 15;
+        reasoning.push('Ready to start');
+      }
+
+      // Role context matching (20% weight)
+      if (roleContext !== 'auto-detect') {
+        const roleKeywords: Record<string, string[]> = {
+          'architect': ['architecture', 'design', 'protocol', 'system', 'api'],
+          'developer': ['implement', 'feature', 'code', 'function', 'component'],
+          'devops': ['docker', 'deployment', 'infrastructure', 'ci/cd', 'monitoring'],
+          'qa': ['test', 'testing', 'quality', 'validation', 'coverage'],
+          'github-cli-specialist': ['github', 'workflow', 'actions', 'repository']
+        };
+
+        const keywords = roleKeywords[roleContext] || [];
+        const contentLower = task.content.toLowerCase();
+        const titleLower = task.title.toLowerCase();
+        
+        const matches = keywords.filter((keyword: string) => 
+          contentLower.includes(keyword) || titleLower.includes(keyword)
+        ).length;
+
+        if (matches > 0) {
+          score += matches * 4; // Up to 20 points for role match
+          reasoning.push(`Matches ${roleContext} role (${matches} keywords)`);
+        }
+      }
+
+      // Time availability matching (10% weight)
+      if (timeAvailable !== 'flexible') {
+        const timeValue = timeAvailable.match(/(\d+)/)?.[1];
+        if (timeValue) {
+          const timeMinutes = parseInt(timeValue) * (timeAvailable.includes('h') ? 60 : 1);
+          
+          // Effort estimation matching
+          if (task.effort.includes('30min') || task.effort.includes('1h')) {
+            if (timeMinutes >= 60) {
+              score += 10;
+              reasoning.push('Good time match for available time');
+            }
+          } else if (task.effort.includes('2h') || task.effort.includes('3h')) {
+            if (timeMinutes >= 120) {
+              score += 10;
+              reasoning.push('Sufficient time for task effort');
+            }
+          } else if (timeMinutes >= 240) {
+            score += 5;
+            reasoning.push('Complex task, adequate time available');
+          }
+        }
+      }
+
+      // Repository context bonus (10% weight)
+      if (repositoryFocus && task.repository === repositoryFocus) {
+        score += 10;
+        reasoning.push(`Focused on ${repositoryFocus}`);
+      }
+
+      // Category-based adjustments
+      if (task.category.toLowerCase().includes('bug')) {
+        score += 5;
+        reasoning.push('Bug fix (higher urgency)');
+      } else if (task.category.toLowerCase().includes('feature')) {
+        score += 3;
+        reasoning.push('Feature development');
+      }
+
+      return {
+        ...task,
+        score: Math.round(score),
+        reasoning
+      };
+    });
+
+    // Sort by score descending
+    scoredTasks.sort((a, b) => b.score - a.score);
+
+    const recommendedTask = scoredTasks[0];
+    const alternativeTasks = scoredTasks.slice(1, showTop);
+
+    return {
+      recommendedTask,
+      alternativeTasks,
+      analysis: {
+        totalTasks,
+        eligibleTasks: eligibleTasks.length,
+        criteria,
+        context: {
+          role: roleContext,
+          timeAvailable,
+          repositoryFocus: repositoryFocus || 'all',
+          priorityFilter: priority || 'all'
+        }
+      }
+    };
+  }
 }
 
 const server = new Server(
@@ -2870,6 +3114,43 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           required: [],
         },
       },
+      {
+        name: "intelligent_task_prioritization",
+        description: "AI-enhanced task prioritization across all repositories with intelligent scoring",
+        inputSchema: {
+          type: "object",
+          properties: {
+            roleContext: {
+              type: "string",
+              enum: ["architect", "developer", "devops", "qa", "github-cli-specialist", "general", "auto-detect"],
+              description: "Role context for task matching (default: auto-detect)",
+            },
+            timeAvailable: {
+              type: "string", 
+              description: "Available time (e.g., '30min', '2h', 'flexible')",
+            },
+            repositoryFocus: {
+              type: "string",
+              description: "Focus on specific repository (e.g., 'loqa-hub', 'loqa-commander')",
+            },
+            priority: {
+              type: "string",
+              enum: ["P1", "P2", "P3", "High", "Medium", "Low"],
+              description: "Filter by priority level",
+            },
+            criteria: {
+              type: "array",
+              items: { type: "string" },
+              description: "Scoring criteria to use: priority, role-match, effort, impact, context",
+            },
+            showTop: {
+              type: "number",
+              description: "Number of top alternatives to show (default: 3)",
+            },
+          },
+          required: [],
+        },
+      },
     ],
   };
 });
@@ -3395,18 +3676,39 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           };
           taskSource = `Manually selected: ${taskId || taskFile}`;
         } else if (autoSelect) {
-          // Auto-select next task using aggregator logic
-          let filterArgs = '';
-          if (priority) filterArgs += ` --priority=${priority}`;
-          if (repository) filterArgs += ` --repo=${repository}`;
-          
-          selectedTask = {
-            command: `./tools/lb next${filterArgs}`,
-            source: 'auto-selection',
-            method: 'ai-recommended',
-            filters: { priority, repository }
-          };
-          taskSource = `Auto-selected using: ./tools/lb next${filterArgs}`;
+          // Auto-select next task using AI-enhanced intelligent prioritization
+          const workspace = new LoqaWorkspaceManager();
+          const intelligentResults = await workspace.intelligentTaskPrioritization({
+            roleContext,
+            priority,
+            repositoryFocus: repository,
+            timeAvailable: 'flexible',
+            showTop: 3
+          });
+
+          if (intelligentResults.recommendedTask) {
+            selectedTask = {
+              taskData: intelligentResults.recommendedTask,
+              source: 'ai-intelligent-selection',
+              method: 'ai-enhanced',
+              aiAnalysis: intelligentResults.analysis,
+              reasoning: intelligentResults.recommendedTask.reasoning
+            };
+            taskSource = `AI-enhanced selection: ${intelligentResults.recommendedTask.title} (score: ${intelligentResults.recommendedTask.score})`;
+          } else {
+            // Fallback to simple aggregator if no tasks found
+            let filterArgs = '';
+            if (priority) filterArgs += ` --priority=${priority}`;
+            if (repository) filterArgs += ` --repo=${repository}`;
+            
+            selectedTask = {
+              command: `./tools/lb next${filterArgs}`,
+              source: 'fallback-aggregator',
+              method: 'simple-selection',
+              filters: { priority, repository }
+            };
+            taskSource = `Fallback to simple selection: ./tools/lb next${filterArgs}`;
+          }
         } else {
           return {
             content: [
@@ -3441,8 +3743,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           taskSelection: {
             method: selectedTask.method,
             source: taskSource,
-            filters: selectedTask.method === 'ai-recommended' ? selectedTask.filters : 'none',
-            command: selectedTask.command || 'Manual selection',
+            filters: selectedTask.method === 'ai-enhanced' ? 'AI-intelligent prioritization' : 
+                    selectedTask.method === 'ai-recommended' ? selectedTask.filters : 'none',
+            command: selectedTask.command || 'AI-enhanced selection',
+            aiAnalysis: selectedTask.method === 'ai-enhanced' ? selectedTask.aiAnalysis : undefined,
+            reasoning: selectedTask.method === 'ai-enhanced' ? selectedTask.reasoning : undefined,
           },
           automation: {
             createBranch,
@@ -3451,6 +3756,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             qualityGates: 'Automatic enforcement',
           },
           workflowSteps: [
+            selectedTask.method === 'ai-enhanced' ? '🧠 AI-enhanced task prioritization with intelligent scoring' :
             selectedTask.method === 'ai-recommended' ? '🎯 Get next recommended task from backlog aggregator' : '📋 Load specified task details',
             '📖 Read and understand task requirements',
             '🎭 Apply role-specific specialization and best practices',
@@ -3832,6 +4138,35 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                   'Use backlog priority system for sprint planning'
                 ],
                 templateReplacement: 'This replaces TODO_ITEM_PROMPT.md with enhanced planning'
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "intelligent_task_prioritization": {
+        const workspaceManager = new LoqaWorkspaceManager(args?.workspaceRoot as string);
+        const result = await workspaceManager.intelligentTaskPrioritization({
+          roleContext: args?.roleContext as string,
+          timeAvailable: args?.timeAvailable as string,
+          repositoryFocus: args?.repositoryFocus as string,
+          priority: args?.priority as string,
+          criteria: args?.criteria as string[],
+          showTop: args?.showTop as number,
+        });
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                intelligentPrioritization: result,
+                summary: result.recommendedTask 
+                  ? `🧠 AI Recommendation: ${result.recommendedTask.title} (Score: ${result.recommendedTask.score})`
+                  : `📋 Analysis complete: ${result.analysis.eligibleTasks}/${result.analysis.totalTasks} eligible tasks`,
+                recommended: result.recommendedTask,
+                alternatives: result.alternativeTasks,
+                analysis: result.analysis
               }, null, 2),
             },
           ],
