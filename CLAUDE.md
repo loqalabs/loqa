@@ -34,9 +34,32 @@ For enhanced development workflows, use the interactive commands in **[DEVELOPER
 
 ## 🚨 CRITICAL: Git Workflow
 
+### Smart Git Detection (RECOMMENDED)
+Use the smart git detection system for reliable repository operations from any subdirectory:
+
+```bash
+# Install once per developer:
+./tools/install-smart-git.sh
+
+# Use instead of manual git commands:
+./tools/smart-git status           # Works from any subdirectory
+./tools/smart-git branch feat-x    # Automatic repo detection
+./tools/smart-git commit "msg"     # Always from correct root
+./tools/smart-git <any-git-cmd>    # Any git command
+```
+
+**Benefits for Claude Code:**
+- ✅ **Eliminates directory confusion** - works from any subdirectory
+- ✅ **Prevents git command failures** due to wrong working directory
+- ✅ **Workspace boundary aware** - stops at appropriate project boundaries
+- ✅ **Consistent behavior** regardless of current directory
+
 ### Feature Branch Creation (ALWAYS FOLLOW)
 ```bash
-# MANDATORY: Fetch latest changes before branching
+# RECOMMENDED: Use smart git (works from anywhere)
+./tools/smart-git branch feature/issue-name
+
+# OR Traditional approach (manual directory navigation):
 git fetch origin main
 git checkout main  
 git pull origin main
@@ -86,8 +109,9 @@ docker-compose build # Docker builds must succeed
 - `cross-repo-work-template.md` - Multi-repository coordination
 
 ## Best Practices
-1. **Always fetch latest** before creating feature branches
-2. **Use backlog.md** for task tracking and planning
-3. **Follow quality gates** - no exceptions
-4. **Document cross-repo dependencies** clearly
-5. **Test thoroughly** across all affected services
+1. **Use smart git detection** - `./tools/smart-git` for all git operations
+2. **Always fetch latest** before creating feature branches
+3. **Use backlog.md** for task tracking and planning
+4. **Follow quality gates** - no exceptions
+5. **Document cross-repo dependencies** clearly
+6. **Test thoroughly** across all affected services
