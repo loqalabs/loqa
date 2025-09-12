@@ -22,3 +22,10 @@ Intelligent failure logging that provides actionable debugging information while
 ## Implementation Notes
 
 GitHub Issue: https://github.com/loqalabs/loqa/issues/49 - Architecture Decision: Security-Aware Observability for Intent Debugging
+
+### Research: Claude Trace
+Check out Claude Trace for debugging workflow inspiration:
+- **Repository**: https://github.com/badlogic/lemmy/tree/main/apps/claude-trace
+- **Demo Video**: https://www.youtube.com/watch?v=nu3VDVzAVaE&t=636s (timestamp 10:36)
+- **Relevance**: Demonstrates innovative approaches to debugging workflows that could inform our privacy-preserving failure debugging implementation for Loqa
+- **Potential Applications**: Could inspire techniques for capturing actionable debugging context while maintaining security boundaries
