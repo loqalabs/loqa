@@ -124,6 +124,8 @@ Use the MCP function `mcp__loqa-assistant__start_comprehensive_task_creation` or
 
 **Complexity detection**: Analyze the description to determine if simple task creation (`add_todo`) or comprehensive creation (`start_comprehensive_task_creation`) is needed.
 
+**Seamless Interview Flow**: For complex tasks, the system may initiate an AI-guided interview. Once started, users can respond conversationally without needing special commands - the system automatically detects and processes interview responses.
+
 #### `/loqa task list [--status] [--repository] [--priority]`
 Use the MCP function `mcp__loqa-assistant__list_tasks` with optional filtering.
 
@@ -138,6 +140,8 @@ Update task status, priority, or other fields. Parse task ID from first argument
 Use the MCP function `mcp__loqa-assistant__continue_task_development` or `mcp__loqa-assistant__answer_task_interview_question`.
 
 **Interactive fallback**: If no args, show available drafts and interviews.
+
+**Seamless Interview Experience**: When an interview is active, users can provide conversational responses directly without explicit commands. The system automatically detects interview context and processes answers seamlessly.
 
 ### **Development Commands**
 

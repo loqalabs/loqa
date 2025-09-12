@@ -4,6 +4,7 @@ import { TaskCreationOptions, CapturedThought, TaskInterviewState, TaskBreakdown
 import { resolveWorkspaceRoot } from '../utils/workspace-resolver.js';
 import { KNOWN_REPOSITORIES_LIST } from '../config/repositories.js';
 import { TaskInterviewStorage } from '../utils/task-interview-storage.js';
+import { InterviewContextManager } from '../utils/interview-context-manager.js';
 import { randomUUID } from 'crypto';
 
 interface ThoughtEvaluation {
@@ -1380,10 +1381,14 @@ async function handleStartComprehensiveTaskCreation(args: any, workspaceRoot: st
     // Start comprehensive interview process
     const interview = await TaskCreationInterviewer.startInterview(initialInput, workspaceRoot, storage);
     
+    // Set active interview context for seamless conversation
+    const contextManager = InterviewContextManager.getInstance();
+    contextManager.setActiveInterview(interview.id, interview.currentQuestion);
+    
     return {
       content: [{
         type: "text",
-        text: `🎯 **Starting Comprehensive Task Creation**\n\n**Original Input**: "${initialInput}"\n\n**Interview ID**: \`${interview.id}\`\n\n**Question 1**: ${interview.currentQuestion}\n\nPlease answer this question to help me create a fully-fleshed out task. Use \`/answer-task-interview-question ${interview.id} "your answer"\` to respond.`
+        text: `🎯 **Starting Comprehensive Task Creation**\n\n**Original Input**: "${initialInput}"\n\n**First Question**: ${interview.currentQuestion}\n\n*Just reply with your answer - no need for special commands.*`
       }]
     };
   } catch (error) {
@@ -1391,6 +1396,62 @@ async function handleStartComprehensiveTaskCreation(args: any, workspaceRoot: st
       content: [{
         type: "text",
         text: `❌ Failed to start task creation: ${error instanceof Error ? error.message : 'Unknown error'}`
+      }]
+    };
+  }
+}
+
+/**
+ * Process interview answer seamlessly without requiring explicit MCP tool approval
+ * This function handles interview continuation automatically when user provides conversational responses
+ */
+async function processInterviewAnswerSeamlessly(interviewId: string, answer: string, workspaceRoot: string): Promise<any> {
+  const storage = new TaskInterviewStorage(workspaceRoot);
+  const contextManager = InterviewContextManager.getInstance();
+  
+  try {
+    const interview = await TaskCreationInterviewer.processAnswer(interviewId, answer, storage);
+    
+    if (!interview) {
+      contextManager.clearActiveInterview();
+      return {
+        content: [{
+          type: "text",
+          text: `❌ Interview not found. It may have expired or been completed.`
+        }]
+      };
+    }
+    
+    if (interview.interviewComplete) {
+      // Create the final task(s)
+      const creationResult = await createTasksFromInterview(interview, workspaceRoot);
+      
+      // Clean up completed interview
+      await storage.deleteInterview(interviewId);
+      contextManager.clearActiveInterview();
+      
+      return {
+        content: [{
+          type: "text",
+          text: `✅ **Task Created Successfully!**\n\n${creationResult.message}`
+        }]
+      };
+    } else {
+      // Continue with next question seamlessly
+      contextManager.updateLastQuestion(interview.currentQuestion);
+      return {
+        content: [{
+          type: "text",
+          text: `📝 **Answer recorded.**\n\n**Next Question**: ${interview.currentQuestion}`
+        }]
+      };
+    }
+  } catch (error) {
+    contextManager.clearActiveInterview();
+    return {
+      content: [{
+        type: "text",
+        text: `❌ Failed to process answer: ${error instanceof Error ? error.message : 'Unknown error'}`
       }]
     };
   }
@@ -1426,11 +1487,14 @@ async function handleAnswerInterviewQuestion(args: any, workspaceRoot: string): 
         }]
       };
     } else {
-      // Continue with next question
+      // Continue with next question and update context
+      const contextManager = InterviewContextManager.getInstance();
+      contextManager.updateLastQuestion(interview.currentQuestion);
+      
       return {
         content: [{
           type: "text",
-          text: `📝 **Answer Recorded**\n\n**Next Question**: ${interview.currentQuestion}\n\nPlease use \`/answer-task-interview-question ${interviewId} "your answer"\` to continue.`
+          text: `📝 **Answer recorded.**\n\n**Next Question**: ${interview.currentQuestion}`
         }]
       };
     }
@@ -2151,8 +2215,31 @@ export const taskManagementTools = [
       },
       required: ["taskFile", "repository", "content"]
     }
+  },
+  {
+    name: "task:ProcessConversationalResponse",
+    description: "Process a conversational response from the user, automatically handling active interviews seamlessly",
+    inputSchema: {
+      type: "object", 
+      properties: {
+        message: {
+          type: "string",
+          description: "The user's conversational message to process"
+        },
+        contextHint: {
+          type: "string",
+          description: "Optional context hint (e.g., 'interview-response', 'general-message')"
+        }
+      },
+      required: ["message"]
+    }
   }
 ];
+
+/**
+ * Export the seamless interview processing function for use by the main server
+ */
+export { processInterviewAnswerSeamlessly, InterviewContextManager };
 
 export async function handleTaskManagementTool(name: string, args: any): Promise<any> {
   // Intelligently resolve the workspace root
@@ -2648,6 +2735,32 @@ export async function handleTaskManagementTool(name: string, args: any): Promise
           }]
         };
       }
+    }
+
+    case "task:ProcessConversationalResponse": {
+      const { message, contextHint } = args;
+      const contextManager = InterviewContextManager.getInstance();
+      
+      // Check if there's an active interview
+      if (contextManager.isInActiveInterview()) {
+        const interviewId = contextManager.getActiveInterviewId()!;
+        
+        // Detect if this message is likely an interview response
+        if (contextManager.isLikelyInterviewResponse(message)) {
+          // Process the response seamlessly
+          return await processInterviewAnswerSeamlessly(interviewId, message, workspaceRoot);
+        }
+      }
+      
+      // Not an interview response, return helpful message
+      return {
+        content: [{
+          type: "text",
+          text: `📝 **Message received**: "${message}"\n\n${contextManager.isInActiveInterview() 
+            ? `💡 **Active Interview**: You're in an interview but your message doesn't look like an answer. The current question is:\n\n"${contextManager.getLastQuestion()}"\n\nPlease provide your answer, or use \`/loqa task resume\` to see available interviews.`
+            : '💡 **No Active Interview**: Your message was received but there\'s no active interview. Use \`/loqa task create "description"\` to start a new task creation process.'}`
+        }]
+      };
     }
 
     default:
