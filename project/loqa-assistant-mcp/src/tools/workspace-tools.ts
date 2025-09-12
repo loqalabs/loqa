@@ -531,7 +531,7 @@ export async function handleWorkspaceTool(name: string, args: any, workspaceMana
           
           priorityText += `🚀 **Next Steps**:\n`;
           priorityText += `• Use \`/loqa dev work\` to begin working on the recommended task\n`;
-          priorityText += `• Create feature branch: \`./tools/smart-git branch feature/[task-name]\`\n`;
+          priorityText += `• Create feature branch: \`smart-git_branch(branchName: "feature/[task-name]")\`\n`;
           priorityText += `• Run quality checks before committing\n\n`;
         }
         

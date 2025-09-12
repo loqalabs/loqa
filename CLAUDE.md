@@ -114,46 +114,41 @@ The unified `/loqa` command provides advanced AI-powered workflow intelligence w
 
 ## 🚨 CRITICAL: Git Workflow
 
-### Smart Git Detection (RECOMMENDED)
-Use the enhanced smart git system for reliable repository operations from any subdirectory:
+### Smart Git MCP Tools (PREFERRED)
+Use the integrated smart git MCP tools for intelligent repository operations with rich context:
 
 ```bash
-# Install once per developer:
-./tools/install-smart-git.sh
+# MCP Tools available in Claude Code (no installation needed):
+smart-git_status                           # Enhanced status with repository context
+smart-git_branch(branchName: "feature/new-ui")  # Create feature branch (fetches main)
+smart-git_commit(message: "Fix bug")       # Smart commit from any subdirectory
+smart-git_sync                             # Pull + show merged branches for cleanup
+smart-git_context                          # Show status across all repositories
+smart-git_command(command: "add", args: ["."])  # Any git command from repo root
 
-# Enhanced commands with rich output:
-./tools/smart-git status                    # Enhanced status with context
-./tools/smart-git branch feature/new-ui    # Create feature branch
-./tools/smart-git commit "Fix bug"          # Smart commit from anywhere
-
-# Common git commands (auto-executed from repo root):
-./tools/smart-git add .                     # Stage all changes
-./tools/smart-git push origin main          # Push to remote
-./tools/smart-git pull origin main          # Pull from remote
-./tools/smart-git log --oneline -5          # View commit history
-./tools/smart-git diff --cached             # Show staged changes
-
-# Get comprehensive help:
-./tools/smart-git help                      # Show all available commands
+# Get git operation guidance:
+git_guidance(operation: "status")          # Get recommendations for git operations
 ```
 
-**Enhanced Features:**
-- 📋 **3 Enhanced Commands**: `status`, `branch`, `commit` with rich formatting
-- 🔧 **14 Common Commands**: `add`, `push`, `pull`, `fetch`, `checkout`, `log`, `diff`, `merge`, `rebase`, `reset`, `stash`, `tag`, `remote`, `show`, `blame`
-- 🎯 **Universal Fallback**: Any other git command executed from repository root
-- 📁 **Repository Context**: Always shows which repo and path commands execute from
+**Enhanced MCP Features:**
+- 🚀 **Integrated into Claude Code** - No external scripts needed
+- 📁 **Repository Context Detection** - Always operates from correct repo root
+- 🎯 **Multi-Repository Awareness** - Works across all Loqa repositories
+- ✅ **Rich Formatted Output** - Enhanced responses with emojis and markdown
+- 🔧 **Smart Guidance System** - Suggests optimal tools for git operations
+- 🔄 **Workflow Integration** - Designed for Loqa development patterns
 
 **Benefits for Claude Code:**
-- ✅ **Eliminates directory confusion** - works from any subdirectory
-- ✅ **Prevents git command failures** due to wrong working directory
-- ✅ **Enhanced user experience** with emojis and clear formatting
-- ✅ **Comprehensive git coverage** - handles all common git operations
-- ✅ **Consistent behavior** regardless of current directory
+- ✅ **Direct MCP Integration** - No shell script dependencies
+- ✅ **Enhanced Context Awareness** - Repository detection and path resolution
+- ✅ **Structured Responses** - Rich markdown output with actionable information
+- ✅ **Comprehensive Git Coverage** - Handles all git operations intelligently
+- ✅ **Preference Guidance** - Actively suggests smart-git over regular git commands
 
 ### Feature Branch Creation (ALWAYS FOLLOW)
 ```bash
-# RECOMMENDED: Use smart git (works from anywhere)
-./tools/smart-git branch feature/issue-name
+# RECOMMENDED: Use smart git MCP tool (works from anywhere)
+smart-git_branch(branchName: "feature/issue-name")
 
 # OR Traditional approach (manual directory navigation):
 git fetch origin main
@@ -205,7 +200,7 @@ docker-compose build # Docker builds must succeed
 - `cross-repo-work-template.md` - Multi-repository coordination
 
 ## Best Practices
-1. **Use smart git detection** - `./tools/smart-git` for all git operations
+1. **Use smart git MCP tools** - `smart-git_*` MCP tools for all git operations
 2. **Always fetch latest** before creating feature branches
 3. **Use backlog.md** for task tracking and planning
 4. **Follow quality gates** - no exceptions

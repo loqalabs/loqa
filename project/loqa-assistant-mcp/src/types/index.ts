@@ -21,6 +21,7 @@ export interface TaskTemplate {
 
 export interface TaskCreationOptions {
   title: string;
+  description?: string;
   template?: string;
   priority?: 'High' | 'Medium' | 'Low';
   type?: 'Feature' | 'Bug Fix' | 'Improvement' | 'Documentation';
