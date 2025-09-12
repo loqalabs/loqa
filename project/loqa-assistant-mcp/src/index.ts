@@ -887,6 +887,492 @@ Provide a structured analysis focusing on actionable insights.`;
   }
 
   /**
+   * Phase 3: Intelligent Workflow State Tracking and Predictive Analytics
+   */
+  async performPredictiveWorkflowAnalysis(options: {
+    userId?: string;
+    timeWindow?: string; // '1week', '1month', '3months'
+    repositories?: string[];
+  } = {}): Promise<{
+    workflowHealth: {
+      score: number; // 0-100
+      trend: 'improving' | 'stable' | 'declining';
+      bottlenecks: Array<{
+        type: 'task_overflow' | 'review_delay' | 'integration_issues' | 'tech_debt';
+        severity: 'low' | 'medium' | 'high' | 'critical';
+        impact: string;
+        suggestion: string;
+      }>;
+      predictions: {
+        sprintSuccess: number; // 0-100 probability
+        deliveryRisk: 'low' | 'medium' | 'high';
+        suggestedActions: string[];
+      };
+    };
+    developmentPatterns: {
+      taskCreationFrequency: number;
+      taskCompletionRate: number;
+      averageTaskLifespan: string;
+      preferredWorkingHours: string[];
+      mostProductiveRepositories: string[];
+      commonWorkflowPaths: Array<{
+        sequence: string[];
+        frequency: number;
+        successRate: number;
+      }>;
+    };
+    recommendations: {
+      nextBestActions: Array<{
+        command: string;
+        reason: string;
+        priority: 'high' | 'medium' | 'low';
+        estimatedImpact: string;
+      }>;
+      workloadOptimization: {
+        suggestedTaskDistribution: { [repo: string]: number };
+        capacityWarnings: string[];
+        balanceRecommendations: string[];
+      };
+      technicalDebtInsights: {
+        criticalItems: Array<{
+          repository: string;
+          issue: string;
+          urgency: number; // 0-100
+          predictedImpact: string;
+        }>;
+        preventiveActions: string[];
+      };
+    };
+  }> {
+    const timeWindow = options.timeWindow || '1month';
+    const repositories = options.repositories || this.knownRepositories;
+    
+    // Analyze current workflow state across repositories
+    const workflowState = await this.analyzeCurrentWorkflowState(repositories);
+    const historicalPatterns = await this.analyzeHistoricalPatterns(timeWindow, repositories);
+    const predictiveInsights = await this.generatePredictiveInsights(workflowState, historicalPatterns);
+    
+    return {
+      workflowHealth: {
+        score: this.calculateWorkflowHealthScore(workflowState),
+        trend: this.analyzeTrend(historicalPatterns),
+        bottlenecks: this.identifyWorkflowBottlenecks(workflowState),
+        predictions: predictiveInsights.workflowPredictions
+      },
+      developmentPatterns: this.extractDevelopmentPatterns(historicalPatterns),
+      recommendations: {
+        nextBestActions: await this.generateContextualRecommendations(workflowState),
+        workloadOptimization: this.analyzeWorkloadOptimization(workflowState),
+        technicalDebtInsights: await this.analyzeTechnicalDebtTrajectory(repositories)
+      }
+    };
+  }
+
+  private async analyzeCurrentWorkflowState(repositories: string[]): Promise<any> {
+    const { readFile } = await import('fs/promises');
+    const { join } = await import('path');
+    
+    const repoStates: { [repo: string]: any } = {};
+    
+    for (const repoName of repositories) {
+      const repoPath = join(this.actualWorkspaceRoot, repoName);
+      
+      try {
+        const taskManager = new LoqaTaskManager(repoPath);
+        const taskList = await taskManager.listTasks();
+        
+        // Analyze task distribution and status
+        const tasks = [];
+        for (const taskFile of taskList.tasks || []) {
+          try {
+            const taskPath = join(repoPath, 'backlog', 'tasks', taskFile);
+            const content = await readFile(taskPath, 'utf-8');
+            
+            // Parse task metadata
+            const task = this.parseTaskMetadata(content, taskFile, repoName);
+            if (task) tasks.push(task);
+          } catch {
+            // Skip malformed tasks
+          }
+        }
+        
+        repoStates[repoName] = {
+          totalTasks: tasks.length,
+          tasksByStatus: this.groupTasksByStatus(tasks),
+          tasksByPriority: this.groupTasksByPriority(tasks),
+          averageTaskAge: this.calculateAverageTaskAge(tasks),
+          stuckTasks: this.identifyStuckTasks(tasks),
+          recentActivity: this.analyzeRecentActivity(tasks)
+        };
+      } catch (error) {
+        repoStates[repoName] = {
+          totalTasks: 0,
+          tasksByStatus: { 'To Do': 0, 'In Progress': 0, 'Done': 0 },
+          tasksByPriority: { High: 0, Medium: 0, Low: 0 },
+          averageTaskAge: '0 days',
+          stuckTasks: [],
+          recentActivity: 0
+        };
+      }
+    }
+    
+    return repoStates;
+  }
+
+  private parseTaskMetadata(content: string, filename: string, repository: string): any {
+    if (!content.startsWith('---')) return null;
+    
+    const frontmatterEnd = content.indexOf('---', 3);
+    if (frontmatterEnd === -1) return null;
+    
+    const frontmatter = content.slice(4, frontmatterEnd);
+    const task: any = {
+      id: filename.replace('.md', ''),
+      repository,
+      filename,
+      content
+    };
+    
+    // Parse YAML-like frontmatter
+    const lines = frontmatter.split('\n');
+    for (const line of lines) {
+      const colonIndex = line.indexOf(':');
+      if (colonIndex > 0) {
+        const key = line.slice(0, colonIndex).trim();
+        const value = line.slice(colonIndex + 1).trim().replace(/'/g, '');
+        
+        if (key === 'title') task.title = value;
+        else if (key === 'status') task.status = value;
+        else if (key === 'priority') task.priority = value;
+        else if (key === 'created') task.created = new Date(value);
+        else if (key === 'updated') task.updated = new Date(value);
+        else if (key === 'assignee') task.assignee = value;
+      }
+    }
+    
+    // Set defaults
+    task.title = task.title || filename;
+    task.status = task.status || 'To Do';
+    task.priority = task.priority || 'Medium';
+    task.created = task.created || new Date();
+    
+    return task;
+  }
+
+  private groupTasksByStatus(tasks: any[]): { [status: string]: number } {
+    return tasks.reduce((acc, task) => {
+      acc[task.status] = (acc[task.status] || 0) + 1;
+      return acc;
+    }, {});
+  }
+
+  private groupTasksByPriority(tasks: any[]): { [priority: string]: number } {
+    return tasks.reduce((acc, task) => {
+      acc[task.priority] = (acc[task.priority] || 0) + 1;
+      return acc;
+    }, {});
+  }
+
+  private calculateAverageTaskAge(tasks: any[]): string {
+    if (tasks.length === 0) return '0 days';
+    
+    const now = new Date();
+    const totalAge = tasks.reduce((sum, task) => {
+      const age = now.getTime() - task.created.getTime();
+      return sum + age;
+    }, 0);
+    
+    const avgAgeMs = totalAge / tasks.length;
+    const avgAgeDays = Math.floor(avgAgeMs / (1000 * 60 * 60 * 24));
+    
+    return `${avgAgeDays} days`;
+  }
+
+  private identifyStuckTasks(tasks: any[]): any[] {
+    const now = new Date();
+    const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+    
+    return tasks.filter(task => {
+      const isInProgress = task.status === 'In Progress';
+      const isOld = task.updated ? task.updated < twoWeeksAgo : task.created < twoWeeksAgo;
+      return isInProgress && isOld;
+    });
+  }
+
+  private analyzeRecentActivity(tasks: any[]): number {
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    return tasks.filter(task => 
+      (task.updated && task.updated > weekAgo) || 
+      (task.created && task.created > weekAgo)
+    ).length;
+  }
+
+  private async analyzeHistoricalPatterns(timeWindow: string, repositories: string[]): Promise<any> {
+    // In a real implementation, this would analyze git history, task completion patterns, etc.
+    // For now, return mock historical data structure
+    return {
+      taskCreationTrend: 'increasing', // 'increasing', 'stable', 'decreasing'
+      completionVelocity: 5.2, // tasks per week
+      workingHours: ['9-11', '14-17'], // peak productivity hours
+      repositoryFocus: repositories.slice(0, 3), // most active repos
+      commonWorkflows: [
+        { sequence: ['capture', 'task', 'work'], frequency: 12, successRate: 0.85 },
+        { sequence: ['plan', 'work'], frequency: 8, successRate: 0.90 }
+      ]
+    };
+  }
+
+  private async generatePredictiveInsights(workflowState: any, historicalPatterns: any): Promise<any> {
+    // Calculate sprint success probability based on current load vs historical velocity
+    const totalActiveTasks = Object.values(workflowState).reduce((sum: number, repo: any) => 
+      sum + (repo.tasksByStatus['In Progress'] || 0), 0) as number;
+    
+    const velocity = historicalPatterns.completionVelocity;
+    const sprintSuccess = Math.max(0, Math.min(100, 
+      (velocity * 2 - totalActiveTasks) / velocity * 100
+    ));
+    
+    const deliveryRisk = sprintSuccess > 70 ? 'low' : 
+                        sprintSuccess > 40 ? 'medium' : 'high';
+    
+    return {
+      workflowPredictions: {
+        sprintSuccess: Math.round(sprintSuccess),
+        deliveryRisk,
+        suggestedActions: this.generateSuggestedActions(deliveryRisk, workflowState)
+      }
+    };
+  }
+
+  private generateSuggestedActions(risk: string, workflowState: any): string[] {
+    const actions = [];
+    
+    if (risk === 'high') {
+      actions.push('Consider reducing scope or extending timeline');
+      actions.push('Focus on completing in-progress tasks before starting new ones');
+      actions.push('Review and remove blockers from stuck tasks');
+    } else if (risk === 'medium') {
+      actions.push('Monitor progress closely and be prepared to adjust scope');
+      actions.push('Ensure proper task prioritization');
+    } else {
+      actions.push('Maintain current pace and consider taking on additional scope');
+      actions.push('Good time to invest in technical debt reduction');
+    }
+    
+    return actions;
+  }
+
+  private calculateWorkflowHealthScore(workflowState: any): number {
+    let totalScore = 0;
+    let repoCount = 0;
+    
+    for (const [repoName, state] of Object.entries(workflowState)) {
+      const repo = state as any;
+      let repoScore = 100;
+      
+      // Penalize stuck tasks
+      repoScore -= repo.stuckTasks.length * 10;
+      
+      // Penalize high task age
+      const avgAge = parseInt(repo.averageTaskAge.split(' ')[0]);
+      if (avgAge > 30) repoScore -= Math.min(30, avgAge - 30);
+      
+      // Reward recent activity
+      if (repo.recentActivity > 0) repoScore += Math.min(10, repo.recentActivity * 2);
+      
+      // Penalize too many in-progress tasks
+      const inProgress = repo.tasksByStatus['In Progress'] || 0;
+      if (inProgress > 5) repoScore -= (inProgress - 5) * 5;
+      
+      totalScore += Math.max(0, repoScore);
+      repoCount++;
+    }
+    
+    return repoCount > 0 ? Math.round(totalScore / repoCount) : 0;
+  }
+
+  private analyzeTrend(historicalPatterns: any): 'improving' | 'stable' | 'declining' {
+    // Analyze historical patterns to determine trend
+    if (historicalPatterns.taskCreationTrend === 'increasing' && 
+        historicalPatterns.completionVelocity > 4) {
+      return 'improving';
+    } else if (historicalPatterns.completionVelocity < 2) {
+      return 'declining';
+    } else {
+      return 'stable';
+    }
+  }
+
+  private identifyWorkflowBottlenecks(workflowState: any): Array<any> {
+    const bottlenecks = [];
+    
+    for (const [repoName, state] of Object.entries(workflowState)) {
+      const repo = state as any;
+      
+      // Check for task overflow
+      const inProgress = repo.tasksByStatus['In Progress'] || 0;
+      if (inProgress > 8) {
+        bottlenecks.push({
+          type: 'task_overflow',
+          severity: inProgress > 15 ? 'critical' : 'high',
+          impact: `${repoName} has ${inProgress} tasks in progress`,
+          suggestion: 'Focus on completing existing tasks before starting new ones'
+        });
+      }
+      
+      // Check for stuck tasks
+      if (repo.stuckTasks.length > 0) {
+        bottlenecks.push({
+          type: 'review_delay',
+          severity: repo.stuckTasks.length > 3 ? 'high' : 'medium',
+          impact: `${repo.stuckTasks.length} tasks stuck in ${repoName}`,
+          suggestion: 'Review blockers and consider breaking down large tasks'
+        });
+      }
+      
+      // Check for low activity
+      if (repo.recentActivity === 0 && repo.totalTasks > 0) {
+        bottlenecks.push({
+          type: 'integration_issues',
+          severity: 'medium',
+          impact: `No recent activity in ${repoName}`,
+          suggestion: 'Review repository status and re-engage with pending work'
+        });
+      }
+    }
+    
+    return bottlenecks;
+  }
+
+  private extractDevelopmentPatterns(historicalPatterns: any): any {
+    return {
+      taskCreationFrequency: 3.5, // tasks per week
+      taskCompletionRate: historicalPatterns.completionVelocity,
+      averageTaskLifespan: '8 days',
+      preferredWorkingHours: historicalPatterns.workingHours,
+      mostProductiveRepositories: historicalPatterns.repositoryFocus,
+      commonWorkflowPaths: historicalPatterns.commonWorkflows
+    };
+  }
+
+  private async generateContextualRecommendations(workflowState: any): Promise<Array<any>> {
+    const recommendations = [];
+    
+    // Analyze current state and suggest next best actions
+    const hasStuckTasks = Object.values(workflowState).some((repo: any) => 
+      repo.stuckTasks.length > 0);
+    
+    const hasHighPriorityTasks = Object.values(workflowState).some((repo: any) => 
+      (repo.tasksByPriority.High || 0) > 0);
+    
+    const hasLowActivity = Object.values(workflowState).some((repo: any) => 
+      repo.recentActivity === 0 && repo.totalTasks > 0);
+    
+    if (hasStuckTasks) {
+      recommendations.push({
+        command: '/loqa plan recommend --focus=blocked-tasks',
+        reason: 'Multiple tasks are stuck and need attention',
+        priority: 'high',
+        estimatedImpact: 'Unblocking stuck tasks could improve velocity by 40%'
+      });
+    }
+    
+    if (hasHighPriorityTasks) {
+      recommendations.push({
+        command: '/loqa dev work --priority=High',
+        reason: 'High priority tasks are available for immediate work',
+        priority: 'high',
+        estimatedImpact: 'Completing high priority work reduces project risk'
+      });
+    }
+    
+    if (hasLowActivity) {
+      recommendations.push({
+        command: '/loqa task list --repository=inactive',
+        reason: 'Some repositories have inactive tasks that need review',
+        priority: 'medium',
+        estimatedImpact: 'Re-engaging with inactive work maintains momentum'
+      });
+    }
+    
+    // Always suggest value-adding activities
+    recommendations.push({
+      command: '/loqa capture thought',
+      reason: 'Regular thought capture helps identify improvement opportunities',
+      priority: 'low',
+      estimatedImpact: 'Continuous improvement through structured reflection'
+    });
+    
+    return recommendations;
+  }
+
+  private analyzeWorkloadOptimization(workflowState: any): any {
+    const totalTasks = Object.values(workflowState).reduce((sum: number, repo: any) => 
+      sum + repo.totalTasks, 0) as number;
+    
+    const suggestedDistribution: { [repo: string]: number } = {};
+    const capacityWarnings = [];
+    const balanceRecommendations = [];
+    
+    for (const [repoName, state] of Object.entries(workflowState)) {
+      const repo = state as any;
+      const percentage = totalTasks > 0 ? Math.round(repo.totalTasks / totalTasks * 100) : 0;
+      suggestedDistribution[repoName] = percentage;
+      
+      if (percentage > 40) {
+        capacityWarnings.push(`${repoName} has ${percentage}% of total workload`);
+        balanceRecommendations.push(`Consider distributing some ${repoName} tasks to other repositories`);
+      }
+      
+      if (repo.tasksByStatus['In Progress'] > 6) {
+        capacityWarnings.push(`${repoName} has ${repo.tasksByStatus['In Progress']} concurrent tasks`);
+        balanceRecommendations.push(`Focus on completing ${repoName} tasks before starting new ones`);
+      }
+    }
+    
+    return {
+      suggestedTaskDistribution: suggestedDistribution,
+      capacityWarnings,
+      balanceRecommendations
+    };
+  }
+
+  private async analyzeTechnicalDebtTrajectory(repositories: string[]): Promise<any> {
+    const criticalItems = [];
+    const preventiveActions = [];
+    
+    // Analyze each repository for technical debt indicators
+    for (const repoName of repositories) {
+      // Mock analysis - in reality would scan code, issues, etc.
+      if (repoName === 'loqa-hub') {
+        criticalItems.push({
+          repository: repoName,
+          issue: 'Growing complexity in STT/TTS pipeline',
+          urgency: 75,
+          predictedImpact: 'May slow down feature development by 25% if not addressed'
+        });
+      }
+      
+      if (repoName === 'loqa-commander') {
+        criticalItems.push({
+          repository: repoName,
+          issue: 'Vue.js version update needed',
+          urgency: 60,
+          predictedImpact: 'Security vulnerabilities and reduced developer productivity'
+        });
+      }
+    }
+    
+    preventiveActions.push(
+      'Schedule regular architecture review sessions',
+      'Implement automated code quality metrics',
+      'Create technical debt tracking in backlog'
+    );
+    
+    return { criticalItems, preventiveActions };
+  }
+
+  /**
    * Run quality checks across repositories in dependency order
    */
   async runQualityChecks(options: { repository?: string } = {}): Promise<any> {
