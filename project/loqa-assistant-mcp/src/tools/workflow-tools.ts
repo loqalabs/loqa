@@ -10,7 +10,7 @@ import { SmartGitHelpers } from '../utils/smart-git-helpers.js';
 
 export const workflowTools = [
   {
-    name: "start_task_work",
+    name: "workflow:StartTaskWork",
     description: "Begin comprehensive task work with full context setup including role detection, model selection, and workflow optimization",
     inputSchema: {
       type: "object",
@@ -51,7 +51,7 @@ export const workflowTools = [
     }
   },
   {
-    name: "plan_strategic_shift", 
+    name: "workflow:PlanStrategicShift", 
     description: "Plan and coordinate strategic shifts across the workspace with comprehensive impact analysis",
     inputSchema: {
       type: "object",
@@ -88,7 +88,7 @@ export const workflowTools = [
     }
   },
   {
-    name: "capture_comprehensive_thought",
+    name: "workflow:CaptureComprehensiveThought",
     description: "Capture complex thoughts with full context, automatic categorization, and intelligent follow-up suggestions",
     inputSchema: {
       type: "object",
@@ -126,7 +126,7 @@ export const workflowTools = [
     }
   },
   {
-    name: "start_complex_todo",
+    name: "workflow:StartComplexTodo",
     description: "Create and begin work on complex, multi-step todos with automatic workflow setup",
     inputSchema: {
       type: "object",
@@ -179,7 +179,7 @@ export async function handleWorkflowTool(name: string, args: any): Promise<any> 
   const modelSelector = new LoqaModelSelector();
 
   switch (name) {
-    case "start_task_work": {
+    case "workflow:StartTaskWork": {
       const { taskTitle, taskDescription, filePaths = [], repository, priority = "Medium", category = "feature", updateStatus = true } = args;
       
       try {
@@ -272,7 +272,7 @@ export async function handleWorkflowTool(name: string, args: any): Promise<any> 
       }
     }
 
-    case "plan_strategic_shift": {
+    case "workflow:PlanStrategicShift": {
       const { shiftTitle, description, scope = [], timeline, stakeholders = [], riskLevel = "medium" } = args;
       
       try {
@@ -341,7 +341,7 @@ export async function handleWorkflowTool(name: string, args: any): Promise<any> 
       }
     }
 
-    case "capture_comprehensive_thought": {
+    case "workflow:CaptureComprehensiveThought": {
       const { content, category, urgency = "backlog", relatedRepositories = [], tags = [], context } = args;
       
       try {
@@ -405,7 +405,7 @@ export async function handleWorkflowTool(name: string, args: any): Promise<any> 
       }
     }
 
-    case "start_complex_todo": {
+    case "workflow:StartComplexTodo": {
       const { title, description, subtasks = [], repositories = [], dependencies = [], estimatedEffort = "days", priority = "Medium" } = args;
       
       try {

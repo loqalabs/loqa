@@ -917,7 +917,7 @@ async function suggestTaskBreakdown(interview: TaskInterviewState): Promise<Task
 
 export const taskManagementTools = [
   {
-    name: "add_todo",
+    name: "task:AddTodo",
     description: "Add a new task to the backlog using templates and priority",
     inputSchema: {
       type: "object",
@@ -950,7 +950,7 @@ export const taskManagementTools = [
     }
   },
   {
-    name: "capture_thought",
+    name: "task:CaptureThought",
     description: "Capture a quick thought or idea for later processing",
     inputSchema: {
       type: "object",
@@ -973,7 +973,7 @@ export const taskManagementTools = [
     }
   },
   {
-    name: "capture_comprehensive_thought",
+    name: "task:CaptureComprehensiveThought",
     description: "Capture complex thoughts with full context, automatic categorization, and intelligent follow-up suggestions",
     inputSchema: {
       type: "object",
@@ -1011,7 +1011,7 @@ export const taskManagementTools = [
     }
   },
   {
-    name: "list_templates",
+    name: "task:ListTemplates",
     description: "List all available task templates",
     inputSchema: {
       type: "object",
@@ -1024,7 +1024,7 @@ export const taskManagementTools = [
     }
   },
   {
-    name: "list_tasks",
+    name: "task:ListTasks",
     description: "List current tasks and drafts in the backlog",
     inputSchema: {
       type: "object",
@@ -1037,7 +1037,7 @@ export const taskManagementTools = [
     }
   },
   {
-    name: "create_task_from_thought",
+    name: "task:CreateFromThought",
     description: "Create a structured task from an evaluated thought/idea with pre-filled template suggestions",
     inputSchema: {
       type: "object",
@@ -1073,7 +1073,7 @@ export const taskManagementTools = [
     }
   },
   {
-    name: "start_comprehensive_task_creation",
+    name: "task:StartComprehensiveCreation",
     description: "Begin structured interview process to create fully-fleshed out, actionable tasks with proper scoping",
     inputSchema: {
       type: "object",
@@ -1091,7 +1091,7 @@ export const taskManagementTools = [
     }
   },
   {
-    name: "answer_task_interview_question",
+    name: "task:AnswerInterviewQuestion",
     description: "Provide an answer to a task creation interview question",
     inputSchema: {
       type: "object",
@@ -1109,7 +1109,7 @@ export const taskManagementTools = [
     }
   },
   {
-    name: "continue_task_development",
+    name: "task:ContinueDevelopment",
     description: "Resume development of draft tasks, showing available drafts and continuing where left off",
     inputSchema: {
       type: "object",
@@ -1130,7 +1130,7 @@ export async function handleTaskManagementTool(name: string, args: any): Promise
   const taskManager = new LoqaTaskManager(workspaceRoot);
 
   switch (name) {
-    case "add_todo": {
+    case "task:AddTodo": {
       const { title, template = "general", priority = "Medium", type, assignee } = args;
       
       // For complex tasks or high priority, use comprehensive creation
@@ -1167,7 +1167,7 @@ export async function handleTaskManagementTool(name: string, args: any): Promise
       }
     }
 
-    case "capture_thought": {
+    case "task:CaptureThought": {
       const { content, tags = [], context } = args;
       
       const thought: CapturedThought = {
@@ -1206,7 +1206,7 @@ export async function handleTaskManagementTool(name: string, args: any): Promise
       }
     }
 
-    case "capture_comprehensive_thought": {
+    case "task:CaptureComprehensiveThought": {
       const { content, category, context, relatedRepositories = [], tags = [], urgency = "backlog" } = args;
       
       const thought: CapturedThought = {
@@ -1245,7 +1245,7 @@ export async function handleTaskManagementTool(name: string, args: any): Promise
       }
     }
 
-    case "list_templates": {
+    case "task:ListTemplates": {
       const { repoPath } = args;
       
       try {
@@ -1268,7 +1268,7 @@ export async function handleTaskManagementTool(name: string, args: any): Promise
       }
     }
 
-    case "list_tasks": {
+    case "task:ListTasks": {
       const { repoPath } = args;
       
       try {
@@ -1338,7 +1338,7 @@ export async function handleTaskManagementTool(name: string, args: any): Promise
       }
     }
 
-    case "create_task_from_thought": {
+    case "task:CreateFromThought": {
       const { thoughtContent, suggestedTemplate, suggestedPriority, category, customTitle, additionalContext } = args;
       
       // Use comprehensive creation for complex tasks
@@ -1384,15 +1384,15 @@ export async function handleTaskManagementTool(name: string, args: any): Promise
       }
     }
 
-    case "start_comprehensive_task_creation": {
+    case "task:StartComprehensiveCreation": {
       return await handleStartComprehensiveTaskCreation(args, workspaceRoot);
     }
 
-    case "answer_task_interview_question": {
+    case "task:AnswerInterviewQuestion": {
       return await handleAnswerInterviewQuestion(args, workspaceRoot);
     }
 
-    case "continue_task_development": {
+    case "task:ContinueDevelopment": {
       return await handleContinueTaskDevelopment(args, workspaceRoot);
     }
 
