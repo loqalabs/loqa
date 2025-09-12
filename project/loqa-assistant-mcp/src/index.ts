@@ -408,6 +408,485 @@ Provide a structured analysis focusing on actionable insights.`;
   }
 
   /**
+   * Phase 2: Advanced Cross-Repository Coordination Intelligence
+   */
+  async performIntelligentCrossRepoAnalysis(options: {
+    changeType: 'protocol' | 'feature' | 'bugfix' | 'infrastructure' | 'breaking';
+    targetRepository: string;
+    changedFiles?: string[];
+    description?: string;
+  }): Promise<{
+    coordinationPlan: {
+      affectedRepositories: Array<{
+        name: string;
+        impactLevel: 'high' | 'medium' | 'low';
+        requiredChanges: string[];
+        estimatedEffort: string;
+        blockedBy: string[];
+        blocks: string[];
+      }>;
+      executionOrder: string[];
+      riskAssessment: {
+        level: 'low' | 'medium' | 'high' | 'critical';
+        factors: string[];
+        mitigations: string[];
+      };
+      timelineEstimate: {
+        total: string;
+        byPhase: { [phase: string]: string };
+      };
+      communicationPlan: {
+        stakeholders: string[];
+        checkpoints: string[];
+        documentation: string[];
+      };
+    };
+    intelligence: {
+      dependencyGraph: { [repo: string]: string[] };
+      criticalPath: string[];
+      parallelizable: string[][];
+      sequentialSteps: string[];
+    };
+  }> {
+    const { readFile } = await import('fs/promises');
+    const { join } = await import('path');
+    
+    // Load repository interdependencies and current state
+    const repoStates = await this.analyzeRepositoryStates();
+    const dependencyGraph = this.buildDependencyGraph(options.changeType);
+    const impactAnalysis = await this.analyzeChangeImpact(options, repoStates);
+    
+    // Generate intelligent coordination plan
+    const coordinationPlan = {
+      affectedRepositories: impactAnalysis.affectedRepos,
+      executionOrder: this.calculateOptimalExecutionOrder(dependencyGraph, impactAnalysis.affectedRepos),
+      riskAssessment: this.assessCoordinationRisk(options, impactAnalysis),
+      timelineEstimate: this.estimateCoordinationTimeline(impactAnalysis.affectedRepos, options.changeType),
+      communicationPlan: this.generateCommunicationPlan(impactAnalysis.affectedRepos, options)
+    };
+    
+    const intelligence = {
+      dependencyGraph,
+      criticalPath: this.identifyCriticalPath(dependencyGraph, impactAnalysis.affectedRepos),
+      parallelizable: this.identifyParallelizableWork(dependencyGraph, impactAnalysis.affectedRepos),
+      sequentialSteps: this.identifySequentialSteps(dependencyGraph, impactAnalysis.affectedRepos)
+    };
+    
+    return { coordinationPlan, intelligence };
+  }
+
+  private async analyzeRepositoryStates(): Promise<{ [repo: string]: any }> {
+    const repoStates: { [repo: string]: any } = {};
+    
+    for (const repoName of this.knownRepositories) {
+      const repoPath = join(this.actualWorkspaceRoot, repoName);
+      try {
+        const taskManager = new LoqaTaskManager(repoPath);
+        const taskList = await taskManager.listTasks();
+        
+        repoStates[repoName] = {
+          activeTasks: taskList.tasks?.length || 0,
+          hasBacklog: taskList.tasks?.length > 0,
+          // Could extend with git status, branch info, etc.
+        };
+      } catch {
+        repoStates[repoName] = {
+          activeTasks: 0,
+          hasBacklog: false
+        };
+      }
+    }
+    
+    return repoStates;
+  }
+
+  private buildDependencyGraph(changeType: string): { [repo: string]: string[] } {
+    // Loqa microservice architecture dependencies
+    const baseDependencies = {
+      'loqa-proto': [], // Foundation - no dependencies
+      'loqa-skills': ['loqa-proto'], // Depends on protocol definitions
+      'loqa-hub': ['loqa-proto', 'loqa-skills'], // Core service depends on proto and skills
+      'loqa-relay': ['loqa-proto'], // Audio client depends on protocol
+      'loqa-commander': ['loqa-hub'], // UI depends on hub API
+      'www-loqalabs-com': [], // Marketing site is independent
+      'loqa': [] // Main orchestration repo
+    };
+    
+    // Adjust dependencies based on change type
+    if (changeType === 'protocol') {
+      // Protocol changes affect all services that use gRPC
+      return {
+        'loqa-proto': [],
+        'loqa-skills': ['loqa-proto'],
+        'loqa-hub': ['loqa-proto', 'loqa-skills'],
+        'loqa-relay': ['loqa-proto'],
+        'loqa-commander': ['loqa-hub'], // Indirectly affected through hub
+        'www-loqalabs-com': [],
+        'loqa': ['loqa-hub', 'loqa-relay']
+      };
+    } else if (changeType === 'infrastructure') {
+      // Infrastructure changes affect deployment and orchestration
+      return {
+        'loqa': [], // Infrastructure changes start here
+        'loqa-hub': ['loqa'],
+        'loqa-commander': ['loqa'],
+        'loqa-relay': ['loqa'],
+        'loqa-skills': ['loqa'],
+        'www-loqalabs-com': ['loqa'],
+        'loqa-proto': []
+      };
+    }
+    
+    return baseDependencies;
+  }
+
+  private async analyzeChangeImpact(options: any, repoStates: any): Promise<{
+    affectedRepos: Array<{
+      name: string;
+      impactLevel: 'high' | 'medium' | 'low';
+      requiredChanges: string[];
+      estimatedEffort: string;
+      blockedBy: string[];
+      blocks: string[];
+    }>;
+  }> {
+    const affectedRepos = [];
+    const dependencyGraph = this.buildDependencyGraph(options.changeType);
+    
+    for (const [repoName, dependencies] of Object.entries(dependencyGraph)) {
+      const impactLevel = this.calculateRepositoryImpact(repoName, options);
+      const effort = this.estimateRepositoryEffort(repoName, impactLevel, options.changeType);
+      
+      if (impactLevel !== 'low' || repoName === options.targetRepository) {
+        affectedRepos.push({
+          name: repoName,
+          impactLevel,
+          requiredChanges: this.identifyRequiredChanges(repoName, options),
+          estimatedEffort: effort,
+          blockedBy: dependencies,
+          blocks: this.findRepositoriesBlockedBy(repoName, dependencyGraph)
+        });
+      }
+    }
+    
+    return { affectedRepos };
+  }
+
+  private calculateRepositoryImpact(repoName: string, options: any): 'high' | 'medium' | 'low' {
+    if (repoName === options.targetRepository) return 'high';
+    
+    const impactMatrix: { [changeType: string]: { [repo: string]: 'high' | 'medium' | 'low' } } = {
+      protocol: {
+        'loqa-hub': 'high',
+        'loqa-relay': 'high', 
+        'loqa-skills': 'medium',
+        'loqa-commander': 'low',
+        'loqa-proto': 'high',
+        'www-loqalabs-com': 'low',
+        'loqa': 'medium'
+      },
+      infrastructure: {
+        'loqa-hub': 'high',
+        'loqa-commander': 'medium',
+        'loqa-relay': 'medium',
+        'loqa-skills': 'low',
+        'loqa-proto': 'low',
+        'www-loqalabs-com': 'medium',
+        'loqa': 'high'
+      },
+      breaking: {
+        'loqa-hub': 'high',
+        'loqa-relay': 'high',
+        'loqa-commander': 'high',
+        'loqa-skills': 'high',
+        'loqa-proto': 'high',
+        'www-loqalabs-com': 'low',
+        'loqa': 'high'
+      }
+    };
+    
+    return impactMatrix[options.changeType]?.[repoName] || 'low';
+  }
+
+  private estimateRepositoryEffort(repoName: string, impactLevel: string, changeType: string): string {
+    const effortMatrix: { [impact: string]: { [change: string]: string } } = {
+      high: {
+        protocol: '2-3 days',
+        infrastructure: '1-2 days', 
+        breaking: '3-5 days',
+        feature: '2-4 days',
+        bugfix: '4-8 hours'
+      },
+      medium: {
+        protocol: '4-8 hours',
+        infrastructure: '2-4 hours',
+        breaking: '1-2 days', 
+        feature: '1-2 days',
+        bugfix: '2-4 hours'
+      },
+      low: {
+        protocol: '1-2 hours',
+        infrastructure: '1-2 hours',
+        breaking: '2-4 hours',
+        feature: '2-6 hours', 
+        bugfix: '1-2 hours'
+      }
+    };
+    
+    return effortMatrix[impactLevel]?.[changeType] || '2-4 hours';
+  }
+
+  private identifyRequiredChanges(repoName: string, options: any): string[] {
+    const changeTemplates: { [changeType: string]: { [repo: string]: string[] } } = {
+      protocol: {
+        'loqa-proto': ['Update .proto files', 'Regenerate bindings', 'Update documentation'],
+        'loqa-hub': ['Update gRPC client/server code', 'Update tests', 'Validate compatibility'],
+        'loqa-relay': ['Update gRPC client code', 'Update audio streaming', 'Test integration'],
+        'loqa-skills': ['Update plugin interface', 'Update skill implementations', 'Test skill loading'],
+        'loqa-commander': ['Update API calls if needed', 'Update UI if protocol affects exposed APIs'],
+        'loqa': ['Update docker-compose', 'Update documentation', 'Test end-to-end']
+      },
+      infrastructure: {
+        'loqa': ['Update docker-compose.yml', 'Update deployment scripts', 'Update documentation'],
+        'loqa-hub': ['Update Dockerfile', 'Update configuration', 'Test deployment'],
+        'loqa-commander': ['Update build process', 'Update Dockerfile', 'Test deployment'],
+        'loqa-relay': ['Update build process', 'Update configuration', 'Test deployment']
+      }
+    };
+    
+    return changeTemplates[options.changeType]?.[repoName] || ['Review and update as needed'];
+  }
+
+  private findRepositoriesBlockedBy(repoName: string, dependencyGraph: { [repo: string]: string[] }): string[] {
+    const blockedRepos = [];
+    for (const [repo, dependencies] of Object.entries(dependencyGraph)) {
+      if (dependencies.includes(repoName)) {
+        blockedRepos.push(repo);
+      }
+    }
+    return blockedRepos;
+  }
+
+  private calculateOptimalExecutionOrder(
+    dependencyGraph: { [repo: string]: string[] },
+    affectedRepos: Array<{ name: string }>
+  ): string[] {
+    const repoNames = affectedRepos.map(r => r.name);
+    const inDegree = new Map<string, number>();
+    const adjList = new Map<string, string[]>();
+    
+    // Initialize
+    for (const repo of repoNames) {
+      inDegree.set(repo, 0);
+      adjList.set(repo, []);
+    }
+    
+    // Build graph for affected repositories only
+    for (const repo of repoNames) {
+      const deps = dependencyGraph[repo] || [];
+      for (const dep of deps) {
+        if (repoNames.includes(dep)) {
+          adjList.get(dep)!.push(repo);
+          inDegree.set(repo, inDegree.get(repo)! + 1);
+        }
+      }
+    }
+    
+    // Topological sort
+    const result: string[] = [];
+    const queue: string[] = [];
+    
+    for (const [repo, degree] of inDegree) {
+      if (degree === 0) queue.push(repo);
+    }
+    
+    while (queue.length > 0) {
+      const repo: string = queue.shift()!;
+      result.push(repo);
+      
+      for (const dependent of adjList.get(repo)!) {
+        inDegree.set(dependent, inDegree.get(dependent)! - 1);
+        if (inDegree.get(dependent) === 0) {
+          queue.push(dependent);
+        }
+      }
+    }
+    
+    return result;
+  }
+
+  private assessCoordinationRisk(options: any, impactAnalysis: any): {
+    level: 'low' | 'medium' | 'high' | 'critical';
+    factors: string[];
+    mitigations: string[];
+  } {
+    const factors = [];
+    const mitigations = [];
+    let riskScore = 0;
+    
+    // Analyze risk factors
+    const highImpactRepos = impactAnalysis.affectedRepos.filter((r: any) => r.impactLevel === 'high');
+    if (highImpactRepos.length > 3) {
+      factors.push(`${highImpactRepos.length} repositories with high impact`);
+      mitigations.push('Implement feature flags for gradual rollout');
+      riskScore += 2;
+    }
+    
+    if (options.changeType === 'protocol' || options.changeType === 'breaking') {
+      factors.push('Breaking changes require careful coordination');
+      mitigations.push('Create compatibility layer during transition');
+      riskScore += 3;
+    }
+    
+    const totalEstimatedDays = impactAnalysis.affectedRepos.reduce((total: number, repo: any) => {
+      const days = parseFloat(repo.estimatedEffort.split('-')[0]) || 1;
+      return total + days;
+    }, 0);
+    
+    if (totalEstimatedDays > 10) {
+      factors.push('Large time commitment across multiple repositories');
+      mitigations.push('Break down into smaller phases');
+      riskScore += 2;
+    }
+    
+    // Determine risk level
+    let level: 'low' | 'medium' | 'high' | 'critical';
+    if (riskScore >= 6) level = 'critical';
+    else if (riskScore >= 4) level = 'high';
+    else if (riskScore >= 2) level = 'medium';
+    else level = 'low';
+    
+    return { level, factors, mitigations };
+  }
+
+  private estimateCoordinationTimeline(affectedRepos: any[], changeType: string): {
+    total: string;
+    byPhase: { [phase: string]: string };
+  } {
+    const phases = {
+      'Planning & Design': '1-2 days',
+      'Implementation': '3-8 days', // Based on affected repos
+      'Integration & Testing': '2-3 days',
+      'Deployment': '1 day'
+    };
+    
+    // Adjust based on complexity
+    const highImpactCount = affectedRepos.filter(r => r.impactLevel === 'high').length;
+    if (highImpactCount > 2 || changeType === 'breaking') {
+      phases['Implementation'] = '5-12 days';
+      phases['Integration & Testing'] = '3-5 days';
+    }
+    
+    const totalDays = Object.values(phases).reduce((sum, range) => {
+      const max = parseInt(range.split('-')[1]) || parseInt(range.split(' ')[0]);
+      return sum + max;
+    }, 0);
+    
+    return {
+      total: `${totalDays} days`,
+      byPhase: phases
+    };
+  }
+
+  private generateCommunicationPlan(affectedRepos: any[], options: any): {
+    stakeholders: string[];
+    checkpoints: string[];
+    documentation: string[];
+  } {
+    const stakeholders = ['Development Team'];
+    const checkpoints = ['Planning Complete', 'Implementation Phase 1 Complete'];
+    const documentation = ['Change Impact Analysis', 'Implementation Guide'];
+    
+    if (options.changeType === 'protocol' || options.changeType === 'breaking') {
+      stakeholders.push('Architecture Team', 'QA Team');
+      checkpoints.push('Protocol Review Complete', 'Backward Compatibility Verified');
+      documentation.push('Protocol Migration Guide', 'Breaking Changes Changelog');
+    }
+    
+    if (affectedRepos.some((r: any) => r.impactLevel === 'high')) {
+      checkpoints.push('Integration Testing Complete', 'Pre-deployment Review');
+    }
+    
+    return { stakeholders, checkpoints, documentation };
+  }
+
+  private identifyCriticalPath(dependencyGraph: { [repo: string]: string[] }, affectedRepos: any[]): string[] {
+    // Find the longest dependency chain
+    const repoNames = affectedRepos.map(r => r.name);
+    let longestPath: string[] = [];
+    
+    for (const repo of repoNames) {
+      const path = this.findLongestPathFrom(repo, dependencyGraph, repoNames, new Set());
+      if (path.length > longestPath.length) {
+        longestPath = path;
+      }
+    }
+    
+    return longestPath;
+  }
+
+  private findLongestPathFrom(
+    repo: string, 
+    dependencyGraph: { [repo: string]: string[] },
+    validRepos: string[],
+    visited: Set<string>
+  ): string[] {
+    if (visited.has(repo)) return [];
+    visited.add(repo);
+    
+    let longestPath = [repo];
+    const blockedRepos = this.findRepositoriesBlockedBy(repo, dependencyGraph)
+      .filter(r => validRepos.includes(r));
+    
+    for (const blocked of blockedRepos) {
+      const path = [repo, ...this.findLongestPathFrom(blocked, dependencyGraph, validRepos, new Set(visited))];
+      if (path.length > longestPath.length) {
+        longestPath = path;
+      }
+    }
+    
+    return longestPath;
+  }
+
+  private identifyParallelizableWork(dependencyGraph: { [repo: string]: string[] }, affectedRepos: any[]): string[][] {
+    const repoNames = affectedRepos.map(r => r.name);
+    const groups: string[][] = [];
+    const processed = new Set<string>();
+    
+    // Group repositories that can be worked on in parallel (no dependencies between them)
+    for (const repo of repoNames) {
+      if (processed.has(repo)) continue;
+      
+      const group = [repo];
+      processed.add(repo);
+      
+      for (const otherRepo of repoNames) {
+        if (processed.has(otherRepo)) continue;
+        
+        const deps1 = dependencyGraph[repo] || [];
+        const deps2 = dependencyGraph[otherRepo] || [];
+        
+        // Can work in parallel if neither depends on the other
+        if (!deps1.includes(otherRepo) && !deps2.includes(repo)) {
+          group.push(otherRepo);
+          processed.add(otherRepo);
+        }
+      }
+      
+      if (group.length > 1) {
+        groups.push(group);
+      }
+    }
+    
+    return groups;
+  }
+
+  private identifySequentialSteps(dependencyGraph: { [repo: string]: string[] }, affectedRepos: any[]): string[] {
+    // Identify repositories that must be done in sequence (critical path)
+    return this.identifyCriticalPath(dependencyGraph, affectedRepos);
+  }
+
+  /**
    * Run quality checks across repositories in dependency order
    */
   async runQualityChecks(options: { repository?: string } = {}): Promise<any> {

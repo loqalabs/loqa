@@ -839,6 +839,431 @@ function estimateComplexity(text: string): 'low' | 'medium' | 'high' {
   return 'low';
 }
 
+/**
+ * Phase 2: Advanced thought impact assessment with sprint alignment analysis
+ */
+async function performAdvancedThoughtAnalysis(
+  thoughtContent: string,
+  thoughtTags: string[],
+  thoughtContext: string | undefined,
+  category: string,
+  urgency: string,
+  workspaceRoot?: string
+): Promise<{
+  projectImpact: 'low' | 'medium' | 'high' | 'critical';
+  sprintAlignment: 'perfect' | 'good' | 'moderate' | 'poor';
+  strategicValue: number; // 0-100
+  implementationComplexity: 'trivial' | 'simple' | 'moderate' | 'complex' | 'architectural';
+  crossServiceImpact: string[];
+  timelineSuggestion: string;
+  contextualInsights: string[];
+  actionRecommendation: 'capture_only' | 'add_to_existing' | 'create_simple_task' | 'create_comprehensive_task' | 'schedule_discussion';
+}> {
+  const { readFile } = await import('fs/promises');
+  const { join } = await import('path');
+  const actualWorkspaceRoot = workspaceRoot || process.cwd();
+  
+  // Load current project context and active work
+  const projectDocs: string[] = [];
+  const activeTasks: any[] = [];
+  
+  try {
+    // Load project documentation
+    try {
+      const claudeFile = await readFile(join(actualWorkspaceRoot, '..', 'loqa', 'CLAUDE.md'), 'utf-8');
+      projectDocs.push(claudeFile);
+    } catch {
+      // Try alternative path structure
+      try {
+        const claudeFile = await readFile(join(actualWorkspaceRoot, 'CLAUDE.md'), 'utf-8');
+        projectDocs.push(claudeFile);
+      } catch {
+        // No project docs available
+      }
+    }
+    
+    // Load active tasks from key repositories to understand current sprint focus
+    const keyRepos = ['loqa-hub', 'loqa-commander', 'loqa-relay', 'loqa-skills'];
+    for (const repo of keyRepos) {
+      try {
+        const taskManager = new LoqaTaskManager(join(actualWorkspaceRoot, '..', repo));
+        const taskList = await taskManager.listTasks();
+        
+        for (const taskFile of taskList.tasks.slice(0, 5)) { // Load top 5 active tasks per repo
+          try {
+            const taskPath = join(actualWorkspaceRoot, '..', repo, 'backlog', 'tasks', taskFile);
+            const content = await readFile(taskPath, 'utf-8');
+            activeTasks.push({
+              file: taskFile,
+              repository: repo,
+              content: content.substring(0, 500)
+            });
+          } catch {
+            // Skip if task file can't be read
+          }
+        }
+      } catch {
+        // Repository doesn't exist or no tasks
+      }
+    }
+  } catch (error) {
+    console.warn('Could not load full project context for advanced analysis');
+  }
+
+  // Advanced analysis based on thought content and current project state
+  const analysis = {
+    projectImpact: assessProjectImpact(thoughtContent, category, projectDocs),
+    sprintAlignment: assessSprintAlignment(thoughtContent, activeTasks, category),
+    strategicValue: calculateStrategicValue(thoughtContent, thoughtTags, category, urgency, projectDocs),
+    implementationComplexity: assessImplementationComplexity(thoughtContent, category),
+    crossServiceImpact: identifyCrossServiceImpact(thoughtContent),
+    timelineSuggestion: generateTimelineSuggestion(thoughtContent, category, urgency),
+    contextualInsights: generateContextualInsights(thoughtContent, category, activeTasks),
+    actionRecommendation: determineActionRecommendation(thoughtContent, category, urgency, activeTasks)
+  };
+  
+  return analysis;
+}
+
+function assessProjectImpact(
+  content: string, 
+  category: string, 
+  projectDocs: string[]
+): 'low' | 'medium' | 'high' | 'critical' {
+  const contentLower = content.toLowerCase();
+  
+  // Critical impact indicators
+  if (contentLower.includes('breaking') || 
+      contentLower.includes('architecture') || 
+      contentLower.includes('security') ||
+      contentLower.includes('data loss') ||
+      category === 'security-compliance') {
+    return 'critical';
+  }
+  
+  // High impact indicators
+  if (contentLower.includes('protocol') ||
+      contentLower.includes('grpc') ||
+      contentLower.includes('api change') ||
+      contentLower.includes('database') ||
+      category === 'architecture') {
+    return 'high';
+  }
+  
+  // Medium impact indicators  
+  if (contentLower.includes('performance') ||
+      contentLower.includes('integration') ||
+      contentLower.includes('user experience') ||
+      category === 'feature-idea') {
+    return 'medium';
+  }
+  
+  return 'low';
+}
+
+function assessSprintAlignment(
+  content: string,
+  activeTasks: any[],
+  category: string
+): 'perfect' | 'good' | 'moderate' | 'poor' {
+  const contentLower = content.toLowerCase();
+  
+  // Check if thought aligns with current active tasks
+  const taskAlignment = activeTasks.filter(task => {
+    const taskContent = task.content?.toLowerCase() || '';
+    return contentLower.split(' ').some(word => 
+      word.length > 4 && taskContent.includes(word)
+    );
+  });
+  
+  if (taskAlignment.length >= 3) return 'perfect';
+  if (taskAlignment.length >= 2) return 'good'; 
+  if (taskAlignment.length >= 1) return 'moderate';
+  
+  // Category-based alignment assessment
+  if (category === 'bug-insight' || category === 'technical-debt') {
+    return 'good'; // Always relevant for sprint health
+  }
+  
+  return 'poor';
+}
+
+function calculateStrategicValue(
+  content: string,
+  tags: string[],
+  category: string,
+  urgency: string,
+  projectDocs: string[]
+): number {
+  let score = 50; // Base score
+  
+  const contentLower = content.toLowerCase();
+  
+  // Category-based scoring
+  const categoryScores: { [key: string]: number } = {
+    'architecture': 25,
+    'feature-idea': 20,
+    'technical-debt': 15,
+    'bug-insight': 18,
+    'optimization': 12,
+    'process-improvement': 10,
+    'research-topic': 8
+  };
+  score += categoryScores[category] || 5;
+  
+  // Urgency-based scoring
+  const urgencyScores: { [key: string]: number } = {
+    'immediate': 20,
+    'next-sprint': 15,
+    'backlog': 5,
+    'future': 0
+  };
+  score += urgencyScores[urgency] || 0;
+  
+  // Content-based strategic indicators
+  if (contentLower.includes('scalability') || contentLower.includes('performance')) score += 15;
+  if (contentLower.includes('user experience') || contentLower.includes('usability')) score += 12;
+  if (contentLower.includes('security') || contentLower.includes('privacy')) score += 20;
+  if (contentLower.includes('maintainability') || contentLower.includes('technical debt')) score += 10;
+  if (contentLower.includes('innovation') || contentLower.includes('competitive')) score += 8;
+  
+  // Microservice architecture relevance
+  if (contentLower.includes('microservice') || contentLower.includes('distributed')) score += 10;
+  if (contentLower.includes('grpc') || contentLower.includes('protocol')) score += 12;
+  
+  return Math.min(100, Math.max(0, score));
+}
+
+function assessImplementationComplexity(
+  content: string,
+  category: string
+): 'trivial' | 'simple' | 'moderate' | 'complex' | 'architectural' {
+  const contentLower = content.toLowerCase();
+  
+  // Architectural complexity
+  if (contentLower.includes('architecture') ||
+      contentLower.includes('refactor entire') ||
+      contentLower.includes('breaking change') ||
+      category === 'architecture') {
+    return 'architectural';
+  }
+  
+  // Complex implementation
+  if (contentLower.includes('integration') ||
+      contentLower.includes('multiple services') ||
+      contentLower.includes('database changes') ||
+      contentLower.includes('protocol change')) {
+    return 'complex';
+  }
+  
+  // Moderate implementation
+  if (contentLower.includes('new feature') ||
+      contentLower.includes('api changes') ||
+      contentLower.includes('performance optimization')) {
+    return 'moderate';
+  }
+  
+  // Simple implementation
+  if (contentLower.includes('config') ||
+      contentLower.includes('small change') ||
+      contentLower.includes('ui tweak')) {
+    return 'simple';
+  }
+  
+  return 'trivial';
+}
+
+function identifyCrossServiceImpact(content: string): string[] {
+  const contentLower = content.toLowerCase();
+  const impactedServices: string[] = [];
+  
+  if (contentLower.includes('hub') || contentLower.includes('core') || contentLower.includes('stt') || contentLower.includes('tts')) {
+    impactedServices.push('loqa-hub');
+  }
+  if (contentLower.includes('ui') || contentLower.includes('dashboard') || contentLower.includes('commander')) {
+    impactedServices.push('loqa-commander');
+  }
+  if (contentLower.includes('relay') || contentLower.includes('audio') || contentLower.includes('capture')) {
+    impactedServices.push('loqa-relay');
+  }
+  if (contentLower.includes('skill') || contentLower.includes('plugin')) {
+    impactedServices.push('loqa-skills');
+  }
+  if (contentLower.includes('protocol') || contentLower.includes('grpc') || contentLower.includes('api')) {
+    impactedServices.push('loqa-proto');
+  }
+  
+  return [...new Set(impactedServices)];
+}
+
+function generateTimelineSuggestion(
+  content: string,
+  category: string,
+  urgency: string
+): string {
+  const complexity = assessImplementationComplexity(content, category);
+  
+  const timelineMap: { [key: string]: string } = {
+    'trivial': 'Can be completed in 1-2 hours',
+    'simple': 'Estimated 2-4 hours of focused work',
+    'moderate': 'Plan for 1-2 days of development',
+    'complex': 'Requires 3-5 days with proper testing',
+    'architectural': 'Major effort: 1-2 weeks with coordination'
+  };
+  
+  let suggestion = timelineMap[complexity];
+  
+  if (urgency === 'immediate') {
+    suggestion += ' - Consider prioritizing in current sprint';
+  } else if (urgency === 'next-sprint') {
+    suggestion += ' - Good candidate for next sprint planning';
+  } else if (urgency === 'backlog') {
+    suggestion += ' - Add to backlog for future consideration';
+  }
+  
+  return suggestion;
+}
+
+function generateContextualInsights(
+  content: string,
+  category: string,
+  activeTasks: any[]
+): string[] {
+  const insights: string[] = [];
+  const contentLower = content.toLowerCase();
+  
+  // Cross-task relationship insights
+  const relatedTasks = activeTasks.filter(task => 
+    contentLower.split(' ').some(word => 
+      word.length > 4 && task.content?.toLowerCase().includes(word)
+    )
+  );
+  
+  if (relatedTasks.length > 0) {
+    insights.push(`Relates to ${relatedTasks.length} active task(s) - consider coordination`);
+  }
+  
+  // Architecture insights
+  if (contentLower.includes('microservice') || contentLower.includes('distributed')) {
+    insights.push('Microservice architecture consideration - may require cross-service coordination');
+  }
+  
+  // Performance insights
+  if (contentLower.includes('performance') || contentLower.includes('optimization')) {
+    insights.push('Performance optimization - measure before/after impact');
+  }
+  
+  // User experience insights
+  if (contentLower.includes('user') || contentLower.includes('ux')) {
+    insights.push('User-facing change - consider UX impact and testing');
+  }
+  
+  // Technical debt insights
+  if (category === 'technical-debt') {
+    insights.push('Technical debt item - balance immediate value vs. long-term maintainability');
+  }
+  
+  return insights;
+}
+
+function determineActionRecommendation(
+  content: string,
+  category: string,
+  urgency: string,
+  activeTasks: any[]
+): 'capture_only' | 'add_to_existing' | 'create_simple_task' | 'create_comprehensive_task' | 'schedule_discussion' {
+  const complexity = assessImplementationComplexity(content, category);
+  const impact = assessProjectImpact(content, category, []);
+  
+  // Schedule discussion for architectural or critical items
+  if (complexity === 'architectural' || impact === 'critical') {
+    return 'schedule_discussion';
+  }
+  
+  // Add to existing task if high alignment
+  const relatedTasks = activeTasks.filter(task => 
+    content.toLowerCase().split(' ').some(word => 
+      word.length > 4 && task.content?.toLowerCase().includes(word)
+    )
+  );
+  
+  if (relatedTasks.length >= 2 && urgency !== 'future') {
+    return 'add_to_existing';
+  }
+  
+  // Create comprehensive task for complex items with high impact
+  if ((complexity === 'complex' || impact === 'high') && urgency !== 'future') {
+    return 'create_comprehensive_task';
+  }
+  
+  // Create simple task for moderate complexity with immediate urgency
+  if (complexity === 'moderate' && urgency === 'immediate') {
+    return 'create_simple_task';
+  }
+  
+  // Just capture for future reference
+  return 'capture_only';
+}
+
+/**
+ * Phase 2: Intelligent category detection for simple thoughts
+ */
+function detectThoughtCategory(content: string, tags: string[]): string {
+  const contentLower = content.toLowerCase();
+  
+  // Check explicit category tags first
+  const categoryTags = ['architecture', 'feature-idea', 'technical-debt', 'process-improvement', 'research-topic', 'bug-insight', 'optimization'];
+  for (const tag of tags) {
+    if (categoryTags.includes(tag)) return tag;
+  }
+  
+  // Content-based detection
+  if (contentLower.includes('architecture') || contentLower.includes('system design') || contentLower.includes('microservice')) {
+    return 'architecture';
+  }
+  if (contentLower.includes('bug') || contentLower.includes('error') || contentLower.includes('issue')) {
+    return 'bug-insight';
+  }
+  if (contentLower.includes('debt') || contentLower.includes('refactor') || contentLower.includes('cleanup')) {
+    return 'technical-debt';
+  }
+  if (contentLower.includes('performance') || contentLower.includes('optimize') || contentLower.includes('faster')) {
+    return 'optimization';
+  }
+  if (contentLower.includes('feature') || contentLower.includes('new') || contentLower.includes('add')) {
+    return 'feature-idea';
+  }
+  if (contentLower.includes('process') || contentLower.includes('workflow') || contentLower.includes('improve')) {
+    return 'process-improvement';
+  }
+  if (contentLower.includes('research') || contentLower.includes('investigate') || contentLower.includes('explore')) {
+    return 'research-topic';
+  }
+  
+  return 'feature-idea'; // Default category
+}
+
+function estimateThoughtUrgency(content: string): string {
+  const contentLower = content.toLowerCase();
+  
+  // Immediate urgency indicators
+  if (contentLower.includes('urgent') || contentLower.includes('asap') || contentLower.includes('critical') || contentLower.includes('breaking')) {
+    return 'immediate';
+  }
+  
+  // Next sprint indicators
+  if (contentLower.includes('soon') || contentLower.includes('next') || contentLower.includes('priority')) {
+    return 'next-sprint';
+  }
+  
+  // Future indicators
+  if (contentLower.includes('someday') || contentLower.includes('eventually') || contentLower.includes('maybe')) {
+    return 'future';
+  }
+  
+  return 'backlog'; // Default urgency
+}
+
 function determineCategory(analysis: any): string {
   if (analysis.hasArchitecturalImplications) return 'architecture';
   if (analysis.hasUrgencyIndicators) return 'urgent';
@@ -1796,7 +2221,21 @@ export async function handleTaskManagementTool(name: string, args: any): Promise
       };
 
       try {
-        // First check for related existing tasks
+        // Phase 2: Intelligent category detection for simple thoughts
+        const detectedCategory = detectThoughtCategory(content, tags);
+        const estimatedUrgency = estimateThoughtUrgency(content);
+        
+        // Phase 2: Advanced analysis for simple thoughts too
+        const advancedAnalysis = await performAdvancedThoughtAnalysis(
+          content, 
+          [...tags, detectedCategory], 
+          context, 
+          detectedCategory, 
+          estimatedUrgency, 
+          workspaceRoot
+        );
+        
+        // Legacy analysis for compatibility
         const projectState = await analyzeCurrentProjectState(workspaceRoot);
         const relatedTasks = await findRelatedExistingTasks(content, tags, context, projectState);
         
@@ -1804,7 +2243,17 @@ export async function handleTaskManagementTool(name: string, args: any): Promise
         const evaluation = await evaluateThoughtPriority(content, tags, context, workspaceRoot);
         const result = await taskManager.captureThought(thought);
         
-        let responseText = `💡 Thought captured successfully!\n\n📁 **File**: ${result.filePath}\n🏷️ **Tags**: ${tags.join(', ') || 'None'}\n⏰ **Captured**: ${thought.timestamp.toISOString()}`;
+        let responseText = `🧠 **Smart Thought Analysis Complete!**\n\n📁 **File**: ${result.filePath}\n🏷️ **Tags**: ${tags.join(', ') || 'None'}\n📂 **Auto-Category**: ${detectedCategory}\n⚡ **Estimated Urgency**: ${estimatedUrgency}\n⏰ **Captured**: ${thought.timestamp.toISOString()}\n\n`;
+        
+        // Phase 2: Add advanced analysis summary for simple thoughts
+        responseText += `🔍 **Quick Analysis**:\n`;
+        responseText += `• **Impact**: ${advancedAnalysis.projectImpact}\n`;
+        responseText += `• **Complexity**: ${advancedAnalysis.implementationComplexity}\n`;
+        responseText += `• **Strategic Value**: ${advancedAnalysis.strategicValue}/100\n\n`;
+        
+        if (advancedAnalysis.crossServiceImpact.length > 0) {
+          responseText += `🔗 **Affects**: ${advancedAnalysis.crossServiceImpact.join(', ')}\n\n`;
+        }
         
         // Prioritize suggesting addition to existing tasks over creating new ones
         if (relatedTasks.length > 0) {
@@ -1865,15 +2314,72 @@ export async function handleTaskManagementTool(name: string, args: any): Promise
       };
 
       try {
-        // First check for related existing tasks
+        // Phase 2: Advanced Thought Analysis with Sprint Alignment
+        const advancedAnalysis = await performAdvancedThoughtAnalysis(
+          content, 
+          [...tags, category, urgency], 
+          context, 
+          category, 
+          urgency, 
+          workspaceRoot
+        );
+        
+        // Legacy analysis for compatibility
         const projectState = await analyzeCurrentProjectState(workspaceRoot);
         const relatedTasks = await findRelatedExistingTasks(content, [...tags, category, urgency], context, projectState);
-        
-        // Enhanced evaluation for comprehensive thoughts
         const evaluation = await evaluateComprehensiveThought(content, category, urgency, relatedRepositories, workspaceRoot);
+        
         const result = await taskManager.captureThought(thought);
         
-        let responseText = `💡 **Comprehensive Thought Captured!**\n\n📁 **File**: ${result.filePath}\n📂 **Category**: ${category}\n⚡ **Urgency**: ${urgency}\n🏷️ **Tags**: ${tags.join(', ') || 'None'}\n🗂️ **Related Repos**: ${relatedRepositories.join(', ') || 'None'}\n⏰ **Captured**: ${thought.timestamp.toISOString()}`;
+        let responseText = `🧠 **Advanced Thought Analysis Complete!**\n\n📁 **File**: ${result.filePath}\n📂 **Category**: ${category}\n⚡ **Urgency**: ${urgency}\n🏷️ **Tags**: ${tags.join(', ') || 'None'}\n🗂️ **Related Repos**: ${relatedRepositories.join(', ') || 'None'}\n⏰ **Captured**: ${thought.timestamp.toISOString()}\n\n`;
+        
+        // Phase 2: Advanced Analysis Results
+        responseText += `🔍 **AI Analysis Results**:\n`;
+        responseText += `• **Project Impact**: ${advancedAnalysis.projectImpact.toUpperCase()}\n`;
+        responseText += `• **Sprint Alignment**: ${advancedAnalysis.sprintAlignment}\n`;
+        responseText += `• **Strategic Value**: ${advancedAnalysis.strategicValue}/100\n`;
+        responseText += `• **Implementation**: ${advancedAnalysis.implementationComplexity}\n`;
+        responseText += `• **Timeline**: ${advancedAnalysis.timelineSuggestion}\n\n`;
+        
+        if (advancedAnalysis.crossServiceImpact.length > 0) {
+          responseText += `🔗 **Cross-Service Impact**: ${advancedAnalysis.crossServiceImpact.join(', ')}\n\n`;
+        }
+        
+        if (advancedAnalysis.contextualInsights.length > 0) {
+          responseText += `💡 **Contextual Insights**:\n`;
+          advancedAnalysis.contextualInsights.forEach(insight => {
+            responseText += `• ${insight}\n`;
+          });
+          responseText += `\n`;
+        }
+        
+        // Action Recommendation based on AI Analysis
+        responseText += `🎯 **Recommended Action**: `;
+        switch (advancedAnalysis.actionRecommendation) {
+          case 'schedule_discussion':
+            responseText += `**Schedule Team Discussion** - This ${advancedAnalysis.implementationComplexity} complexity item requires collaborative planning\n\n`;
+            responseText += `**Next Steps**:\n• Schedule architecture discussion\n• Involve key stakeholders\n• Document decision rationale\n`;
+            break;
+            
+          case 'add_to_existing':
+            responseText += `**Add to Existing Task** - High alignment with current active work\n\n`;
+            responseText += `**Next Steps**:\n• Review related active tasks\n• Choose best-fit task for integration\n• Update task with additional context\n`;
+            break;
+            
+          case 'create_comprehensive_task':
+            responseText += `**Create Comprehensive Task** - High impact and complexity warrant structured planning\n\n`;
+            responseText += `**Ready to create?** Use: \`/loqa task create "${content.substring(0, 50)}..."\`\n`;
+            break;
+            
+          case 'create_simple_task':
+            responseText += `**Create Simple Task** - Immediate priority with moderate complexity\n\n`;
+            responseText += `**Quick create**: Use \`/add-todo "${content.substring(0, 50)}..." --priority=High\`\n`;
+            break;
+            
+          default: // capture_only
+            responseText += `**Captured for Future Reference** - Added to knowledge base for later consideration\n\n`;
+            responseText += `💭 **Status**: Thought successfully captured and will be available for future task creation and planning sessions.\n`;
+        }
         
         // Check for existing task matches first, especially for comprehensive thoughts
         if (relatedTasks.length > 0) {
