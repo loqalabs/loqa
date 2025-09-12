@@ -40,6 +40,7 @@ class MCPWorkspaceManager extends LoqaWorkspaceManager {
     recommendedTask?: any;
     alternativeTasks: any[];
     analysis: any;
+    aiAnalysis?: any;
   }> {
     const taskManager = new LoqaTaskManager(this.actualWorkspaceRoot);
     const showTop = options.showTop || 3;
@@ -151,6 +152,14 @@ class MCPWorkspaceManager extends LoqaWorkspaceManager {
     const recommendedTask = scoredTasks.length > 0 ? scoredTasks[0] : undefined;
     const alternativeTasks = scoredTasks.slice(1, showTop);
     
+    // AI-Powered Enhancement: Add strategic analysis
+    let aiAnalysis = null;
+    try {
+      aiAnalysis = await this.performAIPoweredTaskAnalysis(scoredTasks, options);
+    } catch (error) {
+      console.warn('AI analysis failed for task prioritization:', error);
+    }
+    
     return {
       recommendedTask,
       alternativeTasks,
@@ -164,8 +173,238 @@ class MCPWorkspaceManager extends LoqaWorkspaceManager {
           repositoryFocus: options.repositoryFocus || 'all',
           priorityFilter: options.priority || 'all'
         }
-      }
+      },
+      aiAnalysis
     };
+  }
+
+  /**
+   * AI-Powered strategic analysis of task prioritization results
+   */
+  private async performAIPoweredTaskAnalysis(scoredTasks: any[], options: any): Promise<any> {
+    const { readFile } = await import('fs/promises');
+    const { join } = await import('path');
+
+    // Load project context
+    const projectDocs: string[] = [];
+    
+    try {
+      // Load main project documentation
+      const claudeFile = await readFile(join(this.actualWorkspaceRoot, 'loqa', 'CLAUDE.md'), 'utf-8');
+      projectDocs.push(claudeFile);
+      
+      // Load README files from key repositories
+      const keyRepos = ['loqa-hub', 'loqa-commander', 'loqa-relay', 'loqa-skills'];
+      for (const repo of keyRepos) {
+        try {
+          const readmePath = join(this.actualWorkspaceRoot, repo, 'README.md');
+          const readme = await readFile(readmePath, 'utf-8');
+          projectDocs.push(`# ${repo} README\n\n${readme}`);
+        } catch {
+          // README doesn't exist, skip
+        }
+      }
+    } catch (error) {
+      console.warn('Could not load project documentation for AI analysis');
+    }
+
+    // Prepare task summaries for analysis
+    const taskSummaries = scoredTasks.slice(0, 10).map(task => ({
+      title: task.title,
+      repository: task.repository,
+      priority: task.priority,
+      score: task.score,
+      contentPreview: task.content?.substring(0, 300) + (task.content?.length > 300 ? '...' : '')
+    }));
+
+    // Use the existing AI reasoning approach (similar to task matching and work selection)
+    const analysisPrompt = `Based on the Loqa voice assistant project context and current task landscape, analyze the following task prioritization results and provide strategic insights.
+
+**Project Context:**
+${projectDocs.join('\n\n---\n\n').substring(0, 8000)}
+
+**Current Context:**
+- Role: ${options.roleContext || 'general developer'}
+- Time Available: ${options.timeAvailable || 'flexible'}
+- Repository Focus: ${options.repositoryFocus || 'all repositories'}
+- Priority Filter: ${options.priority || 'all priorities'}
+
+**Top Prioritized Tasks:**
+${taskSummaries.map((task, i) => `${i + 1}. ${task.title} (${task.repository}) - Priority: ${task.priority}, Score: ${task.score}`).join('\n')}
+
+Analyze this prioritization and provide:
+
+1. **Strategic Alignment**: How well do the top tasks align with Loqa's current architecture goals?
+2. **Project Health Assessment**: What does the task distribution tell us about project health?
+3. **Bottleneck Analysis**: Identify any potential bottlenecks or dependencies
+4. **Optimization Recommendations**: Suggest 2-3 specific improvements to task prioritization
+5. **Risk Assessment**: Flag any high-risk tasks or missing critical work
+6. **Timeline Insights**: Estimate realistic completion windows given the current context
+
+Provide a structured analysis focusing on actionable insights.`;
+
+    // Simple analysis result structure (in a real implementation, this would be sent to an LLM)
+    // For now, provide intelligent heuristic-based analysis
+    const analysis = {
+      strategicAlignment: this.assessStrategicAlignment(taskSummaries),
+      projectHealth: this.assessProjectHealth(scoredTasks, options),
+      bottlenecks: this.identifyBottlenecks(taskSummaries),
+      optimizationRecommendations: this.generateOptimizationRecommendations(scoredTasks, options),
+      riskAssessment: this.assessTaskRisks(taskSummaries),
+      timelineInsights: this.generateTimelineInsights(scoredTasks, options)
+    };
+
+    return analysis;
+  }
+
+  private assessStrategicAlignment(taskSummaries: any[]): string {
+    const repoDistribution = taskSummaries.reduce((acc: any, task) => {
+      acc[task.repository] = (acc[task.repository] || 0) + 1;
+      return acc;
+    }, {});
+    
+    const hasBackendWork = taskSummaries.some(t => ['loqa-hub', 'loqa-relay'].includes(t.repository));
+    const hasFrontendWork = taskSummaries.some(t => ['loqa-commander'].includes(t.repository));
+    const hasSkillsWork = taskSummaries.some(t => t.repository === 'loqa-skills');
+    
+    if (hasBackendWork && hasFrontendWork && hasSkillsWork) {
+      return 'Excellent - balanced across core microservice architecture';
+    } else if (hasBackendWork && hasFrontendWork) {
+      return 'Good - covers core services, consider skills development';
+    } else {
+      return 'Moderate - focused on specific area, may benefit from broader scope';
+    }
+  }
+
+  private assessProjectHealth(scoredTasks: any[], options: any): string {
+    const highPriorityCount = scoredTasks.filter(t => t.priority === 'High').length;
+    const totalTasks = scoredTasks.length;
+    const avgScore = scoredTasks.reduce((sum, t) => sum + t.score, 0) / totalTasks;
+    
+    if (highPriorityCount > totalTasks * 0.5) {
+      return 'Critical - high volume of urgent tasks indicates potential issues';
+    } else if (avgScore > 4) {
+      return 'Healthy - tasks are well-aligned with current priorities';
+    } else {
+      return 'Stable - normal task distribution with room for optimization';
+    }
+  }
+
+  private identifyBottlenecks(taskSummaries: any[]): string[] {
+    const bottlenecks: string[] = [];
+    
+    const hubTasks = taskSummaries.filter(t => t.repository === 'loqa-hub').length;
+    const protoTasks = taskSummaries.filter(t => t.repository === 'loqa-proto').length;
+    
+    if (protoTasks > 2) {
+      bottlenecks.push('Protocol changes may block other service development');
+    }
+    
+    if (hubTasks > 5) {
+      bottlenecks.push('Heavy focus on hub service may indicate architectural complexity');
+    }
+    
+    const skillsImplementation = taskSummaries.some(t => 
+      t.title.toLowerCase().includes('skill') && t.title.toLowerCase().includes('implement'));
+    const skillsInfra = taskSummaries.some(t => 
+      t.title.toLowerCase().includes('skill') && (t.title.toLowerCase().includes('system') || t.title.toLowerCase().includes('framework')));
+    
+    if (skillsImplementation && !skillsInfra) {
+      bottlenecks.push('Skills implementation without framework may need infrastructure work');
+    }
+    
+    return bottlenecks;
+  }
+
+  private generateOptimizationRecommendations(scoredTasks: any[], options: any): string[] {
+    const recommendations: string[] = [];
+    
+    // Role-specific recommendations
+    if (options.roleContext === 'developer') {
+      const implTasks = scoredTasks.filter(t => 
+        t.content?.toLowerCase().includes('implement') || 
+        t.content?.toLowerCase().includes('feature')).length;
+      if (implTasks < 3) {
+        recommendations.push('Consider prioritizing implementation tasks to maintain development momentum');
+      }
+    }
+    
+    // Repository balance recommendations
+    const repoDistribution = scoredTasks.reduce((acc: any, task) => {
+      acc[task.repository] = (acc[task.repository] || 0) + 1;
+      return acc;
+    }, {});
+    
+    const maxRepoTasks = Math.max(...Object.values(repoDistribution) as number[]);
+    const totalTasks = scoredTasks.length;
+    
+    if (maxRepoTasks > totalTasks * 0.7) {
+      recommendations.push('Consider distributing tasks across repositories to avoid single-point bottlenecks');
+    }
+    
+    // Priority balance
+    const highPriorityTasks = scoredTasks.filter(t => t.priority === 'High').length;
+    if (highPriorityTasks > 5) {
+      recommendations.push('High volume of high-priority tasks - consider re-evaluating priorities or breaking down tasks');
+    }
+    
+    return recommendations;
+  }
+
+  private assessTaskRisks(taskSummaries: any[]): string[] {
+    const risks: string[] = [];
+    
+    // Protocol change risks
+    const protoChanges = taskSummaries.filter(t => 
+      t.repository === 'loqa-proto' || 
+      t.title.toLowerCase().includes('protocol') ||
+      t.title.toLowerCase().includes('grpc')).length;
+    
+    if (protoChanges > 0) {
+      risks.push('Protocol changes require careful cross-service coordination');
+    }
+    
+    // Infrastructure risks
+    const infraTasks = taskSummaries.filter(t => 
+      t.title.toLowerCase().includes('deploy') ||
+      t.title.toLowerCase().includes('docker') ||
+      t.title.toLowerCase().includes('infrastructure')).length;
+    
+    if (infraTasks > 2) {
+      risks.push('Multiple infrastructure changes increase deployment complexity');
+    }
+    
+    // Breaking change risks
+    const breakingTasks = taskSummaries.filter(t => 
+      t.title.toLowerCase().includes('breaking') ||
+      t.title.toLowerCase().includes('migrate') ||
+      t.title.toLowerCase().includes('refactor')).length;
+      
+    if (breakingTasks > 1) {
+      risks.push('Multiple breaking changes may require careful sequencing');
+    }
+    
+    return risks;
+  }
+
+  private generateTimelineInsights(scoredTasks: any[], options: any): string {
+    const timeAvailable = options.timeAvailable || 'flexible';
+    const taskCount = scoredTasks.length;
+    
+    if (timeAvailable.includes('hour')) {
+      const hours = parseInt(timeAvailable.match(/\d+/)?.[0] || '2');
+      const feasibleTasks = Math.min(hours, 2);
+      return `With ${hours} hour(s), focus on ${feasibleTasks} high-impact task(s) from the top priorities`;
+    } else if (timeAvailable.includes('day')) {
+      const days = parseInt(timeAvailable.match(/\d+/)?.[0] || '1');
+      const feasibleTasks = Math.min(days * 2, 5);
+      return `${days} day(s) allows completion of ${feasibleTasks} tasks with proper testing and quality checks`;
+    } else if (timeAvailable.includes('week')) {
+      const weeks = parseInt(timeAvailable.match(/\d+/)?.[0] || '1');
+      return `${weeks} week(s) enables comprehensive feature development across multiple repositories`;
+    } else {
+      return `Flexible timeline allows strategic selection based on complexity and dependencies`;
+    }
   }
 
   /**
