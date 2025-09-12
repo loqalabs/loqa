@@ -37,6 +37,46 @@ backlog board view --no-interactive   # Non-interactive board view
 3. **Templates**: Use templates in `/backlog/templates/` for consistent task structure
 4. **Cross-Repo**: Use `cross-repo-work-template.md` for multi-repository coordination
 
+### 🚨 **CRITICAL: Automatic Task Closure Workflow**
+
+**NEVER require user prompting for task completion** - Claude Code must automatically close tasks when work is finished:
+
+#### **Mandatory Completion Checklist (AUTO-EXECUTE):**
+```bash
+# When ALL acceptance criteria are met, AUTOMATICALLY:
+
+1. ✅ Update task status in backlog file:
+   - Change status to "✅ COMPLETED" 
+   - Add completion date
+   - Add PR links and metrics
+   - Mark all acceptance criteria as [x]
+
+2. ✅ Close related GitHub issues:
+   - Add comprehensive completion comment with metrics
+   - Close issue with proper status update
+   - Reference PR numbers and branch names
+
+3. ✅ Update any cross-references:
+   - Link PRs to issues and tasks
+   - Update related task dependencies
+   - Record completion in project documentation
+```
+
+#### **Completion Triggers (AUTO-DETECT):**
+- All acceptance criteria verified ✅
+- PR merged successfully
+- All tests passing
+- No blocking issues remaining
+- User indicates work is complete
+
+#### **What NOT to do:**
+- ❌ Never leave tasks in "in_progress" when work is done
+- ❌ Never require user to remind about closure
+- ❌ Never leave GitHub issues open after completion
+- ❌ Never forget to add completion metadata
+
+**This is standard workflow automation - not optional!**
+
 ### 🤖 AI-Powered Development Commands (Phases 1-3)
 The unified `/loqa` command provides advanced AI-powered workflow intelligence with discoverable categories:
 

@@ -478,7 +478,7 @@ Implements authentication middleware (task-21)
 - [ ] Documentation updated
 - [ ] Quality gates passed
 
-**Related Task**: [task-21](../backlog/tasks/task-021-implement-auth-middleware.md)
+**Related Task**: [task-21](../backlog/tasks/task-21%20-%20Plugin-based-Commander-Widgets-System.md)
 ```
 
 **Parameters:**
