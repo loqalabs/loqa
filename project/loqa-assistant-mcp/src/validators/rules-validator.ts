@@ -2,14 +2,34 @@ import { simpleGit, SimpleGit } from 'simple-git';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { ValidationResult, RepositoryInfo } from '../types/index.js';
+import { resolveWorkspaceRoot } from '../utils/workspace-resolver.js';
 
 export class LoqaRulesValidator {
-  private git: SimpleGit;
-  private workspaceRoot: string;
+  private git: SimpleGit | undefined;
+  private workspaceRoot: string | undefined;
+  private workspaceRootPromise: Promise<string> | undefined;
 
   constructor(workspaceRoot?: string) {
-    this.workspaceRoot = workspaceRoot || process.cwd();
-    this.git = simpleGit(this.workspaceRoot);
+    this.workspaceRoot = workspaceRoot;
+    // Don't initialize git here, wait for workspace root resolution
+  }
+
+  private async getWorkspaceRoot(): Promise<string> {
+    if (this.workspaceRoot) {
+      if (!this.git) {
+        this.git = simpleGit(this.workspaceRoot);
+      }
+      return this.workspaceRoot;
+    }
+
+    if (!this.workspaceRootPromise) {
+      this.workspaceRootPromise = resolveWorkspaceRoot();
+    }
+
+    const resolvedRoot = await this.workspaceRootPromise;
+    this.workspaceRoot = resolvedRoot;
+    this.git = simpleGit(resolvedRoot);
+    return resolvedRoot;
   }
 
   /**
@@ -123,7 +143,7 @@ export class LoqaRulesValidator {
    * Get repository information
    */
   async getRepositoryInfo(repoPath?: string): Promise<RepositoryInfo> {
-    const path = repoPath || this.workspaceRoot;
+    const path = repoPath || await this.getWorkspaceRoot();
     const git = simpleGit(path);
 
     try {
@@ -146,7 +166,7 @@ export class LoqaRulesValidator {
    * Validate quality gates
    */
   async validateQualityGates(repoPath?: string): Promise<ValidationResult> {
-    const path = repoPath || this.workspaceRoot;
+    const path = repoPath || await this.getWorkspaceRoot();
     const violations: string[] = [];
     const warnings: string[] = [];
 
@@ -188,7 +208,7 @@ export class LoqaRulesValidator {
    * Pre-commit validation
    */
   async validatePreCommit(message: string, repoPath?: string): Promise<ValidationResult> {
-    const path = repoPath || this.workspaceRoot;
+    const path = repoPath || await this.getWorkspaceRoot();
     const allViolations: string[] = [];
     const allWarnings: string[] = [];
 
