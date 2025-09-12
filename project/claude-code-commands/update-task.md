@@ -13,10 +13,18 @@ If parameters are provided via `$ARGUMENTS`, parse them directly to identify and
 
 If no parameters are provided, use this interactive workflow:
 
-1. **Task Selection**: Present available tasks for selection:
-   - List current tasks with brief descriptions
-   - Allow selection by task ID, title search, or interactive choice
-   - Show task context including current status and linked issues
+1. **Task Identification**: Multiple flexible ways to locate the task:
+   - **Direct ID**: `task-9`, `task-024`, etc.
+   - **Repository + Task**: `loqa-hub/task-15`, `loqa-commander/task-8`
+   - **GitHub Issue**: `loqalabs/loqa#84`, `#85`, `issue-49`
+   - **Description Search**: "security observability", "voice collaboration"
+   - **Interactive Browse**: Show available tasks for selection
+   
+2. **Smart Task Discovery**: When no specific task is provided:
+   - List recent tasks across all repositories
+   - Search by keywords in title/description
+   - Filter by status, priority, or assignee
+   - Show GitHub issue links and status
 
 2. **Update Type Detection**: Analyze the provided update to determine:
    - **Research notes**: Links, references, or investigation findings
@@ -42,10 +50,14 @@ If no parameters are provided, use this interactive workflow:
 
 ## Parameters
 
-### Task Identification
+### Task Identification (Multiple Flexible Methods)
 - `--taskId=task-9`: Update specific task by ID
+- `--repo-task=loqa-hub/task-15`: Repository and task ID combination
+- `--github-issue=loqalabs/loqa#84`: GitHub repository and issue number
+- `--issue-id=#85`: Issue number (assumes current repo)
 - `--title="Security Observability"`: Find task by title search
-- `--interactive`: Force interactive task selection
+- `--search="voice collaboration"`: Search in task descriptions
+- `--interactive`: Force interactive task selection and browsing
 
 ### Update Content
 - `--note="Research finding..."`: Add research note or reference
@@ -61,21 +73,55 @@ If no parameters are provided, use this interactive workflow:
 
 ## Examples
 
-**Add research note:**
-- `/update-task task-9 --note="Check out Claude Trace (https://github.com/badlogic/lemmy/tree/main/apps/claude-trace) for debugging workflow inspiration"`
-- `/update-task --title="Security Observability" --link="https://youtube.com/watch?v=example" --context="Video demonstrates relevant debugging techniques"`
+### Task Identification Methods
 
-**Update implementation details:**
-- `/update-task task-15 --section="Technical Requirements" --note="Must support PostgreSQL 15+ for advanced JSON operations"`
-- `/update-task --taskId=task-22 --context="Scope expanded to include mobile responsive design"`
+**Direct task ID:**
+- `/update-task task-9 --note="Check out Claude Trace for debugging workflow inspiration"`
+- `/update-task task-024 --context="Added dependency on Phase 1 evaluation"`
 
-**Interactive update:**
-- `/update-task` (no parameters) → guided task selection and update workflow
-- `/update-task task-12` → show task details and prompt for update content
+**Repository + task combination:**
+- `/update-task loqa-hub/task-15 --note="Performance requirements updated"`
+- `/update-task loqa-commander/task-8 --priority=High --context="Critical for UI overhaul"`
 
-**Priority/status updates:**
+**GitHub issue identification:**
+- `/update-task loqalabs/loqa#84 --note="Research completed, ready for implementation"`
+- `/update-task #85 --context="Blocked pending API design review"`
+- `/update-task issue-49 --link="https://example.com/security-docs"`
+
+**Search and discovery:**
+- `/update-task --search="voice collaboration" --note="New WebRTC approach identified"`
+- `/update-task --title="Security Observ" --link="https://youtube.com/watch?v=example"`
+
+**Interactive browsing:**
+- `/update-task` → "Which task would you like to update? You can specify by:"
+  - Task ID: `task-9`
+  - Repository: `loqa-hub/task-15`  
+  - GitHub issue: `#84` or `loqalabs/loqa#85`
+  - Description: `"the security observability task"`
+- `/update-task --interactive` → browse available tasks with filtering
+
+### Update Content Examples
+
+**Research notes:**
+- `/update-task task-9 --note="Claude Trace (https://github.com/badlogic/lemmy/tree/main/apps/claude-trace) demos innovative debugging workflows"`
+- `/update-task #84 --link="https://youtube.com/watch?v=example&t=636s" --context="Video shows relevant debugging techniques at 10:36"`
+
+**Implementation updates:**
+- `/update-task loqa-hub/task-15 --section="Technical Requirements" --note="Must support PostgreSQL 15+ for JSON operations"`
+- `/update-task --search="authentication" --context="OAuth 2.0 implementation approach decided"`
+
+**Status and priority changes:**
 - `/update-task task-8 --priority=High --context="Critical for MVP milestone"`
-- `/update-task task-18 --status="Blocked" --note="Waiting for API endpoint implementation"`
+- `/update-task issue-49 --status="Blocked" --note="Waiting for security audit completion"`
+
+### Natural Language Responses
+
+When asked "Which task?", users can respond with:
+- `"task-9"` → Direct ID
+- `"loqa-hub task about voice processing"` → Repository + description
+- `"GitHub issue 84"` or `"issue #85"` → GitHub issue reference  
+- `"the security observability debugging task"` → Description search
+- `"show me recent tasks"` → Browse available tasks
 
 ## Update Types and Formatting
 
@@ -157,5 +203,60 @@ Update task-[ID]: [Update type] - [Brief description]
 - **Auto-formatting**: Ensures consistent, well-structured documentation
 - **Version Control**: Automatic commits preserve change history
 - **Context Preservation**: Research and decisions are captured for future reference
+
+## Interactive Task Discovery Workflow
+
+When no task is specified (`/update-task` with no parameters):
+
+```
+🔍 Which task would you like to update?
+
+You can specify the task in any of these ways:
+• Task ID: task-9, task-024
+• Repository + Task: loqa-hub/task-15, loqa-commander/task-8  
+• GitHub Issue: #84, loqalabs/loqa#85, issue-49
+• Description: "security observability task", "voice collaboration feature"
+• Browse: "show recent tasks" or "list all tasks"
+
+Please describe which task you want to update:
+```
+
+**User Response Examples:**
+- `"task-9"` → Direct lookup of task-9
+- `"the security debugging task"` → Search task descriptions for matching keywords
+- `"loqa-hub task about voice processing"` → Search loqa-hub repository tasks
+- `"GitHub issue 84"` → Lookup GitHub issue #84 and find linked backlog task
+- `"show me recent tasks"` → Display last 10 tasks across all repositories
+- `"list loqa-commander tasks"` → Show all tasks for loqa-commander repository
+
+**Follow-up Clarification:**
+If multiple matches found:
+```
+🎯 Found multiple tasks matching "voice processing":
+
+1. task-12 (loqa-hub): Voice activity detection implementation
+2. task-18 (loqa-relay): Voice capture optimization  
+3. task-21 (loqa-commander): Voice timeline visualization
+
+Which task would you like to update? (1, 2, 3, or be more specific)
+```
+
+**Cross-Repository Discovery:**
+```
+📋 Recent Tasks Across All Repositories:
+
+loqa-hub:
+• task-15: Authentication system refactor (In Progress)
+• task-12: Voice activity detection (To Do) 
+
+loqa-commander:  
+• task-8: UI dashboard redesign (High Priority)
+• task-21: Timeline visualization (Medium)
+
+loqa-skills:
+• task-7: Home Assistant integration (Blocked)
+
+Which task would you like to update?
+```
 
 💡 **Perfect for cases like:** Adding Claude Trace research to security observability tasks, recording architectural decisions, updating technical requirements, or noting relevant resources discovered during development.
