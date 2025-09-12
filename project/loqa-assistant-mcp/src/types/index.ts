@@ -34,6 +34,42 @@ export interface CapturedThought {
   context?: string;
 }
 
+// Enhanced task creation types
+export interface TaskInterviewState {
+  id: string;
+  originalInput: string;
+  currentQuestion: string;
+  questionsAsked: string[];
+  answersReceived: { question: string; answer: string }[];
+  accumulatedInfo: {
+    title?: string;
+    description?: string;
+    acceptanceCriteria?: string[];
+    dependencies?: string[];
+    repositories?: string[];
+    estimatedComplexity?: 'low' | 'medium' | 'high';
+    suggestedBreakdown?: TaskBreakdownSuggestion[];
+  };
+  interviewComplete: boolean;
+  timestamp: Date;
+}
+
+export interface TaskBreakdownSuggestion {
+  title: string;
+  description: string;
+  repository: string;
+  dependencies?: string[];
+  estimatedEffort: string;
+}
+
+export interface ComprehensiveTaskCreationOptions extends TaskCreationOptions {
+  description: string;
+  acceptanceCriteria: string[];
+  dependencies?: string[];
+  repositories: string[];
+  breakdown?: TaskBreakdownSuggestion[];
+}
+
 // Role management types
 export interface RoleConfig {
   role_id: string;

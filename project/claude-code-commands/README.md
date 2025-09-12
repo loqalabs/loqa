@@ -22,9 +22,10 @@ cd loqa/project/claude-code-commands
 |---------|---------|---------|
 | `/work` | Begin working on tasks with AI selection | `/work --priority=P1` |
 | `/recommend` | Get AI task recommendations | `/recommend --roleContext=developer` |
-| `/thought` | Capture technical thoughts and concerns | `/thought "Memory leak in audio processing"` |
-| `/idea` | Capture feature ideas and improvements | `/idea "Add real-time collaboration"` |
-| `/create-task` | Create detailed backlog tasks | `/create-task --title="Implement VAD" --priority=High` |
+| `/thought` | Capture technical thoughts with intelligent task suggestions | `/thought "Memory leak in audio processing"` |
+| `/idea` | Capture feature ideas with intelligent task suggestions | `/idea "Add real-time collaboration"` |
+| `/create-task` | Create detailed backlog tasks with intelligent complexity routing | `/create-task "Implement real-time collaboration"` |
+| `/resume-draft` | **NEW**: Resume draft task creation and answer interview questions | `/resume-draft abc-123 "My answer"` |
 | `/branch` | Create feature branches from tasks | `/branch --taskId=21` |
 | `/pr` | Create pull requests with task linking | `/pr --draft=true` |
 | `/test` | Run cross-service integration tests | `/test --repositories=loqa-hub,loqa-relay` |
@@ -72,6 +73,32 @@ git pull
 ./install.sh --force
 ```
 
+## 🎯 New: Comprehensive Task Creation System
+
+The latest update introduces a powerful task creation system that ensures every task is **fully actionable**, **properly scoped**, and **ready for immediate work**.
+
+### Key Features
+
+- **🧠 Intelligent Evaluation**: Thoughts and ideas are automatically analyzed against current project priorities
+- **📋 Guided Interviews**: 5-question structured process ensures complete task definition
+- **🔄 Persistent Drafts**: Resume interrupted task creation exactly where you left off
+- **🏗️ Multi-Repository Coordination**: Automatic repository detection and cross-repo task creation
+- **⚡ Smart Breakdown**: Complex tasks automatically split into manageable subtasks
+- **💾 File-Based Persistence**: All work saved in `.loqa-assistant/` directory (gitignored)
+
+### Quick Start
+
+1. **Simple task**: `/create-task "Fix login bug"` (auto-upgraded if complex)
+2. **Complex task**: `/create-task "Implement real-time collaboration"`  
+3. **Resume work**: `/resume-draft` (shows available drafts and interviews)
+4. **Answer questions**: `/resume-draft abc-123 "My detailed answer"`
+
+### Smart Integration
+
+- **`/thought`** and **`/idea`** now evaluate against project goals and suggest task creation
+- **`/create-task`** automatically upgrades to comprehensive creation for complex scenarios
+- All existing workflows preserved - new features enhance without breaking changes
+
 ## 🧪 Testing Installation
 
 After installation, test that commands are working:
@@ -79,7 +106,8 @@ After installation, test that commands are working:
 # In Claude Code, try:
 /work --help
 /recommend
-/thought "Test thought capture"
+/thought "Test thought capture with intelligent evaluation"
+/create-task "Test guided task creation"
 ```
 
 ## 📁 Command Files
@@ -88,9 +116,10 @@ After installation, test that commands are working:
 |------|---------|-------------|
 | `work.md` | `/work` | Task work with intelligent selection |
 | `recommend.md` | `/recommend` | AI task recommendations |
-| `thought.md` | `/thought` | Capture technical thoughts |
-| `idea.md` | `/idea` | Capture feature ideas |
-| `create-task.md` | `/create-task` | Create structured tasks |
+| `thought.md` | `/thought` | Capture technical thoughts with intelligent evaluation |
+| `idea.md` | `/idea` | Capture feature ideas with intelligent evaluation |
+| `create-task.md` | `/create-task` | Create structured tasks with intelligent complexity routing |
+| `resume-draft.md` | `/resume-draft` | **NEW**: Resume draft task creation and answer questions |
 | `branch.md` | `/branch` | Create feature branches |
 | `pr.md` | `/pr` | Create pull requests |
 | `test.md` | `/test` | Run integration tests |

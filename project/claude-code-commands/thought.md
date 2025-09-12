@@ -1,6 +1,6 @@
 ---
-description: "Capture technical thoughts, concerns, and insights for later processing"
-allowed_tools: ["mcp__loqa-assistant__capture_thought"]
+description: "Capture technical thoughts, concerns, and insights with intelligent task creation suggestions"
+allowed_tools: ["mcp__loqa-assistant__capture_thought", "mcp__loqa-assistant__capture_comprehensive_thought", "mcp__loqa-assistant__start_comprehensive_task_creation"]
 ---
 
 # Capture Technical Thought
@@ -23,14 +23,49 @@ If no parameters are provided, use this interactive workflow:
 
 3. **Confirmation**: Present suggestions to user: "Based on your description, I suggest capturing this technical thought with the following details: [show suggestions]. Would you like to save the thought with these parameters, or would you like to modify any of them?"
 
-4. **Capture thought**: Only after user confirmation, use the MCP function `mcp__loqa-assistant__capture_thought` with the final parameters.
+4. **Intelligent evaluation**: The system will analyze the thought against current project priorities and suggest task creation if warranted.
 
-## Parameters for MCP Function
+5. **Task creation suggestion**: If the thought aligns with project goals, you'll see:
+   ```
+   🚀 Priority Assessment: This thought appears to align with current project goals!
+   
+   Why it matters: [reasoning based on current project state]
+   
+   💪 Suggested Action: Create a comprehensive task with:
+   • Template: feature
+   • Priority: High
+   • Category: architecture
+   
+   Ready to create a fully-scoped task? Use:
+   /create-task "your thought content"
+   ```
 
-- **content**: The thought content (required, can be provided as `--content="..."` or as the main argument)
-- **context**: Optional context about where this thought came from (if provided as `--context=...`)
-- **tags**: Optional tags to categorize the thought (if provided as `--tags=tag1,tag2,tag3`)
-- **category**: Defaults to "technical-architecture" for /thought command
+6. **Capture thought**: Use the appropriate MCP function based on complexity:
+   - `mcp__loqa-assistant__capture_thought` for simple thoughts
+   - `mcp__loqa-assistant__capture_comprehensive_thought` for complex thoughts with full context
+
+## Parameters for MCP Functions
+
+### Basic Thought Capture (`mcp__loqa-assistant__capture_thought`)
+- **content**: The thought content (required)
+- **context**: Optional context about where this thought came from
+- **tags**: Optional tags to categorize the thought
+
+### Comprehensive Thought Capture (`mcp__loqa-assistant__capture_comprehensive_thought`)
+- **content**: The detailed thought content (required)
+- **category**: Category of the thought (technical-debt, architecture, bug-insight, optimization, etc.)
+- **context**: Context about where this thought originated
+- **relatedRepositories**: Repositories this thought relates to
+- **tags**: Custom tags for categorization
+- **urgency**: Urgency level (immediate, next-sprint, backlog, future)
+
+## Smart Features
+
+- **Dynamic Priority Assessment**: Analyzes thoughts against current project state and active tasks
+- **Repository Detection**: Suggests relevant repositories based on thought content
+- **Gap Analysis**: Identifies if the thought addresses underserved areas of the project
+- **Workload Balancing**: Considers current task distribution when suggesting priorities
+- **Intelligent Task Creation**: Direct path from valuable thoughts to actionable tasks
 
 This command is for technical concerns, architecture insights, and development observations. For feature ideas, use `/idea` instead.
 
