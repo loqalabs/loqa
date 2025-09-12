@@ -129,45 +129,52 @@ For GitHub operations, use the **official GitHub MCP server** instead of custom 
 
 **Migration Note**: The `github-cli-specialist` role has been removed in favor of the official solution.
 
-## 🏗️ MCP Server Tools
+## 🚨 CRITICAL: CLI-First Workflow Integration
 
-When using the MCP server directly (for Claude Code integration):
+**NEW POLICY**: The MCP server now enforces **CLI-first** development by calling official backlog CLI commands underneath instead of bypassing them. This ensures consistency with official Backlog.md workflow.
 
-### `validate_commit_message`
-```json
-{
-  "name": "validate_commit_message",
-  "arguments": {
-    "message": "fix(auth): resolve validation bug"
-  }
-}
+### Key Changes:
+- ✅ **All MCP task commands** now call `backlog task create` underneath
+- ✅ **Directory validation** ensures commands run from correct repository root
+- ✅ **No more task bypassing** - eliminates manual task file creation
+- ✅ **Official compatibility** maintained with Backlog.md standards
+
+### CLI-First Integration Benefits:
+- 🎯 **Consistent Numbering**: Tasks created with proper IDs, no duplicates
+- 🔄 **Workflow Automation**: Full Backlog.md lifecycle management
+- 📊 **Database Integrity**: CLI maintains proper task relationships
+- 🛡️ **Error Prevention**: No broken references or malformed tasks
+
+## 🏗️ MCP Server Tools (CLI-Backed)
+
+All MCP tools now call official backlog CLI commands underneath while providing enhanced Claude Code integration:
+
+### 🚨 Task Management (CLI-Backed)
+
+**`add_todo` - Creates tasks via backlog CLI**
+```bash
+# MCP calls this underneath:
+backlog task create "Task title" --description "..." --priority high --ac "criteria"
 ```
 
-### `validate_pre_commit`  
-```json
-{
-  "name": "validate_pre_commit",
-  "arguments": {
-    "message": "fix(auth): resolve validation bug",
-    "repoPath": "/path/to/repo"
-  }
-}
+**`list_tasks` - Displays tasks via CLI**
+```bash  
+# MCP calls this underneath:
+backlog task list --plain
 ```
 
-### `get_repository_info`
-```json
-{
-  "name": "get_repository_info",
-  "arguments": {
-    "repoPath": "/path/to/repo"
-  }
-}
+**`capture_thought` - Quick idea capture**
+```bash
+# MCP calls this underneath:  
+backlog task create "Quick thought: ..." --draft --labels idea
 ```
 
-### `validate_backlog_context`
+### 🔍 Validation Tools
+
+**`validate_backlog_context` - Directory Safety**
 ```json
 {
-  "name": "validate_backlog_context",
+  "name": "validate_backlog_context", 
   "arguments": {
     "targetRepo": "loqa"
   }
@@ -183,9 +190,43 @@ When using the MCP server directly (for Claude Code integration):
 - 💡 **Smart Recommendations**: Provides navigation guidance to correct location
 
 **Use Cases**:
-- Before running `backlog task create` commands
+- Before running any backlog CLI commands
 - When unsure which repository you're currently in
 - To prevent accidentally creating backlog directories in workspace root
+
+**`validate_commit_message` - Commit Quality**
+```json
+{
+  "name": "validate_commit_message",
+  "arguments": {
+    "message": "fix(auth): resolve validation bug"
+  }
+}
+```
+
+**`get_repository_info` - Repository Health**
+```json
+{
+  "name": "get_repository_info",
+  "arguments": {
+    "repoPath": "/path/to/repo"
+  }
+}
+```
+
+### 🚨 Migration from Custom to CLI-First
+
+**OLD (Bypassed CLI)**: ❌
+- Custom task file creation
+- Manual numbering systems  
+- Inconsistent formatting
+- Database inconsistencies
+
+**NEW (CLI-First)**: ✅
+- All tasks created via `backlog task create`
+- Official numbering and formatting
+- Consistent workflow automation
+- Full Backlog.md compliance
 
 ## 📁 File Structure
 

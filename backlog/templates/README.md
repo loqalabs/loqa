@@ -50,25 +50,57 @@ This directory contains standardized templates for common work patterns in the L
 
 ## How to Use Templates
 
-### Method 1: Manual Copy
-1. Copy the appropriate template file
-2. Rename to your task: `task-001-your-task-name.md`
-3. Fill in all sections with specific details
-4. Save in `backlog/tasks/` directory
+### 🚨 CRITICAL: ALWAYS Use Backlog CLI (NEVER Manual Creation)
 
-### Method 2: Backlog.md CLI
+**CORRECT Method - CLI Creation:**
 ```bash
-# Create task using backlog CLI
-backlog task create "Your task title"
+# ⚠️ IMPORTANT: Run from TARGET REPOSITORY root directory
+cd loqa-hub                 # For hub service tasks
+cd loqa-commander          # For UI tasks
+cd loqa-skills             # For skill development tasks
 
-# Then copy template content into the created task file
+# Create task with template-specific details:
+backlog task create "Your task title" \
+  --description "Detailed description of what needs to be done" \
+  --priority high \
+  --ac "First acceptance criterion" \
+  --ac "Second acceptance criterion" \
+  --labels feature,backend
+
+# Templates guide these parameters:
+# - General: --labels general
+# - Bug Fix: --labels bug-fix,priority-high  
+# - Feature: --labels feature,enhancement
+# - Protocol: --labels protocol,breaking-change
+# - Cross-Repo: --labels cross-repo,coordination
 ```
 
-### Method 3: Interactive Commands (Future)
-Once MCP commands are implemented:
+**❌ NEVER DO - Manual File Creation:**
 ```bash
-/add-todo --template=feature "New voice command processing"
-/add-todo --template=bug-fix "Audio streaming disconnection issue"
+# DON'T copy template files manually
+# DON'T create task files by hand
+# DON'T bypass the CLI tool
+```
+
+**Why CLI-First is Critical:**
+- ✅ Ensures proper task numbering and formatting
+- ✅ Maintains database consistency
+- ✅ Enables workflow automation
+- ✅ Prevents duplicate IDs and broken references
+- ✅ Follows official Backlog.md standards
+
+### Advanced CLI Usage
+```bash
+# Create with implementation plan
+backlog task create "Add authentication system" \
+  --plan "1. Research JWT libraries\n2. Implement middleware\n3. Add tests"
+
+# Create with dependencies
+backlog task create "User dashboard" \
+  --dep task-15,task-16
+
+# Create as child task
+backlog task create -p 20 "Add login form validation"
 ```
 
 ## Template Guidelines

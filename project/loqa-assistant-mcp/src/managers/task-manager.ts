@@ -4,6 +4,8 @@ import { join } from 'path';
 import { glob } from 'glob';
 import { TaskTemplate, TaskCreationOptions, CapturedThought } from '../types/index.js';
 import { executeGitCommand } from '../utils/git-repo-detector.js';
+import { resolveWorkspaceRootWithContext } from '../utils/context-detector.js';
+import { getDefaultRepository } from '../config/repositories.js';
 
 export class LoqaTaskManager {
   private workspaceRoot: string;
@@ -53,22 +55,214 @@ export class LoqaTaskManager {
   }
 
   /**
-   * Create a new task using a template
+   * Create a new task using the official backlog CLI (CLI-FIRST APPROACH)
    */
   async createTaskFromTemplate(options: TaskCreationOptions, repoPath?: string): Promise<{ taskId: string; filePath: string; content: string }> {
-    const path = repoPath || this.workspaceRoot;
-    const backlogPath = join(path, 'backlog');
-    const tasksPath = join(backlogPath, 'tasks');
+    // Determine the correct repository path using existing utilities
+    const path = await this.resolveRepositoryPath(repoPath);
     
-    // Ensure backlog structure exists
+    // Ensure we're in a valid backlog repository
+    const backlogPath = join(path, 'backlog');
     try {
       await fs.access(backlogPath);
     } catch {
-      // Provide more specific error information
       const repoName = path.split('/').pop() || path;
       throw new Error(`Backlog not found in ${repoName} (${path}). Expected backlog directory at: ${backlogPath}. Run 'backlog init' in the repository or check if you're in the correct directory.`);
     }
 
+    // Build backlog CLI command arguments
+    const cliArgs = ['task', 'create', options.title];
+    
+    if (options.description) {
+      cliArgs.push('--description', options.description);
+    }
+    
+    if (options.priority) {
+      cliArgs.push('--priority', options.priority.toLowerCase());
+    }
+    
+    if (options.type) {
+      // Map type to appropriate labels
+      const typeLabels = this.mapTypeToLabels(options.type, options.template);
+      cliArgs.push('--labels', typeLabels);
+    } else if (options.template) {
+      // Use template as label
+      cliArgs.push('--labels', options.template);
+    }
+    
+    if (options.assignee) {
+      cliArgs.push('--assignee', options.assignee);
+    }
+
+    // Execute backlog CLI command from the REPOSITORY ROOT (not workspace root)
+    try {
+      const result = await this.executeBacklogCliCommand(cliArgs, path);
+      
+      if (!result.success) {
+        throw new Error(`Backlog CLI failed: ${result.stderr}`);
+      }
+      
+      // Parse CLI output to extract task information
+      const taskInfo = this.parseBacklogCliOutput(result.stdout, path);
+      
+      return {
+        taskId: taskInfo.taskId,
+        filePath: taskInfo.filePath,
+        content: taskInfo.content || result.stdout
+      };
+      
+    } catch (error) {
+      // Fallback to manual creation only if CLI is not available
+      console.warn(`Backlog CLI failed, falling back to manual creation: ${error}`);
+      return this.createTaskManuallyAsFallback(options, path);
+    }
+  }
+
+  /**
+   * Resolve the correct repository path using existing workspace detection utilities
+   */
+  private async resolveRepositoryPath(repoPath?: string): Promise<string> {
+    if (repoPath) {
+      return repoPath;
+    }
+    
+    try {
+      // Use existing workspace resolution with context awareness
+      const contextResult = await resolveWorkspaceRootWithContext();
+      
+      if (contextResult.context.type === 'individual-repo') {
+        // We're already in a repository
+        return contextResult.path;
+      } else if (contextResult.context.type === 'workspace-root') {
+        // We're in workspace root, pick a default repository for task management
+        // Default to 'loqa' repository for general tasks
+        const defaultRepo = getDefaultRepository('configuration'); // 'loqa' for general config/docs
+        return join(contextResult.path, defaultRepo);
+      } else {
+        // Unknown context, fallback to workspace root or current path
+        return contextResult.path;
+      }
+    } catch (error) {
+      // Fallback to the original workspaceRoot if context detection fails
+      console.warn(`Repository path resolution failed: ${error}, using workspaceRoot`);
+      return this.workspaceRoot;
+    }
+  }
+
+  /**
+   * Map task type to appropriate labels for backlog CLI
+   */
+  private mapTypeToLabels(type: string, template?: string): string {
+    const labels = [];
+    
+    // Add template as primary label
+    if (template) {
+      labels.push(template);
+    }
+    
+    // Add type-specific labels
+    switch (type.toLowerCase()) {
+      case 'feature':
+        labels.push('feature', 'enhancement');
+        break;
+      case 'bug fix':
+        labels.push('bug-fix', 'priority-high');
+        break;
+      case 'improvement':
+        labels.push('improvement', 'enhancement');
+        break;
+      case 'documentation':
+        labels.push('documentation', 'docs');
+        break;
+      case 'refactoring':
+        labels.push('refactoring', 'code-quality');
+        break;
+      default:
+        labels.push('general');
+    }
+    
+    return labels.join(',');
+  }
+
+  /**
+   * Execute backlog CLI command
+   */
+  private async executeBacklogCliCommand(args: string[], workingDir: string): Promise<{ success: boolean; stdout: string; stderr: string }> {
+    return new Promise((resolve) => {
+      const { spawn } = require('child_process');
+      const child = spawn('backlog', args, { 
+        cwd: workingDir, 
+        stdio: ['ignore', 'pipe', 'pipe'],
+        shell: true 
+      });
+      
+      let stdout = '';
+      let stderr = '';
+      
+      child.stdout?.on('data', (data: Buffer) => {
+        stdout += data.toString();
+      });
+      
+      child.stderr?.on('data', (data: Buffer) => {
+        stderr += data.toString();
+      });
+      
+      child.on('close', (code: number) => {
+        resolve({
+          success: code === 0,
+          stdout: stdout.trim(),
+          stderr: stderr.trim()
+        });
+      });
+      
+      child.on('error', (error: Error) => {
+        resolve({
+          success: false,
+          stdout: '',
+          stderr: error.message
+        });
+      });
+    });
+  }
+
+  /**
+   * Parse backlog CLI output to extract task information
+   */
+  private parseBacklogCliOutput(output: string, repositoryPath: string): { taskId: string; filePath: string; content?: string } {
+    // Look for task ID pattern in output (e.g., "Created task-042")
+    const taskIdMatch = output.match(/(?:Created|Task)\s+task-(\d+)/i);
+    const taskId = taskIdMatch ? taskIdMatch[1] : '000';
+    
+    // Look for file path in output
+    const filePathMatch = output.match(/File:\s*(.+\.md)/i);
+    let filePath = '';
+    
+    if (filePathMatch) {
+      filePath = filePathMatch[1];
+      // Make absolute if relative
+      if (!require('path').isAbsolute(filePath)) {
+        filePath = join(repositoryPath, filePath);
+      }
+    } else {
+      // Construct expected file path using the repository path
+      const tasksDir = join(repositoryPath, 'backlog', 'tasks');
+      const taskFiles = require('glob').sync(`task-${taskId}-*.md`, { cwd: tasksDir });
+      if (taskFiles.length > 0) {
+        filePath = join(tasksDir, taskFiles[0]);
+      }
+    }
+    
+    return { taskId, filePath };
+  }
+
+  /**
+   * Fallback manual task creation (ONLY when CLI fails)
+   */
+  private async createTaskManuallyAsFallback(options: TaskCreationOptions, path: string): Promise<{ taskId: string; filePath: string; content: string }> {
+    console.warn('⚠️  Using manual task creation as fallback - CLI method preferred');
+    
+    const tasksPath = join(path, 'backlog', 'tasks');
+    
     // Get the next task ID
     const taskId = await this.getNextTaskId(tasksPath);
     
@@ -80,9 +274,7 @@ export class LoqaTaskManager {
       if (template) {
         templateContent = template.content;
       } else {
-        // Use general template as fallback
-        const generalTemplate = templates.find(t => t.name.toLowerCase().includes('general'));
-        templateContent = generalTemplate?.content || await this.getDefaultTemplate();
+        templateContent = await this.getDefaultTemplate();
       }
     } else {
       templateContent = await this.getDefaultTemplate();
@@ -95,7 +287,6 @@ export class LoqaTaskManager {
     
     if (options.type) {
       content = content.replace(/\[Feature\/Bug Fix\/Improvement\/Documentation\/Refactoring\]/g, options.type);
-      content = content.replace(/\[Addition\/Modification\/Deprecation\/Breaking Change\]/g, options.type);
     }
     
     if (options.priority) {
@@ -269,10 +460,57 @@ export class LoqaTaskManager {
   }
 
   /**
-   * List current tasks
+   * List current tasks using backlog CLI (CLI-FIRST APPROACH)
    */
   async listTasks(repoPath?: string): Promise<{ tasks: string[]; drafts: string[] }> {
-    const path = repoPath || this.workspaceRoot;
+    // Use the same repository resolution logic
+    const path = await this.resolveRepositoryPath(repoPath);
+    
+    try {
+      // Try CLI approach first
+      const cliResult = await this.executeBacklogCliCommand(['task', 'list', '--plain'], path);
+      
+      if (cliResult.success) {
+        // Parse CLI output to extract task files
+        const taskFiles = this.parseTaskListOutput(cliResult.stdout);
+        return {
+          tasks: taskFiles,
+          drafts: [] // CLI doesn't distinguish drafts yet, use fallback for drafts
+        };
+      } else {
+        console.warn('Backlog CLI list failed, falling back to file system scan');
+        return this.listTasksManuallyAsFallback(path);
+      }
+    } catch (error) {
+      console.warn(`Backlog CLI error: ${error}, falling back to manual approach`);
+      return this.listTasksManuallyAsFallback(path);
+    }
+  }
+
+  /**
+   * Parse task list CLI output to extract filenames
+   */
+  private parseTaskListOutput(output: string): string[] {
+    const tasks: string[] = [];
+    const lines = output.split('\n');
+    
+    for (const line of lines) {
+      // Look for task file patterns in output
+      const taskMatch = line.match(/task-\d+-[^.]+\.md/);
+      if (taskMatch) {
+        tasks.push(taskMatch[0]);
+      }
+    }
+    
+    return tasks.sort();
+  }
+
+  /**
+   * Fallback manual task listing (ONLY when CLI fails)
+   */
+  private async listTasksManuallyAsFallback(path: string): Promise<{ tasks: string[]; drafts: string[] }> {
+    console.warn('⚠️  Using manual task listing as fallback - CLI method preferred');
+    
     const tasksPath = join(path, 'backlog', 'tasks');
     const draftsPath = join(path, 'backlog', 'drafts');
     
