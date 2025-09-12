@@ -2,6 +2,7 @@
 
 ## Feature Overview
 **Feature Name:** Extract loqa workflow ecosystem into a reusable framework...
+**Task ID:** 024
 
 **Component(s):** [List affected services/components]
 - [ ] loqa-hub
@@ -90,9 +91,31 @@
 - [ ] Rollback plan documented
 
 ## Related Issues
-- GitHub Issue: #[issue_number]
-- Dependencies: [list dependent issues/PRs]
-- Blocked by: [list blocking issues]
+- GitHub Issue: #84 (Phase 1: Evaluate Current Workflow Ecosystem)
+- GitHub Issue: #85 (Phase 2: Refactor and Improve Current Workflow Components) 
+- GitHub Issue: #86 (Phase 3: Create Unified Workflow Framework)
+- Dependencies: Issues must be completed in order (84 → 85 → 86)
+- Blocked by: None (Phase 1 can start immediately)
 
 ## Success Metrics
 [How will we measure the success of this feature?]
+
+## Original Thought
+
+Extract loqa workflow ecosystem into a reusable framework that can be applied to other repos
+
+## Additional Context
+
+## Detailed Description
+
+Currently the developer workflow is a messy mixture of bash scripts, mcp server, agents, and CLAUDE.md files. I would like to meld it into a more unified framework that is easy to setup and maintain and it should be only as intrusive to the target repo as it needs to be
+
+## Acceptance Criteria
+
+1. Deliverable is a new repo under the loqalabs organization in github with the complete framework and all documentation. Setup should be an interview style shell script that installs and configures all of the parts. Acceptable intrusion is of course the backlog folder and config, plus config files and a .[framework-name] folder.
+
+## Dependencies
+
+- Dependencies are: The entire current workflow needs to be evaluated for cohesive and comprehensive documentation, good software engineering principles and practices, and if it could benefit from refactoring (reducing duplicated logic, etc) then that should be done first
+
+
