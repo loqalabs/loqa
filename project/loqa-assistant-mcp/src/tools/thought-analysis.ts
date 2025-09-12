@@ -1,6 +1,7 @@
 import { LoqaTaskManager } from '../managers/index.js';
 import { join } from 'path';
 import { KNOWN_REPOSITORIES_LIST } from '../config/repositories.js';
+import { analyzeTaskPriorityWithAI, AITaskAnalysis } from './ai-prioritization.js';
 
 /**
  * Thought Analysis Module
@@ -21,9 +22,86 @@ interface ThoughtEvaluation {
 
 /**
  * Dynamically evaluates a thought/idea against current project state
- * Analyzes existing tasks, recent activity, and project context to determine priority
+ * Uses AI-powered analysis instead of brittle keyword matching
  */
 async function evaluateThoughtPriority(
+  content: string, 
+  tags: string[] = [], 
+  context?: string,
+  workspaceRoot?: string
+): Promise<ThoughtEvaluation> {
+  try {
+    // NEW: Use AI-powered analysis for smarter prioritization
+    const aiAnalysis = await analyzeTaskPriorityWithAI(
+      content,
+      undefined, // no title for thoughts
+      'architect', // default to architect perspective for strategic analysis
+      'Voice assistant microservice project with focus on developer experience'
+    );
+    
+    // Convert AI analysis to ThoughtEvaluation format
+    return convertAIAnalysisToThoughtEvaluation(aiAnalysis, content, tags, context);
+    
+  } catch (error) {
+    // Fallback to heuristic analysis if AI analysis fails
+    console.warn('AI analysis failed, falling back to heuristics:', error);
+    return await evaluateThoughtPriorityFallback(content, tags, context, workspaceRoot);
+  }
+}
+
+/**
+ * Converts AI analysis to the legacy ThoughtEvaluation format
+ * for backward compatibility
+ */
+function convertAIAnalysisToThoughtEvaluation(
+  aiAnalysis: AITaskAnalysis,
+  content: string,
+  tags: string[],
+  context?: string
+): ThoughtEvaluation {
+  
+  const templateMap: { [key: string]: string } = {
+    'critical': 'feature',
+    'high': 'feature', 
+    'medium': 'general',
+    'low': 'general'
+  };
+  
+  const priorityMap: { [key: string]: string } = {
+    'critical': 'High',
+    'high': 'High',
+    'medium': 'Medium', 
+    'low': 'Low'
+  };
+  
+  // Determine category from AI analysis
+  let category = 'general';
+  if (aiAnalysis.technicalDebtLevel > 60) category = 'technical-debt';
+  if (aiAnalysis.architecturalImpact > 60) category = 'architecture';
+  if (content.toLowerCase().includes('feature')) category = 'feature-idea';
+  if (content.toLowerCase().includes('bug')) category = 'bug-insight';
+  
+  // Enhanced reasoning that includes AI insights
+  const enhancedReasoning = `AI Analysis (Score: ${aiAnalysis.score}): ${aiAnalysis.reasoning}. ` +
+    `Architectural Impact: ${aiAnalysis.architecturalImpact}%, Technical Debt: ${aiAnalysis.technicalDebtLevel}%, ` +
+    `Productivity Impact: ${aiAnalysis.productivityImpact}%`;
+  
+  return {
+    shouldSuggestTask: aiAnalysis.score > 50, // AI-driven threshold
+    reasoning: enhancedReasoning,
+    suggestedTemplate: templateMap[aiAnalysis.priority] || 'general',
+    suggestedPriority: priorityMap[aiAnalysis.priority] || 'Medium',
+    category: category,
+    scope: aiAnalysis.urgencyFactors.length > 0 ? 'urgent' : 'normal',
+    estimatedEffort: aiAnalysis.score > 80 ? 'High' : aiAnalysis.score > 50 ? 'Medium' : 'Low'
+  };
+}
+
+/**
+ * Fallback to original heuristic-based analysis
+ * Kept for reliability in case AI analysis fails
+ */
+async function evaluateThoughtPriorityFallback(
   content: string, 
   tags: string[] = [], 
   context?: string,
@@ -41,7 +119,7 @@ async function evaluateThoughtPriority(
     
     return priorityAssessment;
   } catch (error) {
-    // Fallback to basic evaluation if dynamic analysis fails
+    // Final fallback
     return {
       shouldSuggestTask: false,
       reasoning: 'Unable to analyze against current project state. Captured for later review.',
