@@ -5,7 +5,7 @@
 
 export const workspaceTools = [
   {
-    name: "workspace_status", 
+    name: "workspace:Status", 
     description: "Get comprehensive status across all repositories in the workspace",
     inputSchema: {
       type: "object",
@@ -13,7 +13,7 @@ export const workspaceTools = [
     }
   },
   {
-    name: "workspace_health",
+    name: "workspace:Health",
     description: "Get backlog health and task statistics across all repositories",
     inputSchema: {
       type: "object",
@@ -21,7 +21,7 @@ export const workspaceTools = [
     }
   },
   {
-    name: "run_quality_checks",
+    name: "workspace:RunQualityChecks",
     description: "Run quality checks across the workspace",
     inputSchema: {
       type: "object",
@@ -34,7 +34,7 @@ export const workspaceTools = [
     }
   },
   {
-    name: "create_branch_from_task",
+    name: "workspace:CreateBranchFromTask",
     description: "Create a feature branch based on a task",
     inputSchema: {
       type: "object",
@@ -52,7 +52,7 @@ export const workspaceTools = [
     }
   },
   {
-    name: "run_integration_tests",
+    name: "workspace:RunIntegrationTests",
     description: "Run integration tests across repositories",
     inputSchema: {
       type: "object",
@@ -66,7 +66,7 @@ export const workspaceTools = [
     }
   },
   {
-    name: "create_pr_from_task",
+    name: "workspace:CreatePRFromTask",
     description: "Create a pull request from a completed task",
     inputSchema: {
       type: "object",
@@ -96,7 +96,7 @@ export const workspaceTools = [
     }
   },
   {
-    name: "analyze_dependency_impact",
+    name: "workspace:AnalyzeDependencyImpact",
     description: "Analyze cross-repository dependency impact of changes",
     inputSchema: {
       type: "object",
@@ -115,7 +115,7 @@ export const workspaceTools = [
     }
   },
   {
-    name: "intelligent_task_prioritization",
+    name: "workspace:IntelligentTaskPrioritization",
     description: "Get intelligent task prioritization recommendations",
     inputSchema: {
       type: "object",
@@ -147,7 +147,7 @@ async function getWorkspaceManager() {
 
 export async function handleWorkspaceTool(name: string, args: any, workspaceManager: any): Promise<any> {
   switch (name) {
-    case "workspace_status": {
+    case "workspace:Status": {
       try {
         const status = await workspaceManager.getWorkspaceStatus();
         
@@ -180,7 +180,7 @@ export async function handleWorkspaceTool(name: string, args: any, workspaceMana
       }
     }
 
-    case "workspace_health": {
+    case "workspace:Health": {
       try {
         const health = await workspaceManager.getWorkspaceHealth();
         
@@ -216,7 +216,7 @@ export async function handleWorkspaceTool(name: string, args: any, workspaceMana
       }
     }
 
-    case "run_quality_checks": {
+    case "workspace:RunQualityChecks": {
       try {
         const result = await workspaceManager.runQualityChecks(args);
         
@@ -265,7 +265,7 @@ export async function handleWorkspaceTool(name: string, args: any, workspaceMana
       }
     }
 
-    case "create_branch_from_task": {
+    case "workspace:CreateBranchFromTask": {
       try {
         const result = await workspaceManager.createBranchFromTask(args);
         
@@ -301,7 +301,7 @@ export async function handleWorkspaceTool(name: string, args: any, workspaceMana
       }
     }
 
-    case "run_integration_tests": {
+    case "workspace:RunIntegrationTests": {
       try {
         const result = await workspaceManager.runIntegrationTests(args);
         
@@ -348,7 +348,7 @@ export async function handleWorkspaceTool(name: string, args: any, workspaceMana
       }
     }
 
-    case "create_pr_from_task": {
+    case "workspace:CreatePRFromTask": {
       try {
         const result = await workspaceManager.createPullRequestFromTask(args);
         
@@ -389,7 +389,7 @@ export async function handleWorkspaceTool(name: string, args: any, workspaceMana
       }
     }
 
-    case "analyze_dependency_impact": {
+    case "workspace:AnalyzeDependencyImpact": {
       try {
         const result = await workspaceManager.analyzeDependencyImpact(args);
         
@@ -471,7 +471,7 @@ export async function handleWorkspaceTool(name: string, args: any, workspaceMana
       }
     }
 
-    case "intelligent_task_prioritization": {
+    case "workspace:IntelligentTaskPrioritization": {
       try {
         const result = await workspaceManager.intelligentTaskPrioritization(args);
         

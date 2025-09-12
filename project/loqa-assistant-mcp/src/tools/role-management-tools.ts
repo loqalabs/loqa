@@ -8,7 +8,7 @@ import { resolveWorkspaceRoot } from '../utils/workspace-resolver.js';
 
 export const roleManagementTools = [
   {
-    name: "set_role",
+    name: "role:Set",
     description: "Set the current working role context for specialized workflows",
     inputSchema: {
       type: "object",
@@ -27,7 +27,7 @@ export const roleManagementTools = [
     }
   },
   {
-    name: "detect_role",
+    name: "role:Detect",
     description: "Automatically detect the most appropriate role based on context",
     inputSchema: {
       type: "object",
@@ -53,7 +53,7 @@ export const roleManagementTools = [
     }
   },
   {
-    name: "get_role_config",
+    name: "role:GetConfig",
     description: "Get detailed configuration for a specific role",
     inputSchema: {
       type: "object",
@@ -67,7 +67,7 @@ export const roleManagementTools = [
     }
   },
   {
-    name: "list_roles",
+    name: "role:List",
     description: "List all available roles and their descriptions",
     inputSchema: {
       type: "object",
@@ -75,7 +75,7 @@ export const roleManagementTools = [
     }
   },
   {
-    name: "get_role_templates",
+    name: "role:GetTemplates",
     description: "Get recommended task templates for a specific role",
     inputSchema: {
       type: "object",
@@ -96,7 +96,7 @@ export async function handleRoleManagementTool(name: string, args: any): Promise
   const roleManager = new LoqaRoleManager(workspaceRoot);
 
   switch (name) {
-    case "set_role": {
+    case "role:Set": {
       const { roleId, context } = args;
       
       try {
@@ -126,7 +126,7 @@ export async function handleRoleManagementTool(name: string, args: any): Promise
       }
     }
 
-    case "detect_role": {
+    case "role:Detect": {
       const { title, description, filePaths, repositoryType } = args;
       
       try {
@@ -157,7 +157,7 @@ export async function handleRoleManagementTool(name: string, args: any): Promise
       }
     }
 
-    case "get_role_config": {
+    case "role:GetConfig": {
       const { roleId } = args;
       
       try {
@@ -190,7 +190,7 @@ export async function handleRoleManagementTool(name: string, args: any): Promise
       }
     }
 
-    case "list_roles": {
+    case "role:List": {
       try {
         const roles = await roleManager.listRoles();
         const rolesList = roles.map(role => 
@@ -213,7 +213,7 @@ export async function handleRoleManagementTool(name: string, args: any): Promise
       }
     }
 
-    case "get_role_templates": {
+    case "role:GetTemplates": {
       const { roleId } = args;
       
       try {

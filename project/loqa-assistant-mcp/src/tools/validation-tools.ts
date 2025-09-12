@@ -7,7 +7,7 @@ import { LoqaRulesValidator } from '../validators/index.js';
 
 export const validationTools = [
   {
-    name: "validate_commit_message",
+    name: "validation:CommitMessage",
     description: "Validate commit message against Loqa rules and detect AI attribution",
     inputSchema: {
       type: "object",
@@ -21,7 +21,7 @@ export const validationTools = [
     }
   },
   {
-    name: "validate_branch_name",
+    name: "validation:BranchName",
     description: "Validate branch name follows proper conventions",
     inputSchema: {
       type: "object",
@@ -35,7 +35,7 @@ export const validationTools = [
     }
   },
   {
-    name: "validate_pre_commit",
+    name: "validation:PreCommit",
     description: "Run comprehensive pre-commit validation including commit message and quality gates",
     inputSchema: {
       type: "object",
@@ -53,7 +53,7 @@ export const validationTools = [
     }
   },
   {
-    name: "get_repository_info",
+    name: "validation:RepositoryInfo",
     description: "Get comprehensive repository information including branch status and Loqa detection",
     inputSchema: {
       type: "object",
@@ -66,7 +66,7 @@ export const validationTools = [
     }
   },
   {
-    name: "validate_quality_gates",
+    name: "validation:QualityGates",
     description: "Validate quality gates for the repository",
     inputSchema: {
       type: "object",
@@ -79,7 +79,7 @@ export const validationTools = [
     }
   },
   {
-    name: "diagnose_workspace",
+    name: "validation:DiagnoseWorkspace",
     description: "Diagnose workspace context and provide detailed environment information",
     inputSchema: {
       type: "object",
@@ -87,7 +87,7 @@ export const validationTools = [
     }
   },
   {
-    name: "validate_backlog_context",
+    name: "validation:BacklogContext",
     description: "Validate current directory context is safe for backlog commands and provide recommendations",
     inputSchema: {
       type: "object",
@@ -105,7 +105,7 @@ export async function handleValidationTool(name: string, args: any): Promise<any
   const validator = new LoqaRulesValidator();
 
   switch (name) {
-    case "validate_commit_message": {
+    case "validation:CommitMessage": {
       const { message } = args;
       const result = await validator.validateCommitMessage(message);
       return {
@@ -121,7 +121,7 @@ export async function handleValidationTool(name: string, args: any): Promise<any
       };
     }
 
-    case "validate_branch_name": {
+    case "validation:BranchName": {
       const { branchName } = args;
       const result = await validator.validateBranchName(branchName);
       return {
@@ -137,7 +137,7 @@ export async function handleValidationTool(name: string, args: any): Promise<any
       };
     }
 
-    case "validate_pre_commit": {
+    case "validation:PreCommit": {
       const { message, repoPath } = args;
       const result = await validator.validatePreCommit(message, repoPath);
       return {
@@ -153,7 +153,7 @@ export async function handleValidationTool(name: string, args: any): Promise<any
       };
     }
 
-    case "get_repository_info": {
+    case "validation:RepositoryInfo": {
       const { repoPath } = args;
       const repoInfo = await validator.getRepositoryInfo(repoPath);
       return {
@@ -167,7 +167,7 @@ export async function handleValidationTool(name: string, args: any): Promise<any
       };
     }
 
-    case "validate_quality_gates": {
+    case "validation:QualityGates": {
       const { repoPath } = args;
       const result = await validator.validateQualityGates(repoPath);
       return {
@@ -183,7 +183,7 @@ export async function handleValidationTool(name: string, args: any): Promise<any
       };
     }
 
-    case "diagnose_workspace": {
+    case "validation:DiagnoseWorkspace": {
       try {
         const { detectWorkspaceContext } = await import('../utils/context-detector.js');
         const context = await detectWorkspaceContext();
@@ -241,7 +241,7 @@ export async function handleValidationTool(name: string, args: any): Promise<any
       }
     }
 
-    case "validate_backlog_context": {
+    case "validation:BacklogContext": {
       const { targetRepo } = args;
       try {
         const { detectWorkspaceContext } = await import('../utils/context-detector.js');

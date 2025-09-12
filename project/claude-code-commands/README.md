@@ -1,6 +1,6 @@
-# Loqa Claude Code Commands
+# Loqa Claude Code Command
 
-This directory contains the official Claude Code commands for Loqa development. These commands provide AI-enhanced workflow automation, intelligent task management, and cross-repository coordination.
+This directory contains the unified Claude Code command for Loqa development. The `/loqa` command provides AI-enhanced workflow automation, intelligent task management, and cross-repository coordination through a discoverable CLI-style interface.
 
 ## 🚀 Quick Installation
 
@@ -16,21 +16,34 @@ cd loqa/project/claude-code-commands
 ./install.sh
 ```
 
-## 📋 Available Commands
+## 📋 The Unified `/loqa` Command
 
-| Command | Purpose | Example |
-|---------|---------|---------|
-| `/work` | Begin working on tasks with AI selection | `/work --priority=P1` |
-| `/recommend` | Get AI task recommendations | `/recommend --roleContext=developer` |
-| `/thought` | Capture technical thoughts with intelligent task suggestions | `/thought "Memory leak in audio processing"` |
-| `/idea` | Capture feature ideas with intelligent task suggestions | `/idea "Add real-time collaboration"` |
-| `/create-task` | Create detailed backlog tasks with intelligent complexity routing | `/create-task "Implement real-time collaboration"` |
-| `/resume-draft` | **NEW**: Resume draft task creation and answer interview questions | `/resume-draft abc-123 "My answer"` |
-| `/branch` | Create feature branches from tasks | `/branch --taskId=21` |
-| `/pr` | Create pull requests with task linking | `/pr --draft=true` |
-| `/test` | Run cross-service integration tests | `/test --repositories=loqa-hub,loqa-relay` |
-| `/analyze` | Analyze protocol change impact | `/analyze --protoChanges=audio.proto` |
-| `/plan` | Plan strategic changes | `/plan --title="Migrate to gRPC"` |
+**One command, all functionality.** The `/loqa` command uses a CLI-style interface similar to `git`, `docker`, or `kubectl`:
+
+### **🔍 Discovery Pattern**
+```bash
+/loqa                    # Show all categories: task, dev, plan, capture
+/loqa task              # Show task actions: create, list, update, resume  
+/loqa dev               # Show dev actions: work, branch, pr, test, analyze
+/loqa plan              # Show planning actions: recommend, strategy
+/loqa capture           # Show capture actions: thought, idea
+```
+
+### **🚀 Command Examples**
+| Usage | Purpose | 
+|-------|---------|
+| `/loqa task create "Fix login bug"` | Create detailed backlog tasks with intelligent complexity routing |
+| `/loqa task list --status=active` | List tasks across repositories with filtering |
+| `/loqa task resume abc-123 "My answer"` | Resume draft task creation and answer interview questions |
+| `/loqa dev work --priority=P1` | Begin working on tasks with AI selection and workspace detection |
+| `/loqa dev branch --taskId=21` | Create feature branches from tasks with proper naming |
+| `/loqa dev pr --draft=true` | Create pull requests with task linking and templates |
+| `/loqa dev test --repositories=loqa-hub,loqa-relay` | Run cross-service integration tests |
+| `/loqa dev analyze --protoChanges=audio.proto` | Analyze protocol change impact across repositories |
+| `/loqa plan recommend --roleContext=developer` | Get AI-powered task recommendations |
+| `/loqa plan strategy --title="Migrate to gRPC"` | Plan strategic changes with impact analysis |
+| `/loqa capture thought "Memory leak in audio processing"` | Capture technical thoughts with intelligent task suggestions |
+| `/loqa capture idea "Add real-time collaboration"` | Capture feature ideas with intelligent evaluation |
 
 ## 📖 Documentation
 
@@ -88,15 +101,15 @@ The latest update introduces a powerful task creation system that ensures every 
 
 ### Quick Start
 
-1. **Simple task**: `/create-task "Fix login bug"` (auto-upgraded if complex)
-2. **Complex task**: `/create-task "Implement real-time collaboration"`  
-3. **Resume work**: `/resume-draft` (shows available drafts and interviews)
-4. **Answer questions**: `/resume-draft abc-123 "My detailed answer"`
+1. **Simple task**: `/loqa task create "Fix login bug"` (auto-upgraded if complex)
+2. **Complex task**: `/loqa task create "Implement real-time collaboration"`  
+3. **Resume work**: `/loqa task resume` (shows available drafts and interviews)
+4. **Answer questions**: `/loqa task resume abc-123 "My detailed answer"`
 
 ### Smart Integration
 
-- **`/thought`** and **`/idea`** now evaluate against project goals and suggest task creation
-- **`/create-task`** automatically upgrades to comprehensive creation for complex scenarios
+- **`/loqa capture thought`** and **`/loqa capture idea`** now evaluate against project goals and suggest task creation
+- **`/loqa task create`** automatically upgrades to comprehensive creation for complex scenarios
 - All existing workflows preserved - new features enhance without breaking changes
 
 ## 🧪 Testing Installation
@@ -104,28 +117,20 @@ The latest update introduces a powerful task creation system that ensures every 
 After installation, test that commands are working:
 ```bash
 # In Claude Code, try:
-/work --help
-/recommend
-/thought "Test thought capture with intelligent evaluation"
-/create-task "Test guided task creation"
+/loqa                    # Show all categories
+/loqa task              # Show task actions  
+/loqa dev               # Show development actions
+/loqa task create "Test guided task creation"
+/loqa capture thought "Test thought capture with intelligent evaluation"
 ```
 
-## 📁 Command Files
+## 📁 Command File
 
 | File | Command | Description |
 |------|---------|-------------|
-| `work.md` | `/work` | Task work with intelligent selection |
-| `recommend.md` | `/recommend` | AI task recommendations |
-| `thought.md` | `/thought` | Capture technical thoughts with intelligent evaluation |
-| `idea.md` | `/idea` | Capture feature ideas with intelligent evaluation |
-| `create-task.md` | `/create-task` | Create structured tasks with intelligent complexity routing |
-| `resume-draft.md` | `/resume-draft` | **NEW**: Resume draft task creation and answer questions |
-| `branch.md` | `/branch` | Create feature branches |
-| `pr.md` | `/pr` | Create pull requests |
-| `test.md` | `/test` | Run integration tests |
-| `analyze.md` | `/analyze` | Analyze protocol changes |
-| `plan.md` | `/plan` | Strategic planning |
-| `list-tasks.md` | `/list-tasks` | Simple task listing |
+| `loqa.md` | `/loqa` | Unified command with all Loqa development functionality |
+
+**Previous individual commands have been consolidated into the single `/loqa` command with a discoverable CLI interface.**
 
 ## 🐛 Troubleshooting
 

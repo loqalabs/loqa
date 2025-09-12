@@ -9,7 +9,7 @@ import { resolveWorkspaceRoot } from '../utils/workspace-resolver.js';
 
 export const modelSelectionTools = [
   {
-    name: "select_model",
+    name: "model:Select",
     description: "Get intelligent AI model recommendation based on task complexity and context",
     inputSchema: {
       type: "object",
@@ -48,7 +48,7 @@ export const modelSelectionTools = [
     }
   },
   {
-    name: "get_model_capabilities",
+    name: "model:GetCapabilities",
     description: "Get detailed capabilities and use cases for available AI models",
     inputSchema: {
       type: "object",
@@ -63,7 +63,7 @@ export async function handleModelSelectionTool(name: string, args: any): Promise
   const modelSelector = new LoqaModelSelector(workspaceRoot);
 
   switch (name) {
-    case "select_model": {
+    case "model:Select": {
       const { roleId, taskTitle, taskDescription, complexity, filePaths, repositoryType, manualOverride } = args;
       
       const context: ModelSelectionContext = {
@@ -101,7 +101,7 @@ export async function handleModelSelectionTool(name: string, args: any): Promise
       }
     }
 
-    case "get_model_capabilities": {
+    case "model:GetCapabilities": {
       try {
         const capabilities = modelSelector.getModelCapabilities();
         
