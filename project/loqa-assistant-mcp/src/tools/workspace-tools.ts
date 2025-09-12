@@ -494,6 +494,45 @@ export async function handleWorkspaceTool(name: string, args: any, workspaceMana
           for (const task of result.alternativeTasks) {
             priorityText += `- **${task.title}** (${task.repository}) - Score: ${task.score}/10\n`;
           }
+          priorityText += `\n`;
+        }
+        
+        // AI-Enhanced Analysis Section
+        if (result.aiAnalysis) {
+          priorityText += `🧠 **AI Strategic Analysis**:\n\n`;
+          
+          priorityText += `📈 **Strategic Alignment**: ${result.aiAnalysis.strategicAlignment}\n`;
+          priorityText += `🏥 **Project Health**: ${result.aiAnalysis.projectHealth}\n`;
+          priorityText += `⏰ **Timeline Insight**: ${result.aiAnalysis.timelineInsights}\n\n`;
+          
+          if (result.aiAnalysis.bottlenecks.length > 0) {
+            priorityText += `🚧 **Identified Bottlenecks**:\n`;
+            for (const bottleneck of result.aiAnalysis.bottlenecks) {
+              priorityText += `• ${bottleneck}\n`;
+            }
+            priorityText += `\n`;
+          }
+          
+          if (result.aiAnalysis.riskAssessment.length > 0) {
+            priorityText += `⚠️ **Risk Assessment**:\n`;
+            for (const risk of result.aiAnalysis.riskAssessment) {
+              priorityText += `• ${risk}\n`;
+            }
+            priorityText += `\n`;
+          }
+          
+          if (result.aiAnalysis.optimizationRecommendations.length > 0) {
+            priorityText += `💡 **Optimization Recommendations**:\n`;
+            for (const rec of result.aiAnalysis.optimizationRecommendations) {
+              priorityText += `• ${rec}\n`;
+            }
+            priorityText += `\n`;
+          }
+          
+          priorityText += `🚀 **Next Steps**:\n`;
+          priorityText += `• Use \`/loqa dev work\` to begin working on the recommended task\n`;
+          priorityText += `• Create feature branch: \`./tools/smart-git branch feature/[task-name]\`\n`;
+          priorityText += `• Run quality checks before committing\n\n`;
         }
         
         if (result.analysis.totalTasks === 0) {
