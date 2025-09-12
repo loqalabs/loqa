@@ -1,6 +1,19 @@
-# Loqa Interactive Development Commands - Developer User Guide
+# Loqa Unified Development Command - Developer User Guide
 
-This guide provides comprehensive documentation for Loqa's intelligent development workflow commands. These interactive commands streamline development tasks through AI-enhanced automation, intelligent task selection, and cross-repository coordination.
+This guide provides comprehensive documentation for Loqa's unified `/loqa` command with discoverable categories and AI-enhanced automation. The command streamlines development tasks through intelligent task selection, cross-repository coordination, and predictive workflow intelligence.
+
+## 🚨 **IMPORTANT: Unified Command Structure**
+
+**The unified `/loqa` command structure:**
+- `/loqa` - Show available categories (task, dev, plan, capture)
+- `/loqa [category]` - Show actions for a category  
+- `/loqa [category] [action] [args]` - Execute specific command
+
+## 📋 **Complete Command Reference**
+
+**For the authoritative command structure**, see: `/project/claude-code-commands/loqa.md`
+
+The unified `/loqa` command provides discoverable categories with full functionality.
 
 ## 🚀 Installation
 
@@ -24,17 +37,18 @@ cd loqa/project/claude-code-commands
 
 ## Quick Start
 
-For immediate productivity, start with these essential **interactive commands** - just run them without parameters for guided workflows:
+For immediate productivity, use the **unified `/loqa` command** with discoverable categories:
 
 ```bash
-/work                    # Interactive task selection based on your preferences
-/create-task            # Interactive task creation with AI-powered suggestions  
-/idea                   # Interactive feature idea capture with intelligent categorization
-/thought                # Interactive technical thought capture with smart tagging
-/branch                 # Interactive branch creation with task selection
-/pr                     # Interactive PR creation with quality checklists
-/plan                   # Interactive strategic planning with risk assessment
-/analyze                # Interactive protocol analysis with impact assessment
+/loqa                           # Show all available categories and usage
+/loqa dev work                  # AI-enhanced task selection and workflow setup
+/loqa task create "description" # Interactive task creation with AI-powered templates
+/loqa capture idea "content"    # Intelligent feature idea capture with categorization  
+/loqa capture thought "content" # Technical thought capture with smart analysis
+/loqa dev branch --taskId=21    # Interactive branch creation from tasks
+/loqa dev pr --draft=true       # Interactive PR creation with quality checklists
+/loqa plan strategy "title"     # Strategic planning with comprehensive impact analysis
+/loqa dev analyze --repository=loqa-hub # Protocol analysis with cross-repo impact
 ```
 
 **✨ Revolutionary Interactive Experience**: All commands now work conversationally! Simply run them without parameters to get:
@@ -47,7 +61,7 @@ For immediate productivity, start with these essential **interactive commands** 
 
 **Example Interactive Flow:**
 ```bash
-/create-task
+/loqa task create
 # → "Please describe the task you'd like to create in your own words..."
 # → You: "I need to fix the memory leak in audio processing"
 # → AI: "I suggest: Title: 'Fix memory leak in audio processing module', 
@@ -60,27 +74,28 @@ For immediate productivity, start with these essential **interactive commands** 
 
 ### 🎯 **Core Workflow Commands**
 
+| Command | Purpose | When to Use |
 |---------|---------|-------------|
-| `/work` | Begin working on backlog tasks with intelligent selection | Starting development work, need guidance on what to work on |
-| `/recommend` | Get AI-enhanced task recommendations | Unsure which task to tackle next, want optimized suggestions |
-| `/thought` | Quickly capture technical thoughts and concerns | Have a technical concern that needs to be recorded for later |
-| `/idea` | Quickly capture feature ideas and improvements | Have a feature idea or improvement that needs to be recorded |
-| `/create-task` | Create detailed, structured tasks in the backlog | Planning complex work that needs to be broken down |
+| `/loqa dev work` | Begin working on backlog tasks with intelligent selection | Starting development work, need guidance on what to work on |
+| `/loqa plan recommend` | Get AI-enhanced task recommendations | Unsure which task to tackle next, want optimized suggestions |
+| `/loqa capture thought` | Quickly capture technical thoughts and concerns | Have a technical concern that needs to be recorded for later |
+| `/loqa capture idea` | Quickly capture feature ideas and improvements | Have a feature idea or improvement that needs to be recorded |
+| `/loqa task create` | Create detailed, structured tasks in the backlog | Planning complex work that needs to be broken down |
 
 ### 🚀 **Git & GitHub Automation**
 
 | Command | Purpose | When to Use |
 |---------|---------|-------------|
-| `/branch` | Create properly named feature branches from tasks | Ready to start implementation work on a task |
-| `/pr` | Create structured PRs with automatic task linking | Feature is complete and ready for review |
-| `/test` | Run comprehensive cross-service tests | Need to validate changes across multiple services |
-| `/analyze` | Analyze protocol changes across repositories | Making changes to shared protocols or APIs |
+| `/loqa dev branch` | Create properly named feature branches from tasks | Ready to start implementation work on a task |
+| `/loqa dev pr` | Create structured PRs with automatic task linking | Feature is complete and ready for review |
+| `/loqa dev test` | Run comprehensive cross-service tests | Need to validate changes across multiple services |
+| `/loqa dev analyze` | Analyze protocol changes across repositories | Making changes to shared protocols or APIs |
 
 ### 🎨 **Strategic Planning**
 
 | Command | Purpose | When to Use |
 |---------|---------|-------------|
-| `/plan` | Plan major architectural or technology changes | Considering significant changes to technology stack or approach |
+| `/loqa plan strategy` | Plan major architectural or technology changes | Considering significant changes to technology stack or approach |
 
 ## Key Features
 
@@ -102,13 +117,13 @@ For immediate productivity, start with these essential **interactive commands** 
 
 ## 🎯 Core Workflow Commands
 
-### `/work` - Begin Development Work
+### `/loqa dev work` - Begin Development Work
 
 **Purpose**: The primary command for starting development work. **Interactive mode** asks about your preferences and intelligently recommends the best tasks for you.
 
 **Interactive Usage (Recommended):**
 ```bash
-/work                    # Starts guided workflow asking about your preferences
+/loqa dev work           # Starts guided workflow asking about your preferences
 # → "What kind of work would you like to focus on today?"
 # → AI suggests 2-3 optimal tasks based on your response
 # → Select and begin work automatically
@@ -116,8 +131,8 @@ For immediate productivity, start with these essential **interactive commands** 
 
 **Traditional Usage:**
 ```bash
-/work --taskId=task-21   # Work on a specific task
-/work --priority=P1 --repository=loqa-hub   # Filter and auto-select
+/loqa dev work --taskId=task-21   # Work on a specific task
+/loqa dev work --priority=P1 --repository=loqa-hub   # Filter and auto-select
 ```
 
 **Key Features:**
@@ -135,13 +150,13 @@ For immediate productivity, start with these essential **interactive commands** 
 **Examples:**
 ```bash
 # Let AI choose the best task for you
-/work
+/loqa dev work
 
 # Work on a high-priority Hub service task
-/work --priority=P1 --repository=loqa-hub
+/loqa dev work --priority=P1 --repository=loqa-hub
 
 # Work as an architect on system design tasks
-/work --roleContext=architect
+/loqa dev work --roleContext=architect
 ```
 
 **When to Use:**
@@ -150,14 +165,14 @@ For immediate productivity, start with these essential **interactive commands** 
 - ✅ Want automatic branch creation and task setup
 - ✅ Need role-specific workflow optimization
 
-### `/recommend` - Get AI Task Recommendations
+### `/loqa plan recommend` - Get AI Task Recommendations
 
 **Purpose**: Get intelligent, AI-powered recommendations for which task to work on next.
 
 **Usage:**
 ```bash
-/recommend                    # Get general recommendations
-/recommend --roleContext=developer --timeAvailable=2h
+/loqa plan recommend                    # Get general recommendations
+/loqa plan recommend --roleContext=developer --timeAvailable=2h
 ```
 
 **Key Features:**
@@ -188,18 +203,18 @@ For immediate productivity, start with these essential **interactive commands** 
 - 🎯 Want tasks that match your role and expertise
 - 📈 Need to understand task priorities across repositories
 
-### `/thought` and `/idea` - Capture Ideas and Notes
+### `/loqa capture thought` and `/loqa capture idea` - Capture Ideas and Notes
 
 **Purpose**: Quickly capture ideas, technical insights, concerns, or observations using **interactive workflows** that help structure and categorize your thoughts.
 
 **Interactive Usage (Recommended):**
 ```bash
-/thought                 # Starts guided workflow for technical thoughts
+/loqa capture thought    # Starts guided workflow for technical thoughts
 # → "Please describe your technical thought, concern, or insight..."
 # → AI suggests appropriate tags, context, and categorization
 # → Confirm and save structured thought
 
-/idea                    # Starts guided workflow for feature ideas  
+/loqa capture idea      # Starts guided workflow for feature ideas  
 # → "Please describe your feature idea..."
 # → AI suggests relevant tags and proper categorization
 # → Confirm and save structured idea
@@ -207,8 +222,8 @@ For immediate productivity, start with these essential **interactive commands** 
 
 **Traditional Usage:**
 ```bash
-/thought "Memory leak in audio processing" --tags=technical-debt,performance
-/idea "Add real-time collaboration" --tags=feature,collaboration --context="user feedback"
+/loqa capture thought "Memory leak in audio processing" --tags=technical-debt,performance
+/loqa capture idea "Add real-time collaboration" --tags=feature,collaboration --context="user feedback"
 ```
 
 **Key Features:**
@@ -228,16 +243,16 @@ For immediate productivity, start with these essential **interactive commands** 
 
 **Quick Examples:**
 ```bash
-# Technical concern (use /thought)
-/thought
+# Technical concern (use /loqa capture thought)
+/loqa capture thought
 # "Need to investigate memory leaks in audio processing"
 
-# Architecture insight (use /thought) 
-/thought
+# Architecture insight (use /loqa capture thought) 
+/loqa capture thought
 # "Consider using NATS for inter-service communication instead of direct gRPC"
 
-# Feature idea (use /idea)
-/idea
+# Feature idea (use /loqa capture idea)
+/loqa capture idea
 # "Add real-time collaboration features for voice commands"
 ```
 
@@ -247,13 +262,13 @@ For immediate productivity, start with these essential **interactive commands** 
 - 📄 Need to record something for later investigation
 - ⚙️ Thinking about process or architecture improvements
 
-### `/create-task` - Create Detailed Tasks
+### `/loqa task create` - Create Detailed Tasks
 
 **Purpose**: Create comprehensive, well-structured tasks using **interactive workflows** that guide you through proper planning and breakdown.
 
 **Interactive Usage (Recommended):**
 ```bash
-/create-task             # Starts guided task creation workflow
+/loqa task create        # Starts guided task creation workflow
 # → "Please describe the task you'd like to create in your own words..."
 # → AI suggests title, template, priority, type, and assignee
 # → Review and modify suggestions before creating
@@ -262,7 +277,7 @@ For immediate productivity, start with these essential **interactive commands** 
 
 **Traditional Usage:**
 ```bash
-/create-task --title="Implement auth middleware" --template=feature --priority=High
+/loqa task create --title="Implement auth middleware" --template=feature --priority=High
 ```
 
 **Key Features:**
@@ -282,7 +297,7 @@ For immediate productivity, start with these essential **interactive commands** 
 
 **Example Workflow:**
 ```
-1. Run: /create-task
+1. Run: /loqa task create
 2. Title: "Implement real-time voice activity detection"
 3. Category: feature
 4. Priority: P1
@@ -300,13 +315,13 @@ For immediate productivity, start with these essential **interactive commands** 
 - 🔄 Converting captured thoughts/ideas into formal tasks
 - 📋 Want structured task planning with proper templates
 
-### `/plan` - Plan Major Changes
+### `/loqa plan strategy` - Plan Major Changes
 
 **Purpose**: Plan significant architectural, technology, or strategic changes using **interactive workflows** that guide you through comprehensive analysis and risk assessment.
 
 **Interactive Usage (Recommended):**
 ```bash
-/plan                    # Starts guided strategic planning workflow
+/loqa plan strategy      # Starts guided strategic planning workflow
 # → "Please describe the strategic change you're planning..."
 # → AI suggests title, type, risk level, scope, and timeline
 # → Guided questions about drivers, concerns, and constraints
@@ -315,7 +330,7 @@ For immediate productivity, start with these essential **interactive commands** 
 
 **Traditional Usage:**
 ```bash
-/plan --title="Migrate to gRPC" --type=technology --description="Replace REST with gRPC"
+/loqa plan strategy --title="Migrate to gRPC" --type=technology --description="Replace REST with gRPC"
 ```
 
 **Key Features:**
@@ -340,13 +355,13 @@ For immediate productivity, start with these essential **interactive commands** 
 
 ## 🚀 Git & GitHub Automation Commands
 
-### `/branch` - Create Feature Branches
+### `/loqa dev branch` - Create Feature Branches
 
 **Purpose**: Create properly named feature branches using **interactive workflows** that help you select tasks and target repositories.
 
 **Interactive Usage (Recommended):**
 ```bash
-/branch                  # Starts guided branch creation workflow
+/loqa dev branch         # Starts guided branch creation workflow
 # → "What task or work would you like to create a branch for?"
 # → Shows available tasks if no specific task mentioned
 # → AI suggests branch prefix, repository, and naming
@@ -355,8 +370,8 @@ For immediate productivity, start with these essential **interactive commands** 
 
 **Traditional Usage:**
 ```bash
-/branch --taskId=21      # Create branch for specific task
-/branch task-21 --repository=loqa-hub --branchPrefix=bugfix
+/loqa dev branch --taskId=21      # Create branch for specific task
+/loqa dev branch task-21 --repository=loqa-hub --branchPrefix=bugfix
 ```
 
 **Key Features:**
@@ -382,14 +397,14 @@ For immediate productivity, start with these essential **interactive commands** 
 - 🔄 Need proper feature branch with consistent naming
 - 📋 Following Loqa's mandatory branching workflow
 
-### `/test` - Run Cross-Service Tests
+### `/loqa dev test` - Run Cross-Service Tests
 
 **Purpose**: Execute comprehensive integration tests across Loqa services with Docker orchestration.
 
 **Usage:**
 ```bash
-/test                             # Run all integration tests
-/test --repositories=loqa-hub,loqa-relay
+/loqa dev test                             # Run all integration tests
+/loqa dev test --repositories=loqa-hub,loqa-relay
 ```
 
 **Key Features:**
@@ -419,13 +434,13 @@ For immediate productivity, start with these essential **interactive commands** 
 - 📊 Validating system health across repositories
 - ✅ As part of quality gate validation
 
-### `/pr` - Create Pull Requests
+### `/loqa dev pr` - Create Pull Requests
 
 **Purpose**: Create structured pull requests using **interactive workflows** that guide you through comprehensive descriptions and quality checks.
 
 **Interactive Usage (Recommended):**
 ```bash
-/pr                      # Starts guided PR creation workflow
+/loqa dev pr                      # Starts guided PR creation workflow
 # → "Please describe what you've accomplished in this pull request..."
 # → AI suggests title, type, and comprehensive description
 # → Guided quality checklist (tests, docs, breaking changes)
@@ -434,7 +449,7 @@ For immediate productivity, start with these essential **interactive commands** 
 
 **Traditional Usage:**
 ```bash
-/pr --taskId=21 --draft=true --title="Implement auth middleware"
+/loqa dev pr --taskId=21 --draft=true --title="Implement auth middleware"
 ```
 
 **Key Features:**
@@ -476,13 +491,13 @@ Implements authentication middleware (task-21)
 - 📋 Ready for code review
 - 🔗 Want proper task linking and documentation
 
-### `/analyze` - Analyze Protocol Changes
+### `/loqa dev analyze` - Analyze Protocol Changes
 
 **Purpose**: Analyze the impact of protocol and API changes using **interactive workflows** that guide you through comprehensive impact assessment.
 
 **Interactive Usage (Recommended):**
 ```bash
-/analyze                 # Starts guided protocol analysis workflow
+/loqa dev analyze                 # Starts guided protocol analysis workflow
 # → "Please describe the protocol or API changes you're planning..."
 # → AI suggests change type, affected files, and risk level
 # → Guided questions about compatibility and rollout timeline
@@ -491,7 +506,7 @@ Implements authentication middleware (task-21)
 
 **Traditional Usage:**
 ```bash
-/analyze --protoChanges=audio.proto,skills.proto --changeType=breaking
+/loqa dev analyze --protoChanges=audio.proto,skills.proto --changeType=breaking
 ```
 
 **Key Features:**
@@ -537,21 +552,21 @@ Implements authentication middleware (task-21)
 
 ```bash
 # 1. Get AI recommendations for what to work on
-/recommend --roleContext=developer --timeAvailable=3h
+/loqa plan recommend --roleContext=developer --timeAvailable=3h
 
 # 2. Start working on the recommended task
-/work --taskId=21
+/loqa dev work --taskId=21
 
 # 3. Create feature branch (if not auto-created)
-/branch --taskId=21
+/loqa dev branch --taskId=21
 
 # [Do your development work]
 
 # 4. Run integration tests before PR
-/test
+/loqa dev test
 
 # 5. Create pull request with task linking
-/pr
+/loqa dev pr
 ```
 
 ### 🔗 **Cross-Repository Protocol Changes**
@@ -560,25 +575,25 @@ Implements authentication middleware (task-21)
 
 ```bash
 # 1. Plan the strategic change
-/plan --shiftType=technology
+/loqa plan strategy --shiftType=technology
 
 # 2. Analyze impact across services
-/analyze --protoChanges=audio.proto,skills.proto
+/loqa dev analyze --protoChanges=audio.proto,skills.proto
 
 # 3. Create coordinated branches
-/branch --taskId=15 --repository=loqa-proto
-/branch --taskId=15 --repository=loqa-hub
-/branch --taskId=15 --repository=loqa-relay
+/loqa dev branch --taskId=15 --repository=loqa-proto
+/loqa dev branch --taskId=15 --repository=loqa-hub
+/loqa dev branch --taskId=15 --repository=loqa-relay
 
 # [Make coordinated changes]
 
 # 4. Test integration across services
-/test --repositories=loqa-hub,loqa-relay,loqa-skills
+/loqa dev test --repositories=loqa-hub,loqa-relay,loqa-skills
 
 # 5. Create coordinated PRs
-/pr --repository=loqa-proto
-/pr --repository=loqa-hub
-/pr --repository=loqa-relay
+/loqa dev pr --repository=loqa-proto
+/loqa dev pr --repository=loqa-hub
+/loqa dev pr --repository=loqa-relay
 ```
 
 ### 💡 **Idea to Implementation Workflow**
@@ -587,14 +602,14 @@ Implements authentication middleware (task-21)
 
 ```bash
 # 1. Capture the initial idea
-/idea
+/loqa capture idea
 # "Need real-time collaboration features for voice commands"
 
 # 2. Convert to formal task when ready
-/create-task --title="Implement real-time collaboration" --category=feature
+/loqa task create --title="Implement real-time collaboration" --category=feature
 
 # 3. Start implementation
-/work --taskId=25
+/loqa dev work --taskId=25
 
 # 4. Follow standard development workflow...
 ```
@@ -630,10 +645,10 @@ Commands automatically analyze your task content and select the most appropriate
 
 ```bash
 # Get AI recommendations based on your role and available time
-/recommend --roleContext=developer --timeAvailable=4h
+/loqa plan recommend --roleContext=developer --timeAvailable=4h
 
 # Start the recommended task with automatic setup
-/work --taskId=21
+/loqa dev work --taskId=21
 ```
 
 ### 💡 **Capturing Ideas During Work**
@@ -642,7 +657,7 @@ Commands automatically analyze your task content and select the most appropriate
 
 ```bash
 # Quickly capture the thought without losing focus
-/thought
+/loqa capture thought
 # Enter: "Need centralized error handling for auth failures"
 # Category: technical-debt
 # Impact: medium
@@ -654,7 +669,7 @@ Commands automatically analyze your task content and select the most appropriate
 
 ```bash
 # Start with impact analysis
-/analyze-dependency-impact --protoChanges=newservice.proto
+/loqa dev analyze-dependency-impact --protoChanges=newservice.proto
 
 # Create coordinated branches
 /create-branch-from-task --taskId=33 --repository=loqa-proto
@@ -676,7 +691,7 @@ Commands automatically analyze your task content and select the most appropriate
 
 ```bash
 # Plan the strategic shift
-/plan-strategic-shift
+/loqa plan strategy-strategic-shift
 # Type: technology
 # From: REST APIs
 # To: gRPC throughout
@@ -698,7 +713,7 @@ backlog task list --status=draft
 # Priority: P2
 
 # Start working on it
-/work --taskId=34
+/loqa dev work --taskId=34
 ```
 
 ---
@@ -710,13 +725,13 @@ backlog task list --status=draft
 **Most parameters are optional and auto-detected:**
 ```bash
 # Minimal usage - let AI decide everything
-/work
+/loqa dev work
 
 # Specific usage - control what you need
-/work --priority=P1 --repository=loqa-hub
+/loqa dev work --priority=P1 --repository=loqa-hub
 
 # Role-specific usage - get specialized guidance  
-/work --roleContext=architect
+/loqa dev work --roleContext=architect
 ```
 
 **Smart auto-detection works across commands:**
@@ -724,7 +739,7 @@ backlog task list --status=draft
 # These commands auto-detect task from current branch:
 /create-pr-from-task
 /run-integration-tests
-/analyze-dependency-impact
+/loqa dev analyze-dependency-impact
 ```
 
 ### 🔗 **Cross-Repository Coordination**
@@ -733,7 +748,7 @@ backlog task list --status=draft
 
 1. **Always analyze impact first:**
    ```bash
-   /analyze-dependency-impact
+   /loqa dev analyze-dependency-impact
    ```
 
 2. **Create branches in dependency order:**
@@ -760,10 +775,10 @@ backlog task list --status=draft
 **Override role detection when needed:**
 ```bash
 # Force architect perspective for development task
-/work --roleContext=architect --taskId=21
+/loqa dev work --roleContext=architect --taskId=21
 
 # Use github-cli-specialist for complex multi-repo work
-/pr --roleContext=github-cli-specialist
+/loqa dev pr --roleContext=github-cli-specialist
 ```
 
 ---
@@ -782,14 +797,14 @@ All interactive commands are designed to work seamlessly with the backlog.md tas
 ### **Workflow Integration:**
 ```bash
 # Capture initial idea
-/thought
+/loqa capture thought
 # "Need better error handling"
 
 # Convert to formal task when ready
 /start-complex-todo --title="Implement centralized error handling" --priority=P2
 
 # Work on backlog task with automated selection
-/work --priority=P1 --roleContext=developer
+/loqa dev work --priority=P1 --roleContext=developer
 
 # View progress in backlog system
 backlog board view    # Terminal Kanban view
@@ -802,7 +817,7 @@ backlog/
 ├── tasks/           # Formal tasks created by /start-complex-todo
 │   ├── task-001-implement-auth.md
 │   └── task-002-fix-logging.md
-├── drafts/          # Thoughts captured by /thought and /idea
+├── drafts/          # Thoughts captured by /loqa capture thought and /loqa capture idea
 │   ├── thought-2024-01-15-auth-improvement.md
 │   └── thought-2024-01-16-performance-ideas.md
 └── templates/       # Task templates for different types of work

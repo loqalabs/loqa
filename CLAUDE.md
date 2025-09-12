@@ -37,14 +37,40 @@ backlog board view --no-interactive   # Non-interactive board view
 3. **Templates**: Use templates in `/backlog/templates/` for consistent task structure
 4. **Cross-Repo**: Use `cross-repo-work-template.md` for multi-repository coordination
 
-### 🤖 AI Development Commands
-For enhanced development workflows, use the interactive commands in **[DEVELOPER_COMMANDS.md](./DEVELOPER_COMMANDS.md)**:
-- `/work` - Begin working with intelligent task selection
-- `/recommend` - Get AI recommendations for next tasks  
-- `/thought` - Quickly capture technical concerns and insights
-- `/idea` - Quickly capture feature ideas and improvements
-- `/branch` - Create properly named feature branches
-- `/pr` - Generate structured PRs with task linking
+### 🤖 AI-Powered Development Commands (Phases 1-3)
+The unified `/loqa` command provides advanced AI-powered workflow intelligence with discoverable categories:
+
+```bash
+/loqa                           # Show all available categories and usage
+/loqa [category]                # Show available actions for a category
+/loqa [category] [action] [args] # Execute specific AI-enhanced commands
+```
+
+#### 📋 Task Management (`/loqa task`)
+- **AI-enhanced task creation** with complexity routing and intelligent templates
+- **Cross-repository task management** with filtering and status tracking
+- **Interactive task development** with AI-guided interview processes
+
+#### 🛠️ Development Workflow (`/loqa dev`) 
+- **AI-powered work sessions** with intelligent task selection and context setup
+- **Smart branch creation** with proper naming conventions from task context
+- **Intelligent PR generation** with comprehensive task linking and templates
+- **Cross-repository testing** with dependency awareness and impact analysis
+
+#### 📊 Planning & Strategy (`/loqa plan`)
+- **AI recommendations** with strategic value scoring (0-100) and bottleneck analysis  
+- **Strategic planning** with comprehensive impact analysis and risk assessment
+- **Predictive analytics** for sprint success probability and delivery forecasting
+
+#### 💭 Knowledge Capture (`/loqa capture`)
+- **Quick thought capture** with automated categorization and strategic value assessment
+- **Advanced idea analysis** with sprint alignment, cross-repo impact, and follow-up suggestions
+- **Technical debt insights** with trajectory analysis and automated recommendations
+
+**Enhanced with 3-Phase AI Intelligence:**
+- **Phase 1**: Intelligent task selection with project context understanding
+- **Phase 2**: Cross-repository coordination with dependency graph analysis  
+- **Phase 3**: Predictive analytics with workflow automation and bottleneck detection
 
 ## 🚨 CRITICAL: Git Workflow
 
