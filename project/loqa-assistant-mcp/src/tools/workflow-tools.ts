@@ -778,7 +778,7 @@ export async function handleWorkflowTool(name: string, args: any): Promise<any> 
                         `\n**💡 Recommendation**: ${workAnalysis.recommendation}\n\n` +
                         `**🚀 Next Steps**:\n` +
                         `1. Review the recommended task details\n` +
-                        `2. Create feature branch: \`./tools/smart-git branch feature/${topTask.task.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}\`\n` +
+                        `2. Create feature branch: \`smart-git_branch(branchName: "feature/${topTask.task.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}")\`\n` +
                         `3. Begin implementation following the task requirements\n` +
                         `4. Run quality checks before committing\n\n` +
                         `**🤖 Role Context**: Optimized for ${roleDetection.detectedRole} workflows\n` +

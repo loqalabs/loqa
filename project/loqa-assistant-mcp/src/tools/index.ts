@@ -10,6 +10,8 @@ export { roleManagementTools, handleRoleManagementTool } from './role-management
 export { modelSelectionTools, handleModelSelectionTool } from './model-selection-tools.js';
 export { workspaceTools, handleWorkspaceTool } from './workspace-tools.js';
 export { workflowTools, handleWorkflowTool } from './workflow-tools.js';
+export { smartGitTools, handleSmartGitTool } from './smart-git-tool-definitions.js';
+export { gitPreferenceTools, handleGitPreferenceTool } from './git-preference-tool.js';
 
 /**
  * Get all available tools as a single array
@@ -21,6 +23,8 @@ export async function getAllTools() {
   const { modelSelectionTools } = await import('./model-selection-tools.js');
   const { workspaceTools } = await import('./workspace-tools.js');
   const { workflowTools } = await import('./workflow-tools.js');
+  const { smartGitTools } = await import('./smart-git-tool-definitions.js');
+  const { gitPreferenceTools } = await import('./git-preference-tool.js');
   
   return [
     ...validationTools,
@@ -28,7 +32,9 @@ export async function getAllTools() {
     ...roleManagementTools,
     ...modelSelectionTools,
     ...workspaceTools,
-    ...workflowTools
+    ...workflowTools,
+    ...smartGitTools,
+    ...gitPreferenceTools
   ];
 }
 
@@ -42,9 +48,13 @@ export async function getToolsForRepository(isLoqaRepository: boolean) {
   const { modelSelectionTools } = await import('./model-selection-tools.js');
   const { workspaceTools } = await import('./workspace-tools.js');
   const { workflowTools } = await import('./workflow-tools.js');
+  const { smartGitTools } = await import('./smart-git-tool-definitions.js');
+  const { gitPreferenceTools } = await import('./git-preference-tool.js');
   
   const baseTools = [
-    ...validationTools
+    ...validationTools,
+    ...smartGitTools,  // Smart git tools available for all repositories
+    ...gitPreferenceTools  // Git guidance available for all repositories
   ];
   
   const loqaTools = [
@@ -69,11 +79,25 @@ export async function handleToolCall(name: string, args: any, workspaceManager?:
   const { modelSelectionTools } = await import('./model-selection-tools.js');
   const { workspaceTools } = await import('./workspace-tools.js');
   const { workflowTools } = await import('./workflow-tools.js');
+  const { smartGitTools } = await import('./smart-git-tool-definitions.js');
+  const { gitPreferenceTools } = await import('./git-preference-tool.js');
   
   // Validation tools
   if (validationTools.find((tool: any) => tool.name === name)) {
     const { handleValidationTool } = await import('./validation-tools.js');
     return handleValidationTool(name, args);
+  }
+  
+  // Smart git tools
+  if (smartGitTools.find((tool: any) => tool.name === name)) {
+    const { handleSmartGitTool } = await import('./smart-git-tool-definitions.js');
+    return handleSmartGitTool(name, args);
+  }
+  
+  // Git preference tools
+  if (gitPreferenceTools.find((tool: any) => tool.name === name)) {
+    const { handleGitPreferenceTool } = await import('./git-preference-tool.js');
+    return handleGitPreferenceTool(name, args);
   }
   
   // Task management tools
