@@ -45,10 +45,10 @@ Once connected, you can use the unified `/loqa` command in Claude Code with disc
 ```
 
 ### 📋 Task Management (`/loqa task`)
-- `/loqa task create "description"` - **AI-enhanced task creation** with complexity routing and templates
+- `/loqa task create "description"` - **AI-enhanced task creation** with complexity routing and seamless interview experience
 - `/loqa task list --status=active` - **Smart task listing** with cross-repository filtering
 - `/loqa task update task-123 --status=done` - **Task updates** with intelligent state management
-- `/loqa task resume abc-123` - **Resume draft creation** with AI-guided interview process
+- `/loqa task resume abc-123` - **Resume draft creation** with conversational AI-guided interviews
 
 ### 🛠️ Development Workflow (`/loqa dev`)
 - `/loqa dev work --priority=P1` - **AI-powered work sessions** with task selection and context setup
@@ -92,6 +92,34 @@ Once connected, you can use the unified `/loqa` command in Claude Code with disc
 - **Workflow bottleneck detection** with automated mitigation strategies
 - **Predictive analytics** for delivery risk assessment
 - **Context-aware recommendations** for optimal next actions
+
+## 🎯 Seamless Interview Experience
+
+One of the key improvements is the **elimination of MCP tool approval friction** during task creation interviews:
+
+### Before (Friction)
+```
+System: What's the main goal of this task?
+User: Add user authentication
+Claude: I need approval to call answer_task_interview_question
+User: [clicks approve]
+System: Next Question: What are the acceptance criteria?
+```
+
+### After (Seamless)
+```
+System: What's the main goal of this task?
+User: Add user authentication
+System: Next Question: What are the acceptance criteria?
+User: Users should be able to login and logout securely
+System: ✅ Task Created Successfully!
+```
+
+### How It Works
+- **Automatic Context Detection**: System maintains interview state across conversation
+- **Smart Response Recognition**: Distinguishes between commands and conversational answers  
+- **Persistent State**: Interviews can be resumed if interrupted
+- **Natural Flow**: No need for special commands during interviews
 
 ## Troubleshooting
 
