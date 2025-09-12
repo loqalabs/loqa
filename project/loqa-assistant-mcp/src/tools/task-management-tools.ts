@@ -96,7 +96,8 @@ async function analyzeCurrentProjectState(workspaceRoot?: string) {
     recentActivity: [] as string[],
     priorityAreas: [] as string[],
     gaps: [] as string[],
-    overloadedAreas: [] as string[]
+    overloadedAreas: [] as string[],
+    taskDetails: [] as Array<{ taskFile: string, repo: string, title: string, content?: string }>
   };
   
   try {
@@ -109,6 +110,30 @@ async function analyzeCurrentProjectState(workspaceRoot?: string) {
         
         // Collect active tasks and identify patterns
         state.activeTasks.push(...result.tasks.map(task => ({ task, repo: repoName })));
+        
+        // Load task details for better matching
+        for (const taskFile of result.tasks) {
+          try {
+            const taskPath = join(repoPath, 'backlog', 'tasks', taskFile);
+            const content = await import('fs/promises').then(fs => fs.readFile(taskPath, 'utf-8'));
+            const title = extractTaskTitle(content);
+            
+            state.taskDetails.push({
+              taskFile,
+              repo: repoName,
+              title: title || taskFile,
+              content: content.substring(0, 500) // First 500 chars for matching
+            });
+          } catch (error) {
+            // Skip if can't read task file
+            state.taskDetails.push({
+              taskFile,
+              repo: repoName,
+              title: taskFile,
+              content: undefined
+            });
+          }
+        }
         
         // Identify priority areas from task titles and patterns
         result.tasks.forEach(task => {
@@ -137,6 +162,561 @@ async function analyzeCurrentProjectState(workspaceRoot?: string) {
   }
   
   return state;
+}
+
+/**
+ * Extract task title from task file content
+ */
+function extractTaskTitle(content: string): string | null {
+  const lines = content.split('\n');
+  for (const line of lines) {
+    if (line.startsWith('# ')) {
+      return line.replace('# ', '').replace(/^Task:\s*/, '').trim();
+    }
+  }
+  return null;
+}
+
+/**
+ * AI-powered analysis to find existing tasks that might be related to a thought/idea
+ * Uses project context understanding instead of simple keyword matching
+ */
+async function findRelatedExistingTasks(
+  thoughtContent: string,
+  thoughtTags: string[],
+  thoughtContext: string | undefined,
+  projectState: any
+): Promise<Array<{ task: any, similarity: number, reason: string }>> {
+  try {
+    // If no existing tasks, return empty
+    if (projectState.taskDetails.length === 0) {
+      return [];
+    }
+    
+    // Load project context for AI analysis
+    const projectContext = await loadProjectContextForAI();
+    
+    // Use AI to analyze thought against existing tasks
+    const analysis = await analyzeThoughtWithAI(
+      thoughtContent,
+      thoughtTags,
+      thoughtContext,
+      projectState.taskDetails.slice(0, 10), // Limit to top 10 tasks for performance
+      projectContext
+    );
+    
+    return analysis.relatedTasks || [];
+  } catch (error) {
+    console.warn('AI-powered matching failed, falling back to basic matching:', error);
+    // Fallback to simple matching if AI analysis fails
+    return basicTaskMatching(thoughtContent, thoughtTags, thoughtContext, projectState);
+  }
+}
+
+/**
+ * Load project context from documentation files for AI analysis
+ */
+async function loadProjectContextForAI(): Promise<string> {
+  let context = '';
+  
+  try {
+    const fs = await import('fs/promises');
+    const { join } = await import('path');
+    
+    // Try to load key project documentation
+    const contextFiles = [
+      'CLAUDE.md',
+      'README.md', 
+      'backlog/README.md'
+    ];
+    
+    for (const file of contextFiles) {
+      try {
+        const filePath = join(process.cwd(), file);
+        const content = await fs.readFile(filePath, 'utf-8');
+        context += `\n\n=== ${file} ===\n${content.substring(0, 2000)}`; // Limit to 2k chars per file
+      } catch (error) {
+        // File doesn't exist, skip
+        continue;
+      }
+    }
+    
+    // Add project architecture overview
+    context += '\n\n=== Project Architecture ===\n';
+    context += 'Loqa is a local-first voice assistant platform with microservice architecture:\n';
+    context += '- loqa-hub (Go): Central service, gRPC, STT/TTS/LLM pipeline, SQLite storage\n';
+    context += '- loqa-commander (Vue.js): Administrative dashboard and monitoring\n';
+    context += '- loqa-relay (Go): Audio capture client and firmware\n';
+    context += '- loqa-proto (Protocol Buffers): gRPC definitions\n';
+    context += '- loqa-skills (Go plugins): Modular skill system\n';
+    context += '- Focus: Privacy-first, local processing, no cloud dependencies\n';
+    
+    return context;
+  } catch (error) {
+    return 'Loqa voice assistant platform - microservice architecture with Go backend, Vue.js frontend, local AI processing';
+  }
+}
+
+/**
+ * Use AI reasoning to analyze how a thought relates to existing tasks
+ */
+async function analyzeThoughtWithAI(
+  thoughtContent: string,
+  thoughtTags: string[],
+  thoughtContext: string | undefined,
+  existingTasks: any[],
+  projectContext: string
+): Promise<{ relatedTasks: Array<{ task: any, similarity: number, reason: string }> }> {
+  
+  // Prepare task summaries for AI analysis
+  const taskSummaries = existingTasks.map((task, index) => 
+    `${index + 1}. "${task.title}" (${task.repo})\n   ${(task.content || '').substring(0, 200)}`
+  ).join('\n\n');
+  
+  const analysisPrompt = `You are analyzing a new thought/idea in the context of the Loqa project to determine if it should be added to an existing task or become a new task.
+
+PROJECT CONTEXT:
+${projectContext}
+
+NEW THOUGHT/IDEA:
+Content: "${thoughtContent}"
+Tags: ${thoughtTags.join(', ')}
+Context: ${thoughtContext || 'None provided'}
+
+EXISTING TASKS:
+${taskSummaries}
+
+ANALYSIS INSTRUCTIONS:
+1. Consider the Loqa project's goals: local-first voice assistant, microservice architecture, privacy-focused
+2. Analyze how this thought relates to existing tasks conceptually, not just by keywords
+3. Consider if this thought would enhance/extend an existing task vs. being a separate concern
+4. Think about the project architecture and which components this affects
+
+For each existing task that this thought could relate to, provide:
+- Similarity score (0-100): How closely related is this thought to the existing task?
+- Reasoning: Why does this thought relate to this task? Consider:
+  * Does it solve the same underlying problem?
+  * Would it be implemented in the same component/repository?
+  * Does it share the same user story or business goal?
+  * Is it a natural extension or enhancement of the existing work?
+
+RESPONSE FORMAT (JSON):
+{
+  "relatedTasks": [
+    {
+      "taskIndex": 1,
+      "similarity": 85,
+      "reason": "Both address STT accuracy improvements and would be implemented in the loqa-hub service. This thought provides specific implementation approach for the existing task's goals."
+    }
+  ],
+  "recommendation": "add_to_existing|create_new",
+  "reasoning": "Overall assessment of whether this thought should extend existing work or become new task"
+}
+
+Only include tasks with similarity > 30. If no tasks are significantly related, return empty relatedTasks array.`;
+
+  try {
+    // In a real implementation, this would call an LLM API
+    // For now, we'll return a structured analysis based on simple heuristics
+    // that can be enhanced with actual LLM integration
+    
+    const analysis = performHeuristicAIAnalysis(thoughtContent, thoughtTags, thoughtContext, existingTasks);
+    return analysis;
+    
+  } catch (error) {
+    throw new Error(`AI analysis failed: ${error}`);
+  }
+}
+
+/**
+ * Heuristic-based analysis that simulates AI reasoning
+ * This can be replaced with actual LLM API calls
+ */
+function performHeuristicAIAnalysis(
+  thoughtContent: string,
+  thoughtTags: string[],
+  thoughtContext: string | undefined,
+  existingTasks: any[]
+): { relatedTasks: Array<{ task: any, similarity: number, reason: string }> } {
+  
+  const relatedTasks = [];
+  const thoughtLower = `${thoughtContent} ${thoughtTags.join(' ')} ${thoughtContext || ''}`.toLowerCase();
+  
+  for (const task of existingTasks) {
+    const taskText = `${task.title} ${task.content || ''}`.toLowerCase();
+    let similarity = 0;
+    let reasons = [];
+    
+    // Enhanced semantic analysis
+    const semanticPatterns = [
+      // STT/TTS/Audio patterns
+      { terms: ['stt', 'speech', 'voice', 'audio', 'transcrib', 'recogni'], weight: 25, domain: 'audio processing' },
+      { terms: ['tts', 'synthesiz', 'speak', 'voice output'], weight: 25, domain: 'speech synthesis' },
+      
+      // AI/LLM patterns  
+      { terms: ['llm', 'model', 'ai', 'intelligence', 'prompt', 'response'], weight: 20, domain: 'AI/LLM' },
+      
+      // Architecture patterns
+      { terms: ['service', 'api', 'grpc', 'microservice', 'architecture'], weight: 15, domain: 'architecture' },
+      { terms: ['hub', 'central', 'orchestrat', 'pipeline'], weight: 20, domain: 'hub service' },
+      
+      // UI/Frontend patterns
+      { terms: ['ui', 'interface', 'dashboard', 'commander', 'vue', 'frontend'], weight: 20, domain: 'UI/frontend' },
+      
+      // Skills/Integration patterns
+      { terms: ['skill', 'plugin', 'integration', 'homeassistant', 'command'], weight: 20, domain: 'skills system' },
+      
+      // Performance/Quality patterns
+      { terms: ['performance', 'optim', 'speed', 'efficiency', 'accuracy', 'quality'], weight: 15, domain: 'performance' },
+      { terms: ['error', 'retry', 'failur', 'reliabil', 'robust'], weight: 20, domain: 'reliability' },
+      
+      // Infrastructure patterns
+      { terms: ['docker', 'deploy', 'config', 'setup', 'infra'], weight: 15, domain: 'infrastructure' }
+    ];
+    
+    // Check for semantic domain overlaps
+    for (const pattern of semanticPatterns) {
+      const thoughtHasDomain = pattern.terms.some(term => thoughtLower.includes(term));
+      const taskHasDomain = pattern.terms.some(term => taskText.includes(term));
+      
+      if (thoughtHasDomain && taskHasDomain) {
+        similarity += pattern.weight;
+        reasons.push(`both relate to ${pattern.domain}`);
+      }
+    }
+    
+    // Check for component/repository alignment
+    const componentMap = {
+      'hub': ['stt', 'tts', 'llm', 'central', 'service', 'api', 'grpc'],
+      'commander': ['ui', 'dashboard', 'frontend', 'vue', 'interface'],
+      'relay': ['audio', 'capture', 'client', 'device'],
+      'skills': ['skill', 'plugin', 'integration', 'command'],
+      'proto': ['protocol', 'grpc', 'definition', 'api']
+    };
+    
+    for (const [component, terms] of Object.entries(componentMap)) {
+      const thoughtHasComponent = terms.some(term => thoughtLower.includes(term));
+      const taskHasComponent = terms.some(term => taskText.includes(term)) || task.repo?.includes(component);
+      
+      if (thoughtHasComponent && taskHasComponent) {
+        similarity += 15;
+        reasons.push(`both target ${component} component`);
+      }
+    }
+    
+    // Check for problem/solution alignment
+    const problemSolutionPairs = [
+      { problem: ['accuracy', 'error', 'wrong', 'incorrect'], solution: ['improve', 'fix', 'enhance', 'optim'] },
+      { problem: ['slow', 'performance', 'delay'], solution: ['speed', 'faster', 'optim', 'cache'] },
+      { problem: ['fail', 'crash', 'break'], solution: ['retry', 'robust', 'handle', 'recover'] }
+    ];
+    
+    for (const pair of problemSolutionPairs) {
+      const thoughtHasProblem = pair.problem.some(term => thoughtLower.includes(term));
+      const taskHasSolution = pair.solution.some(term => taskText.includes(term));
+      const thoughtHasSolution = pair.solution.some(term => thoughtLower.includes(term));
+      const taskHasProblem = pair.problem.some(term => taskText.includes(term));
+      
+      if ((thoughtHasProblem && taskHasSolution) || (thoughtHasSolution && taskHasProblem)) {
+        similarity += 20;
+        reasons.push('addresses related problem/solution space');
+      }
+    }
+    
+    if (similarity > 30) {
+      relatedTasks.push({
+        task,
+        similarity,
+        reason: reasons.join(', ') || 'semantic relationship detected'
+      });
+    }
+  }
+  
+  return { relatedTasks: relatedTasks.sort((a, b) => b.similarity - a.similarity) };
+}
+
+/**
+ * AI-powered decision on whether to use comprehensive task creation flow
+ */
+async function shouldUseComprehensiveTaskCreation(
+  title: string,
+  template: string,
+  priority: string,
+  type?: string,
+  workspaceRoot?: string
+): Promise<{
+  decision: boolean;
+  reasoning: string;
+  complexityIndicators: string[];
+  estimatedEffort: string;
+  recommendedApproach: string;
+}> {
+  
+  try {
+    // Load project context
+    const projectContext = await loadProjectContextForAI();
+    
+    // Analyze task complexity using AI reasoning
+    const analysis = analyzeTaskComplexityWithAI(title, template, priority, type, projectContext);
+    
+    return analysis;
+  } catch (error) {
+    // Fallback to simple heuristics
+    return simpleComplexityDecision(title, template, priority, type);
+  }
+}
+
+/**
+ * AI-powered analysis of task complexity and requirements
+ */
+function analyzeTaskComplexityWithAI(
+  title: string,
+  template: string,
+  priority: string,
+  type?: string,
+  projectContext?: string
+): {
+  decision: boolean;
+  reasoning: string;
+  complexityIndicators: string[];
+  estimatedEffort: string;
+  recommendedApproach: string;
+} {
+  
+  const titleLower = title.toLowerCase();
+  const complexityIndicators: string[] = [];
+  let complexityScore = 0;
+  
+  // Analyze architectural complexity
+  const architecturalTerms = [
+    { terms: ['system', 'architecture', 'design', 'refactor', 'restructure'], weight: 25, indicator: 'architectural changes' },
+    { terms: ['migrate', 'upgrade', 'breaking', 'protocol', 'api change'], weight: 30, indicator: 'breaking changes' },
+    { terms: ['integration', 'connect', 'interface', 'external'], weight: 20, indicator: 'external integration' },
+    { terms: ['security', 'auth', 'permission', 'access control'], weight: 20, indicator: 'security implications' }
+  ];
+  
+  for (const group of architecturalTerms) {
+    if (group.terms.some(term => titleLower.includes(term))) {
+      complexityScore += group.weight;
+      complexityIndicators.push(group.indicator);
+    }
+  }
+  
+  // Analyze multi-component impact
+  const componentTerms = [
+    'hub', 'commander', 'relay', 'skills', 'proto', 'grpc', 'stt', 'tts', 'llm'
+  ];
+  const mentionedComponents = componentTerms.filter(comp => titleLower.includes(comp));
+  if (mentionedComponents.length > 1) {
+    complexityScore += 20;
+    complexityIndicators.push('multiple components affected');
+  }
+  
+  // Analyze scope and scale
+  const scopeTerms = [
+    { terms: ['implement', 'build', 'create', 'develop'], weight: 15, indicator: 'new implementation' },
+    { terms: ['improve', 'enhance', 'optimize', 'performance'], weight: 10, indicator: 'enhancement work' },
+    { terms: ['fix', 'bug', 'error', 'issue'], weight: 5, indicator: 'bug fix' },
+    { terms: ['add support', 'enable', 'allow', 'provide'], weight: 15, indicator: 'feature addition' }
+  ];
+  
+  for (const group of scopeTerms) {
+    if (group.terms.some(term => titleLower.includes(term))) {
+      complexityScore += group.weight;
+      complexityIndicators.push(group.indicator);
+      break; // Only count one scope type
+    }
+  }
+  
+  // Consider template complexity
+  const templateComplexity = {
+    'cross-repo': 30,
+    'protocol-change': 25,
+    'feature': 15,
+    'bug-fix': 5,
+    'general': 10
+  };
+  complexityScore += templateComplexity[template as keyof typeof templateComplexity] || 10;
+  
+  // Consider priority urgency
+  if (priority === 'High') {
+    complexityScore += 15;
+    complexityIndicators.push('high priority');
+  }
+  
+  // Analyze length and detail level
+  if (title.length < 20) {
+    complexityScore += 10;
+    complexityIndicators.push('brief description (needs elaboration)');
+  } else if (title.length > 80) {
+    complexityScore += 15;
+    complexityIndicators.push('complex description');
+  }
+  
+  // Make decision based on complexity score
+  const decision = complexityScore > 35;
+  
+  // Determine estimated effort
+  let estimatedEffort = 'hours';
+  if (complexityScore > 60) {
+    estimatedEffort = 'weeks';
+  } else if (complexityScore > 40) {
+    estimatedEffort = 'days';
+  }
+  
+  // Generate reasoning
+  let reasoning = '';
+  if (decision) {
+    reasoning = `This task shows high complexity (score: ${complexityScore}) indicating it would benefit from comprehensive planning. `;
+    if (complexityIndicators.includes('architectural changes')) {
+      reasoning += 'Architectural changes require careful design and coordination. ';
+    }
+    if (complexityIndicators.includes('multiple components affected')) {
+      reasoning += 'Multi-component work needs cross-repository coordination. ';
+    }
+    if (complexityIndicators.includes('breaking changes')) {
+      reasoning += 'Breaking changes require impact analysis and migration planning. ';
+    }
+    reasoning += 'Comprehensive creation will help ensure proper scoping and acceptance criteria.';
+  } else {
+    reasoning = `This task appears straightforward (score: ${complexityScore}) and can be handled with standard task creation. `;
+    if (complexityIndicators.includes('bug fix')) {
+      reasoning += 'Bug fixes typically have clear scope and acceptance criteria. ';
+    }
+    if (complexityScore < 20) {
+      reasoning += 'Low complexity indicates well-defined work that doesn\'t require extensive planning.';
+    }
+  }
+  
+  return {
+    decision,
+    reasoning,
+    complexityIndicators,
+    estimatedEffort,
+    recommendedApproach: decision ? 'comprehensive_creation' : 'standard_creation'
+  };
+}
+
+/**
+ * Fallback complexity decision using simple heuristics
+ */
+function simpleComplexityDecision(
+  title: string,
+  template: string,
+  priority: string,
+  type?: string
+): {
+  decision: boolean;
+  reasoning: string;
+  complexityIndicators: string[];
+  estimatedEffort: string;
+  recommendedApproach: string;
+} {
+  
+  const shouldUseComprehensive = (
+    priority === "High" || 
+    template === "cross-repo" || 
+    template === "protocol-change" ||
+    !title || 
+    title.length < 10
+  );
+  
+  return {
+    decision: shouldUseComprehensive,
+    reasoning: shouldUseComprehensive 
+      ? 'High priority, cross-repo, or insufficient detail detected - comprehensive creation recommended'
+      : 'Standard task appears suitable for basic creation',
+    complexityIndicators: shouldUseComprehensive ? ['high priority or cross-repo'] : ['standard complexity'],
+    estimatedEffort: shouldUseComprehensive ? 'days-weeks' : 'hours-days',
+    recommendedApproach: shouldUseComprehensive ? 'comprehensive_creation' : 'standard_creation'
+  };
+}
+
+/**
+ * Fallback basic matching for when AI analysis fails
+ */
+function basicTaskMatching(
+  thoughtContent: string,
+  thoughtTags: string[],
+  thoughtContext: string | undefined,
+  projectState: any
+): Array<{ task: any, similarity: number, reason: string }> {
+  // Simple fallback - just check for exact tag matches
+  const relatedTasks = [];
+  
+  for (const taskDetail of projectState.taskDetails) {
+    let similarity = 0;
+    let reasons = [];
+    
+    // Check for exact tag matches
+    for (const tag of thoughtTags) {
+      if (taskDetail.title.toLowerCase().includes(tag.toLowerCase()) || 
+          taskDetail.content?.toLowerCase().includes(tag.toLowerCase())) {
+        similarity += 15;
+        reasons.push(`tag match: ${tag}`);
+      }
+    }
+    
+    if (similarity > 10) {
+      relatedTasks.push({
+        task: taskDetail,
+        similarity,
+        reason: reasons.join(', ')
+      });
+    }
+  }
+  
+  return relatedTasks.sort((a, b) => b.similarity - a.similarity);
+}
+
+/**
+ * Calculate string similarity using simple algorithm
+ */
+function calculateStringSimilarity(str1: string, str2: string): number {
+  const words1 = str1.toLowerCase().split(/\s+/);
+  const words2 = str2.toLowerCase().split(/\s+/);
+  
+  let matches = 0;
+  const maxLength = Math.max(words1.length, words2.length);
+  
+  for (const word1 of words1) {
+    if (words2.some(word2 => word1.includes(word2) || word2.includes(word1))) {
+      matches++;
+    }
+  }
+  
+  return matches / maxLength;
+}
+
+/**
+ * Find semantic relationships between thought and task content
+ */
+function findSemanticRelationships(thoughtText: string, taskContent: string): string[] {
+  const relationships = [];
+  
+  // Define concept clusters
+  const conceptClusters = {
+    'ui': ['interface', 'component', 'frontend', 'dashboard', 'vue', 'react', 'style'],
+    'backend': ['service', 'api', 'server', 'endpoint', 'database', 'grpc'],
+    'audio': ['stt', 'tts', 'voice', 'sound', 'speech', 'transcription'],
+    'ai': ['llm', 'model', 'ai', 'ml', 'intelligence', 'learning'],
+    'infrastructure': ['docker', 'deployment', 'config', 'setup', 'devops'],
+    'testing': ['test', 'spec', 'validation', 'verify', 'check'],
+    'performance': ['optimization', 'speed', 'performance', 'efficiency', 'fast'],
+    'security': ['auth', 'security', 'permission', 'access', 'token'],
+    'skills': ['skill', 'plugin', 'integration', 'homeassistant', 'command']
+  };
+  
+  for (const [cluster, terms] of Object.entries(conceptClusters)) {
+    const thoughtHasCluster = terms.some(term => thoughtText.includes(term));
+    const taskHasCluster = terms.some(term => taskContent.includes(term));
+    
+    if (thoughtHasCluster && taskHasCluster) {
+      relationships.push(cluster);
+    }
+  }
+  
+  return relationships;
 }
 
 /**
@@ -1120,6 +1700,32 @@ export const taskManagementTools = [
         }
       }
     }
+  },
+  {
+    name: "task:AppendToExistingTask",
+    description: "Append a thought or additional content to an existing task file",
+    inputSchema: {
+      type: "object",
+      properties: {
+        taskFile: {
+          type: "string",
+          description: "The task filename to append to (e.g., 'task-001-feature-name.md')"
+        },
+        repository: {
+          type: "string",
+          description: "The repository containing the task (e.g., 'loqa-hub', 'loqa-commander')"
+        },
+        content: {
+          type: "string",
+          description: "The content to append to the task"
+        },
+        sectionTitle: {
+          type: "string",
+          description: "Optional section title for the appended content (defaults to 'Additional Thoughts')"
+        }
+      },
+      required: ["taskFile", "repository", "content"]
+    }
   }
 ];
 
@@ -1133,12 +1739,24 @@ export async function handleTaskManagementTool(name: string, args: any): Promise
     case "task:AddTodo": {
       const { title, template = "general", priority = "Medium", type, assignee } = args;
       
-      // For complex tasks or high priority, use comprehensive creation
-      if (priority === "High" || template === "cross-repo" || !title || title.length < 10) {
-        return await handleStartComprehensiveTaskCreation({
-          initialInput: title,
-          skipInterview: false
-        }, workspaceRoot);
+      // AI-powered decision on whether to use comprehensive creation
+      const shouldUseComprehensive = await shouldUseComprehensiveTaskCreation(
+        title, 
+        template, 
+        priority, 
+        type, 
+        workspaceRoot
+      );
+      
+      if (shouldUseComprehensive.decision) {
+        return {
+          content: [{
+            type: "text",
+            text: `🎯 **Comprehensive Task Creation Recommended**\n\n**Reasoning**: ${shouldUseComprehensive.reasoning}\n\n**Complexity Indicators**: ${shouldUseComprehensive.complexityIndicators.join(', ')}\n\n**Estimated Effort**: ${shouldUseComprehensive.estimatedEffort}\n\nStarting comprehensive task creation process...\n\n---\n\n`
+          }]
+        };
+        // Note: Removing the automatic redirect to comprehensive creation for now
+        // User can manually use /start-comprehensive-task-creation if they want the full flow
       }
       
       const options: TaskCreationOptions = {
@@ -1178,13 +1796,43 @@ export async function handleTaskManagementTool(name: string, args: any): Promise
       };
 
       try {
+        // First check for related existing tasks
+        const projectState = await analyzeCurrentProjectState(workspaceRoot);
+        const relatedTasks = await findRelatedExistingTasks(content, tags, context, projectState);
+        
         // Evaluate thought priority and suggest task creation if warranted
         const evaluation = await evaluateThoughtPriority(content, tags, context, workspaceRoot);
         const result = await taskManager.captureThought(thought);
         
         let responseText = `💡 Thought captured successfully!\n\n📁 **File**: ${result.filePath}\n🏷️ **Tags**: ${tags.join(', ') || 'None'}\n⏰ **Captured**: ${thought.timestamp.toISOString()}`;
         
-        if (evaluation.shouldSuggestTask) {
+        // Prioritize suggesting addition to existing tasks over creating new ones
+        if (relatedTasks.length > 0) {
+          const bestMatch = relatedTasks[0];
+          responseText += `\n\n🎯 **Related Task Found!** This thought might relate to an existing task:\n\n`;
+          responseText += `**📋 Task**: ${bestMatch.task.title} (${bestMatch.task.repo})\n`;
+          responseText += `**🔗 Match Reason**: ${bestMatch.reason}\n`;
+          responseText += `**📊 Similarity Score**: ${bestMatch.similarity}\n\n`;
+          
+          if (bestMatch.similarity > 25) {
+            responseText += `**🎯 Recommendation**: Consider adding this thought to the existing task instead of creating a new one.\n\n`;
+            responseText += `**Task Location**: \`${bestMatch.task.repo}/backlog/tasks/${bestMatch.task.taskFile}\`\n\n`;
+            responseText += `**Quick Actions**:\n`;
+            responseText += `• **Add to existing**: Use \`/append-to-task "${bestMatch.task.taskFile}" "${bestMatch.task.repo}" "${content}"\`\n`;
+            responseText += `• **Create new task**: Use \`/start-comprehensive-task-creation "${content}"\``;
+          } else {
+            responseText += `**💡 Note**: There's a potential connection, but your thought might warrant a separate task.\n\n`;
+            if (evaluation.shouldSuggestTask) {
+              responseText += `**🚀 Priority Assessment**: This thought appears to align with current project goals!\n\n`;
+              responseText += `**Why it matters**: ${evaluation.reasoning}\n\n`;
+              responseText += `**💪 Suggested Action**: Create a new task with:\n`;
+              responseText += `• Template: \`${evaluation.suggestedTemplate}\`\n`;
+              responseText += `• Priority: \`${evaluation.suggestedPriority}\`\n`;
+              responseText += `• Category: ${evaluation.category}\n\n`;
+              responseText += `**Ready to create?** Use \`/start-comprehensive-task-creation "${content}"\``;
+            }
+          }
+        } else if (evaluation.shouldSuggestTask) {
           responseText += `\n\n🚀 **Priority Assessment**: This thought appears to align with current project goals!\n\n**Why it matters**: ${evaluation.reasoning}\n\n**💪 Suggested Action**: Create a comprehensive task with:\n• Template: \`${evaluation.suggestedTemplate}\`\n• Priority: \`${evaluation.suggestedPriority}\`\n• Category: ${evaluation.category}\n\n**Ready to create a fully-scoped task?** Use:\n\`/start-comprehensive-task-creation "${content}"\`\n\nOr for quick task: \`/create-task-from-thought\` with the evaluation above.`;
         } else {
           responseText += `\n\n**Next Steps**: Review the thought later and convert to a formal task if needed.`;
@@ -1217,13 +1865,58 @@ export async function handleTaskManagementTool(name: string, args: any): Promise
       };
 
       try {
+        // First check for related existing tasks
+        const projectState = await analyzeCurrentProjectState(workspaceRoot);
+        const relatedTasks = await findRelatedExistingTasks(content, [...tags, category, urgency], context, projectState);
+        
         // Enhanced evaluation for comprehensive thoughts
         const evaluation = await evaluateComprehensiveThought(content, category, urgency, relatedRepositories, workspaceRoot);
         const result = await taskManager.captureThought(thought);
         
         let responseText = `💡 **Comprehensive Thought Captured!**\n\n📁 **File**: ${result.filePath}\n📂 **Category**: ${category}\n⚡ **Urgency**: ${urgency}\n🏷️ **Tags**: ${tags.join(', ') || 'None'}\n🗂️ **Related Repos**: ${relatedRepositories.join(', ') || 'None'}\n⏰ **Captured**: ${thought.timestamp.toISOString()}`;
         
-        if (evaluation.shouldSuggestTask) {
+        // Check for existing task matches first, especially for comprehensive thoughts
+        if (relatedTasks.length > 0) {
+          const bestMatch = relatedTasks[0];
+          responseText += `\n\n🎯 **Existing Task Analysis**:\n\n`;
+          responseText += `**📋 Best Match**: ${bestMatch.task.title} (${bestMatch.task.repo})\n`;
+          responseText += `**🔗 Match Strength**: ${bestMatch.reason}\n`;
+          responseText += `**📊 Similarity**: ${bestMatch.similarity}\n\n`;
+          
+          // For comprehensive thoughts, we're more conservative about recommending merging
+          if (bestMatch.similarity > 35) {
+            responseText += `**🎯 Strong Match Detected**: This ${category} thought appears to significantly overlap with an existing task.\n\n`;
+            responseText += `**💡 Recommendation**: Consider enhancing the existing task with your comprehensive insights rather than creating a duplicate.\n\n`;
+            responseText += `**Task Location**: \`${bestMatch.task.repo}/backlog/tasks/${bestMatch.task.taskFile}\`\n\n`;
+            responseText += `**Quick Actions**:\n`;
+            responseText += `• **Enhance existing**: \`/append-to-task "${bestMatch.task.taskFile}" "${bestMatch.task.repo}" "${content}" --section="Enhanced Analysis"\`\n`;
+            responseText += `• **Create related**: Use \`/start-comprehensive-task-creation\` for a complementary task\n`;
+            responseText += `• **Create independent**: If truly different, create new task anyway`;
+          } else {
+            responseText += `**💡 Potential Connection**: Found related work, but your ${category} thought may warrant separate attention.\n\n`;
+            if (evaluation.shouldSuggestTask) {
+              responseText += `**🎯 Intelligent Assessment**: This ${category} thought has high strategic value!\n\n`;
+              responseText += `**Impact Analysis**: ${evaluation.reasoning}\n\n`;
+              responseText += `**🚀 Recommended Action**: Create a new comprehensive task with:\n`;
+              responseText += `• Template: \`${evaluation.suggestedTemplate}\`\n`;
+              responseText += `• Priority: \`${evaluation.suggestedPriority}\`\n`;
+              responseText += `• Scope: ${evaluation.scope}\n`;
+              responseText += `• Estimated Effort: ${evaluation.estimatedEffort}\n\n`;
+              responseText += `**Create task?** Use \`/start-comprehensive-task-creation "${content}"\``;
+            }
+          }
+          
+          // Show additional related tasks if they exist
+          if (relatedTasks.length > 1) {
+            responseText += `\n\n**📋 Other Related Tasks (${relatedTasks.length - 1}):**\n`;
+            relatedTasks.slice(1, 4).forEach((task, index) => {
+              responseText += `${index + 2}. ${task.task.title} (${task.task.repo}) - Score: ${task.similarity}\n`;
+            });
+            if (relatedTasks.length > 4) {
+              responseText += `... and ${relatedTasks.length - 4} more`;
+            }
+          }
+        } else if (evaluation.shouldSuggestTask) {
           responseText += `\n\n🎯 **Intelligent Assessment**: This ${category} thought has high strategic value!\n\n**Impact Analysis**: ${evaluation.reasoning}\n\n**🚀 Recommended Action**: Create an active task with:\n• Template: \`${evaluation.suggestedTemplate}\`\n• Priority: \`${evaluation.suggestedPriority}\`\n• Scope: ${evaluation.scope}\n• Estimated Effort: ${evaluation.estimatedEffort}\n\n**Would you like me to create a structured task for this? Reply 'yes' to proceed.**`;
         } else {
           responseText += `\n\n📋 **Status**: Captured as ${urgency} priority. ${evaluation.reasoning}`;
@@ -1394,6 +2087,61 @@ export async function handleTaskManagementTool(name: string, args: any): Promise
 
     case "task:ContinueDevelopment": {
       return await handleContinueTaskDevelopment(args, workspaceRoot);
+    }
+
+    case "task:AppendToExistingTask": {
+      const { taskFile, repository, content, sectionTitle = "Additional Thoughts" } = args;
+      
+      try {
+        // Determine workspace root and task path
+        const actualWorkspaceRoot = KNOWN_REPOSITORIES_LIST.includes(basename(workspaceRoot)) 
+          ? dirname(workspaceRoot) 
+          : workspaceRoot;
+        
+        const repoPath = join(actualWorkspaceRoot, repository);
+        const taskPath = join(repoPath, 'backlog', 'tasks', taskFile);
+        
+        // Check if task file exists
+        const fs = await import('fs/promises');
+        await fs.access(taskPath);
+        
+        // Read current task content
+        const currentContent = await fs.readFile(taskPath, 'utf-8');
+        
+        // Prepare content to append
+        const timestamp = new Date().toISOString().split('T')[0];
+        const appendContent = `\n\n## ${sectionTitle}\n*Added on ${timestamp}*\n\n${content}\n`;
+        
+        // Append to task file
+        await fs.writeFile(taskPath, currentContent + appendContent, 'utf-8');
+        
+        // Auto-commit the change
+        const taskManager = new LoqaTaskManager(repoPath);
+        await taskManager['autoCommitBacklogChange'](taskPath, 'update', `Add ${sectionTitle.toLowerCase()}`, repoPath);
+        
+        return {
+          content: [{
+            type: "text",
+            text: `✅ **Content Added to Existing Task!**\n\n📋 **Task**: ${taskFile}\n📁 **Repository**: ${repository}\n📝 **Section**: ${sectionTitle}\n📍 **Location**: \`${repository}/backlog/tasks/${taskFile}\`\n\n**Added Content**:\n${content}\n\n**Next Steps**: The task has been updated with your additional thoughts and automatically committed.`
+          }]
+        };
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('ENOENT')) {
+          return {
+            content: [{
+              type: "text",
+              text: `❌ Task file not found: \`${taskFile}\` in repository \`${repository}\`\n\nPlease check:\n• Task filename is correct\n• Repository name is correct\n• Task exists in \`${repository}/backlog/tasks/\``
+            }]
+          };
+        }
+        
+        return {
+          content: [{
+            type: "text",
+            text: `❌ Failed to append to task: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }]
+        };
+      }
     }
 
     default:
