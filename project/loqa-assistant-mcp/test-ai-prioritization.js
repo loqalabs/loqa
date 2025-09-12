@@ -1,6 +1,6 @@
 /**
  * Test script to validate AI-powered prioritization improvements
- * Tests the exact task-027 scenario that was under-prioritized
+ * Tests the exact task-27 scenario that was under-prioritized
  */
 
 import { analyzeTaskPriorityWithAI } from './dist/tools/ai-prioritization.js';
@@ -8,7 +8,7 @@ import { analyzeTaskPriorityWithAI } from './dist/tools/ai-prioritization.js';
 async function testTask027Scenario() {
   console.log('🧪 Testing AI-Powered Prioritization with Task-027 Scenario\n');
   
-  // Exact task-027 content that was under-prioritized
+  // Exact task-27 content that was under-prioritized
   const task027Content = `
     Emergency Fix: Split 2,768-line task-management-tools.ts monolith
     
@@ -110,7 +110,7 @@ async function testTask027Scenario() {
     console.log(`\n📊 **Overall: ${passedTests}/${validations.length} tests passed**`);
     
     if (passedTests === validations.length) {
-      console.log('🎉 **SUCCESS: AI-powered prioritization fixes the task-027 scenario!**');
+      console.log('🎉 **SUCCESS: AI-powered prioritization fixes the task-27 scenario!**');
     } else {
       console.log('⚠️ **NEEDS IMPROVEMENT: Some validations failed**');
     }

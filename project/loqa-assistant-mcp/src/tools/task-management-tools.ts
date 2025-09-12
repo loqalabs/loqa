@@ -5,7 +5,7 @@
  * importing from focused modules instead of containing a monolithic implementation.
  * 
  * Emergency Fix: Split 2,768-line monolith to resolve Claude Code timeout issues
- * Task: task-027-emergency-fix-split-2-768-line-task-management-tools-ts-monolith
+ * Task: task-27 - Emergency-fix-split-2768-line-task-management-tools-ts-monolith
  */
 
 // Re-export all functionality from the modular implementation
