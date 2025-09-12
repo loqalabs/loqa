@@ -101,12 +101,14 @@ COMMANDS=(
     "thought.md"
     "idea.md"
     "create-task.md"
+    "update-task.md"
     "branch.md"
     "pr.md"
     "test.md"
     "analyze.md"
     "plan.md"
     "list-tasks.md"
+    "resume-draft.md"
 )
 
 # Install each command
@@ -150,6 +152,8 @@ if [[ $INSTALLED_COUNT -gt 0 ]]; then
     echo "   /thought      - Capture technical thoughts and concerns"
     echo "   /idea         - Capture feature ideas and improvements"
     echo "   /create-task  - Create detailed backlog tasks"
+    echo "   /update-task  - Update existing tasks with new information"
+    echo "   /resume-draft - Resume task creation drafts and interviews"
     echo "   /branch       - Create feature branches from tasks"
     echo "   /pr           - Create pull requests with task linking"
     echo "   /test         - Run cross-service integration tests"
