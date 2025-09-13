@@ -1,0 +1,87 @@
+name: Protocol Change
+description: Request changes to gRPC protocols or API contracts
+title: "[Protocol]: "
+labels: ["template-protocol-change", "priority-high"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Protocol changes affect multiple services and require careful coordination.
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Why is this protocol change needed?
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_protocol
+    attributes:
+      label: Current Protocol
+      description: Describe the current protocol/API behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_changes
+    attributes:
+      label: Proposed Changes
+      description: Detailed description of the protocol changes
+      placeholder: |
+        - Add new field: ...
+        - Modify message: ...
+        - Remove deprecated: ...
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: affected_services
+    attributes:
+      label: Affected Services
+      description: Which services will need updates?
+      options:
+        - label: loqa-hub
+        - label: loqa-relay
+        - label: loqa-commander
+        - label: loqa-skills
+        - label: Other services
+
+  - type: dropdown
+    id: breaking_change
+    attributes:
+      label: Breaking Change
+      description: Is this a breaking change?
+      options:
+        - "No - backward compatible"
+        - "Yes - requires migration"
+        - "Unsure - needs analysis"
+    validations:
+      required: true
+
+  - type: textarea
+    id: migration_plan
+    attributes:
+      label: Migration Plan
+      description: How will existing services migrate to the new protocol?
+      placeholder: |
+        1. Update loqa-proto
+        2. Update service X
+        3. Deploy in order: ...
+
+  - type: textarea
+    id: testing_plan
+    attributes:
+      label: Testing Plan
+      description: How will these changes be tested?
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our Code of Conduct
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
