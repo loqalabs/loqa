@@ -16,7 +16,20 @@ export class LoqaRoleManager {
    * Load role configurations from files
    */
   async loadRoleConfigurations(): Promise<void> {
-    const roleConfigsPath = join(this.workspaceRoot, '..', 'role-configs');
+    // Role configs are always in the loqa repository at project/role-configs
+    // First, determine if we're in a specific repository or workspace root
+    const { basename } = await import('path');
+    const repoName = basename(this.workspaceRoot);
+    
+    let roleConfigsPath: string;
+    if (repoName === 'loqa') {
+      // We're in the loqa repository
+      roleConfigsPath = join(this.workspaceRoot, 'project', 'role-configs');
+    } else {
+      // We're in another repository or workspace root, navigate to loqa
+      const workspaceRoot = repoName === 'loqalabs' ? this.workspaceRoot : join(this.workspaceRoot, '..');
+      roleConfigsPath = join(workspaceRoot, 'loqa', 'project', 'role-configs');
+    }
     
     try {
       // Load role system configuration
