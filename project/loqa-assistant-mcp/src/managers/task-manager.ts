@@ -1,7 +1,8 @@
 import { simpleGit, SimpleGit } from 'simple-git';
 import { promises as fs } from 'fs';
-import { join } from 'path';
+import { join, isAbsolute } from 'path';
 import { glob } from 'glob';
+import { spawn, execSync } from 'child_process';
 import { TaskTemplate, TaskCreationOptions, CapturedThought } from '../types/index.js';
 import { executeGitCommand } from '../utils/git-repo-detector.js';
 import { resolveWorkspaceRootWithContext } from '../utils/context-detector.js';
@@ -70,29 +71,8 @@ export class LoqaTaskManager {
       throw new Error(`Backlog not found in ${repoName} (${path}). Expected backlog directory at: ${backlogPath}. Run 'backlog init' in the repository or check if you're in the correct directory.`);
     }
 
-    // Build backlog CLI command arguments
-    const cliArgs = ['task', 'create', options.title];
-    
-    if (options.description) {
-      cliArgs.push('--description', options.description);
-    }
-    
-    if (options.priority) {
-      cliArgs.push('--priority', options.priority.toLowerCase());
-    }
-    
-    if (options.type) {
-      // Map type to appropriate labels
-      const typeLabels = this.mapTypeToLabels(options.type, options.template);
-      cliArgs.push('--labels', typeLabels);
-    } else if (options.template) {
-      // Use template as label
-      cliArgs.push('--labels', options.template);
-    }
-    
-    if (options.assignee) {
-      cliArgs.push('--assignee', options.assignee);
-    }
+    // Build backlog CLI command arguments with proper quoting for the title
+    const cliArgs = ['task', 'create', `"${options.title}"`];
 
     // Execute backlog CLI command from the REPOSITORY ROOT (not workspace root)
     try {
@@ -112,9 +92,16 @@ export class LoqaTaskManager {
       };
       
     } catch (error) {
-      // Fallback to manual creation only if CLI is not available
-      console.warn(`Backlog CLI failed, falling back to manual creation: ${error}`);
-      return this.createTaskManuallyAsFallback(options, path);
+      // Never fall back to manual creation - always use backlog CLI
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(
+        `❌ Backlog CLI execution failed: ${errorMessage}\n\n` +
+        `🔧 **Fix Required**:\n` +
+        `1. Ensure backlog CLI is installed: \`npm install -g backlog.md\`\n` +
+        `2. Verify you're in a repository with initialized backlog: \`backlog init\`\n` +
+        `3. Check repository path: ${path}\n\n` +
+        `💡 **Note**: MCP system requires working backlog CLI - no manual fallback provided.`
+      );
     }
   }
 
@@ -149,80 +136,31 @@ export class LoqaTaskManager {
     }
   }
 
-  /**
-   * Map task type to appropriate labels for backlog CLI
-   */
-  private mapTypeToLabels(type: string, template?: string): string {
-    const labels = [];
-    
-    // Add template as primary label
-    if (template) {
-      labels.push(template);
-    }
-    
-    // Add type-specific labels
-    switch (type.toLowerCase()) {
-      case 'feature':
-        labels.push('feature', 'enhancement');
-        break;
-      case 'bug fix':
-        labels.push('bug-fix', 'priority-high');
-        break;
-      case 'improvement':
-        labels.push('improvement', 'enhancement');
-        break;
-      case 'documentation':
-        labels.push('documentation', 'docs');
-        break;
-      case 'refactoring':
-        labels.push('refactoring', 'code-quality');
-        break;
-      default:
-        labels.push('general');
-    }
-    
-    return labels.join(',');
-  }
 
   /**
    * Execute backlog CLI command
    */
   private async executeBacklogCliCommand(args: string[], workingDir: string): Promise<{ success: boolean; stdout: string; stderr: string }> {
-    return new Promise((resolve) => {
-      const { spawn } = require('child_process');
-      const child = spawn('backlog', args, { 
-        cwd: workingDir, 
-        stdio: ['ignore', 'pipe', 'pipe'],
-        shell: true 
+    try {
+      const fullCommand = `backlog ${args.join(' ')}`;
+      
+      const result = execSync(fullCommand, {
+        cwd: workingDir,
+        encoding: 'utf-8'
       });
       
-      let stdout = '';
-      let stderr = '';
-      
-      child.stdout?.on('data', (data: Buffer) => {
-        stdout += data.toString();
-      });
-      
-      child.stderr?.on('data', (data: Buffer) => {
-        stderr += data.toString();
-      });
-      
-      child.on('close', (code: number) => {
-        resolve({
-          success: code === 0,
-          stdout: stdout.trim(),
-          stderr: stderr.trim()
-        });
-      });
-      
-      child.on('error', (error: Error) => {
-        resolve({
-          success: false,
-          stdout: '',
-          stderr: error.message
-        });
-      });
-    });
+      return {
+        success: true,
+        stdout: result.toString().trim(),
+        stderr: ''
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        stdout: '',
+        stderr: error.message || error.toString()
+      };
+    }
   }
 
   /**
@@ -240,13 +178,13 @@ export class LoqaTaskManager {
     if (filePathMatch) {
       filePath = filePathMatch[1];
       // Make absolute if relative
-      if (!require('path').isAbsolute(filePath)) {
+      if (!isAbsolute(filePath)) {
         filePath = join(repositoryPath, filePath);
       }
     } else {
       // Construct expected file path using the repository path
       const tasksDir = join(repositoryPath, 'backlog', 'tasks');
-      const taskFiles = require('glob').sync(`task-${taskId}-*.md`, { cwd: tasksDir });
+      const taskFiles = glob.sync(`task-${taskId}-*.md`, { cwd: tasksDir });
       if (taskFiles.length > 0) {
         filePath = join(tasksDir, taskFiles[0]);
       }
@@ -255,62 +193,6 @@ export class LoqaTaskManager {
     return { taskId, filePath };
   }
 
-  /**
-   * Fallback manual task creation (ONLY when CLI fails)
-   */
-  private async createTaskManuallyAsFallback(options: TaskCreationOptions, path: string): Promise<{ taskId: string; filePath: string; content: string }> {
-    console.warn('⚠️  Using manual task creation as fallback - CLI method preferred');
-    
-    const tasksPath = join(path, 'backlog', 'tasks');
-    
-    // Get the next task ID
-    const taskId = await this.getNextTaskId(tasksPath);
-    
-    // Get template content
-    let templateContent = '';
-    if (options.template) {
-      const templates = await this.getAvailableTemplates(path);
-      const template = templates.find(t => t.name.toLowerCase().includes(options.template!.toLowerCase()));
-      if (template) {
-        templateContent = template.content;
-      } else {
-        templateContent = await this.getDefaultTemplate();
-      }
-    } else {
-      templateContent = await this.getDefaultTemplate();
-    }
-
-    // Fill in template with provided options
-    let content = templateContent;
-    content = content.replace(/\[Clear, descriptive title\]/g, options.title);
-    content = content.replace(/\[Clear, descriptive name\]/g, options.title);
-    
-    if (options.type) {
-      content = content.replace(/\[Feature\/Bug Fix\/Improvement\/Documentation\/Refactoring\]/g, options.type);
-    }
-    
-    if (options.priority) {
-      content = content.replace(/\[High\/Medium\/Low\]/g, options.priority);
-    }
-    
-    if (options.assignee) {
-      content = content.replace(/\[Team member or role\]/g, options.assignee);
-    }
-
-    // Save the task file
-    const fileName = `task-${taskId}-${options.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.md`;
-    const filePath = join(tasksPath, fileName);
-    await fs.writeFile(filePath, content);
-
-    // Auto-commit the new task
-    await this.autoCommitBacklogChange(filePath, 'add', options.title, path);
-
-    return {
-      taskId,
-      filePath,
-      content
-    };
-  }
 
   /**
    * Capture a quick thought or idea
@@ -361,26 +243,6 @@ export class LoqaTaskManager {
   }
 
   /**
-   * Get the next available task ID
-   */
-  private async getNextTaskId(tasksPath: string): Promise<string> {
-    try {
-      const taskFiles = await glob('task-*.md', { cwd: tasksPath });
-      const taskNumbers = taskFiles
-        .map(file => {
-          const match = file.match(/task-(\d+)-/);
-          return match ? parseInt(match[1], 10) : 0;
-        })
-        .filter(num => !isNaN(num));
-      
-      const maxId = taskNumbers.length > 0 ? Math.max(...taskNumbers) : 0;
-      return String(maxId + 1).padStart(3, '0');
-    } catch {
-      return '001';
-    }
-  }
-
-  /**
    * Auto-commit backlog changes to git using smart git helpers
    */
   private async autoCommitBacklogChange(filePath: string, action: 'add' | 'capture' | 'update', description: string, repoPath?: string): Promise<void> {
@@ -425,38 +287,6 @@ export class LoqaTaskManager {
       console.warn(`Auto-commit failed for ${filePath}:`, error);
       // Don't throw error - backlog operation should still succeed even if commit fails
     }
-  }
-
-  /**
-   * Get default template content
-   */
-  private async getDefaultTemplate(): Promise<string> {
-    return `# Task: [Title]
-
-## Description
-[Describe what needs to be done]
-
-## Acceptance Criteria
-- [ ] [Specific outcome 1]
-- [ ] [Specific outcome 2]
-- [ ] [Specific outcome 3]
-
-## Implementation Notes
-[Any specific implementation details]
-
-## Dependencies
-- **Depends on:** [List dependencies]
-- **Blocks:** [List what this blocks]
-
-## Quality Gates
-- [ ] Code review completed
-- [ ] Tests passing
-- [ ] Documentation updated
-
-## Status
-- Created: ${new Date().toISOString().split('T')[0]}
-- Status: To Do
-`;
   }
 
   /**

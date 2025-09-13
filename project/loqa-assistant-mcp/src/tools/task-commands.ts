@@ -47,60 +47,91 @@ async function shouldUseComprehensiveTaskCreation(
   complexityIndicators: string[];
   estimatedEffort: string;
 }> {
-  // Simplified implementation for now - can be enhanced later
   const complexityIndicators = [];
+  let complexityScore = 0;
   
-  // Check for complexity indicators in title
+  // Strong indicators - these really suggest comprehensive creation
   if (title.toLowerCase().includes('comprehensive') || 
       title.toLowerCase().includes('complex') ||
-      title.toLowerCase().includes('multi') ||
-      title.toLowerCase().includes('enterprise') ||
-      title.toLowerCase().includes('architecture')) {
-    complexityIndicators.push('Complex keywords detected');
+      title.toLowerCase().includes('architecture') ||
+      title.toLowerCase().includes('system') ||
+      title.toLowerCase().includes('framework') ||
+      title.toLowerCase().includes('infrastructure')) {
+    complexityIndicators.push('Complex system design keywords');
+    complexityScore += 3;
   }
   
-  // High priority suggests comprehensive approach
-  if (priority === 'High' || priority === 'Critical') {
-    complexityIndicators.push('High priority task');
+  // Multi-repo work is inherently complex
+  if (title.toLowerCase().includes('multi') ||
+      title.toLowerCase().includes('cross-repo') ||
+      template === 'cross-repo') {
+    complexityIndicators.push('Cross-repository coordination required');
+    complexityScore += 3;
   }
   
-  // Certain templates suggest comprehensive approach
-  if (template === 'feature' || template === 'protocol-change' || template === 'cross-repo') {
-    complexityIndicators.push('Complex template type');
+  // Protocol changes are complex and need careful planning
+  if (template === 'protocol-change' ||
+      title.toLowerCase().includes('protocol') ||
+      title.toLowerCase().includes('breaking change')) {
+    complexityIndicators.push('Protocol or breaking changes involved');
+    complexityScore += 3;
   }
   
-  const decision = complexityIndicators.length > 1;
+  // Medium indicators - suggest complexity but not automatically
+  if (title.length > 80) {
+    complexityIndicators.push('Long, detailed title suggests complexity');
+    complexityScore += 1;
+  }
+  
+  // Enterprise/large-scale indicators
+  if (title.toLowerCase().includes('enterprise') ||
+      title.toLowerCase().includes('scalability') ||
+      title.toLowerCase().includes('performance optimization')) {
+    complexityIndicators.push('Enterprise-scale requirements');
+    complexityScore += 2;
+  }
+  
+  // Only trigger comprehensive creation for truly complex tasks (score >= 3)
+  const decision = complexityScore >= 3;
   
   return {
     decision,
     reasoning: decision 
-      ? `Complexity indicators suggest comprehensive creation: ${complexityIndicators.join(', ')}`
-      : 'Simple task creation appropriate',
+      ? `High complexity detected (score: ${complexityScore}): ${complexityIndicators.join(', ')}`
+      : `Simple task creation appropriate (score: ${complexityScore})`,
     complexityIndicators,
-    estimatedEffort: decision ? 'High' : 'Medium'
+    estimatedEffort: complexityScore >= 3 ? 'High' : complexityScore >= 2 ? 'Medium' : 'Low'
   };
 }
 
 async function handleStartComprehensiveTaskCreation(args: any, workspaceRoot: string): Promise<any> {
-  return { content: [{ type: "text", text: "Comprehensive task creation not yet implemented in standalone version" }] };
+  // Import the actual handler from handlers.ts
+  const { handleStartComprehensiveTaskCreation: actualHandler } = await import('./handlers.js');
+  return await actualHandler(args, workspaceRoot);
 }
 
 async function handleAnswerInterviewQuestion(args: any, workspaceRoot: string): Promise<any> {
-  return { content: [{ type: "text", text: "Interview questions not yet implemented in standalone version" }] };
+  // Import the actual handler from handlers.ts
+  const { handleAnswerInterviewQuestion: actualHandler } = await import('./handlers.js');
+  return await actualHandler(args, workspaceRoot);
 }
 
 async function handleContinueTaskDevelopment(args: any, workspaceRoot: string): Promise<any> {
-  return { content: [{ type: "text", text: "Task development continuation not yet implemented in standalone version" }] };
+  // Import the actual handler from handlers.ts
+  const { handleContinueTaskDevelopment: actualHandler } = await import('./handlers.js');
+  return await actualHandler(args, workspaceRoot);
 }
 
 async function processInterviewAnswerSeamlessly(interviewId: string, message: string, workspaceRoot: string): Promise<any> {
-  return { content: [{ type: "text", text: "Seamless interview processing not yet implemented in standalone version" }] };
+  // Import the actual handler from handlers.ts
+  const { processInterviewAnswerSeamlessly: actualHandler } = await import('./handlers.js');
+  return await actualHandler(interviewId, message, workspaceRoot);
 }
 
 export const taskManagementTools = [
   {
     name: "task:AddTodo",
-    description: "Add a new task to the backlog using templates and priority",
+    description: "Add a new task to the backlog using templates and priority. IMPORTANT: Use this MCP tool directly - do not invoke project-manager-backlog agent or use Bash commands.",
     inputSchema: {
       type: "object",
       properties: {
@@ -175,8 +206,8 @@ export const taskManagementTools = [
     }
   },
   {
-    name: "task:StartComprehensiveCreation",
-    description: "Begin structured interview process to create fully-fleshed out, actionable tasks with proper scoping",
+    name: "task:StartComprehensiveCreation", 
+    description: "Begin structured interview process to create fully-fleshed out, actionable tasks with proper scoping. IMPORTANT: This MCP tool handles all backlog CLI operations internally - do not use agents or Bash commands.",
     inputSchema: {
       type: "object",
       properties: {

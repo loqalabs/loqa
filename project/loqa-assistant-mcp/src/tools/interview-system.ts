@@ -259,25 +259,35 @@ export async function analyzeRepositoryRequirements(text: string): Promise<strin
   const textLower = text.toLowerCase();
   const repos: string[] = [];
   
-  // Direct mentions
+  // Only use exact repository name matches (with word boundaries) to avoid false positives
   KNOWN_REPOSITORIES_LIST.forEach(repo => {
-    if (textLower.includes(repo.toLowerCase())) {
+    const repoPattern = new RegExp(`\\b${repo.toLowerCase()}\\b`);
+    if (repoPattern.test(textLower)) {
       repos.push(repo);
     }
   });
   
-  // Technology-based inference
-  if (textLower.includes('ui') || textLower.includes('dashboard') || textLower.includes('vue')) {
+  // Technology-based inference (more precise)
+  if ((textLower.includes('ui') || textLower.includes('dashboard') || textLower.includes('vue')) 
+      && !repos.includes('loqa-commander')) {
     repos.push('loqa-commander');
   }
-  if (textLower.includes('grpc') || textLower.includes('proto')) {
+  if ((textLower.includes('grpc') || textLower.includes('protocol') || textLower.includes('proto')) 
+      && !repos.includes('loqa-proto')) {
     repos.push('loqa-proto');
   }
-  if (textLower.includes('skill') || textLower.includes('plugin')) {
+  if ((textLower.includes('skill') || textLower.includes('plugin')) 
+      && !repos.includes('loqa-skills')) {
     repos.push('loqa-skills');
   }
-  if (textLower.includes('hub') || textLower.includes('stt') || textLower.includes('tts') || textLower.includes('llm')) {
+  if ((textLower.includes('stt') || textLower.includes('tts') || textLower.includes('llm')) 
+      && !repos.includes('loqa-hub')) {
     repos.push('loqa-hub');
+  }
+  
+  // Default to loqa (main repo) for MCP tools and system-level changes if no specific repos found
+  if (repos.length === 0) {
+    repos.push('loqa');
   }
   
   return [...new Set(repos)];
@@ -338,37 +348,39 @@ export async function suggestTaskBreakdown(interview: TaskInterviewState): Promi
   
   // Simple breakdown logic - in practice this could be more sophisticated
   if (repos.length > 1) {
-    // Multi-repo task - suggest one task per repo
+    // Multi-repo task - suggest one task per repo with clean titles
     repos.forEach(repo => {
+      // Create clean titles without problematic characters
+      const cleanTitle = `${interview.accumulatedInfo.title} (${repo})`;
       breakdown.push({
-        title: `${interview.accumulatedInfo.title} - ${repo} changes`,
+        title: cleanTitle,
         description: `Implement ${repo}-specific changes for: ${description}`,
         repository: repo,
         estimatedEffort: 'days'
       });
     });
   } else if (interview.accumulatedInfo.estimatedComplexity === 'high') {
-    // Complex single-repo task - suggest phases
+    // Complex single-repo task - suggest phases with clean titles
     breakdown.push(
       {
-        title: `${interview.accumulatedInfo.title} - Planning & Design`,
+        title: `${interview.accumulatedInfo.title} (Planning)`,
         description: `Design and plan the implementation approach for: ${description}`,
         repository: repos[0],
         estimatedEffort: 'hours'
       },
       {
-        title: `${interview.accumulatedInfo.title} - Core Implementation`,
+        title: `${interview.accumulatedInfo.title} (Implementation)`,
         description: `Implement core functionality: ${description}`,
         repository: repos[0],
         estimatedEffort: 'days',
-        dependencies: ['Planning & Design']
+        dependencies: ['Planning']
       },
       {
-        title: `${interview.accumulatedInfo.title} - Testing & Validation`,
+        title: `${interview.accumulatedInfo.title} (Testing)`,
         description: `Test and validate implementation: ${description}`,
         repository: repos[0],
         estimatedEffort: 'hours',
-        dependencies: ['Core Implementation']
+        dependencies: ['Implementation']
       }
     );
   }
@@ -397,17 +409,17 @@ export function determineTemplateFromBreakdown(subtask: TaskBreakdownSuggestion)
  * Derives a concise task title from thought content
  */
 export function deriveTaskTitle(thoughtContent: string): string {
-  // Extract first sentence or first 60 characters
+  // Extract first sentence, but allow reasonable length for task titles
   const firstSentence = thoughtContent.split(/[.!?]/)[0].trim();
   let title = firstSentence.length > 0 ? firstSentence : thoughtContent;
   
-  // Truncate if too long
-  if (title.length > 60) {
-    title = title.substring(0, 57) + '...';
-  }
-  
-  // Clean up common prefixes
+  // Clean up common prefixes first
   title = title.replace(/^(i think|we should|maybe|what if|idea:|thought:)/i, '').trim();
+  
+  // Only truncate if extremely long (filesystem-safe limit), preserve more context
+  if (title.length > 150) {
+    title = title.substring(0, 147) + '...';
+  }
   
   return title || 'New Task';
 }
