@@ -97,7 +97,7 @@ export const REPOSITORIES: Record<string, RepositoryConfig> = {
 };
 
 // Derived configurations
-export const REPOSITORY_NAMES = Object.keys(REPOSITORIES);
+const REPOSITORY_NAMES = Object.keys(REPOSITORIES);
 
 export const TESTABLE_REPOSITORIES = REPOSITORY_NAMES.filter(
   name => REPOSITORIES[name].testable
@@ -107,7 +107,7 @@ export const DEPENDENCY_ORDER = REPOSITORY_NAMES.sort(
   (a, b) => REPOSITORIES[a].priority - REPOSITORIES[b].priority
 );
 
-export const REPOSITORIES_BY_TYPE = {
+const REPOSITORIES_BY_TYPE = {
   core: REPOSITORY_NAMES.filter(name => REPOSITORIES[name].type === 'core'),
   service: REPOSITORY_NAMES.filter(name => REPOSITORIES[name].type === 'service'),
   client: REPOSITORY_NAMES.filter(name => REPOSITORIES[name].type === 'client'),
@@ -125,19 +125,6 @@ export const KNOWN_REPOSITORIES_LIST = [
   'loqa-proto', 'loqa-skills', 'www-loqalabs-com', 'loqalabs-github-config'
 ];
 
-/**
- * Check if a repository name is valid
- */
-export function isValidRepository(name: string): boolean {
-  return name in REPOSITORIES;
-}
-
-/**
- * Get repository by name with fallback
- */
-export function getRepository(name: string): RepositoryConfig | null {
-  return REPOSITORIES[name] || null;
-}
 
 /**
  * Get repositories by type
@@ -184,57 +171,3 @@ export function getDefaultRepository(context: RepositoryContext = 'development')
   return contextDefaults[context];
 }
 
-/**
- * Detect context from operation/command description
- */
-export function detectRepositoryContext(operation?: string): RepositoryContext {
-  if (!operation) return 'general';
-  
-  const op = operation.toLowerCase();
-  
-  // Documentation context
-  if (op.includes('document') || op.includes('readme') || op.includes('guide') || 
-      op.includes('explain') || op.includes('overview')) {
-    return 'documentation';
-  }
-  
-  // Configuration/orchestration context
-  if (op.includes('docker') || op.includes('compose') || op.includes('deploy') ||
-      op.includes('config') || op.includes('orchestrat')) {
-    return 'configuration';
-  }
-  
-  // Architecture/protocol context
-  if (op.includes('protocol') || op.includes('api') || op.includes('grpc') ||
-      op.includes('architect') || op.includes('design')) {
-    return 'architecture';
-  }
-  
-  // UI/Frontend context
-  if (op.includes('ui') || op.includes('dashboard') || op.includes('frontend') ||
-      op.includes('vue') || op.includes('component')) {
-    return 'ui';
-  }
-  
-  // Testing context
-  if (op.includes('test') || op.includes('e2e') || op.includes('integration')) {
-    return 'testing';
-  }
-  
-  // DevOps/Deployment context
-  if (op.includes('deploy') || op.includes('infra') || op.includes('devops') ||
-      op.includes('ci/cd') || op.includes('pipeline')) {
-    return 'deployment';
-  }
-  
-  // Default to development for coding activities
-  return 'development';
-}
-
-/**
- * Get context-aware default repository (convenience function)
- */
-export function getContextualDefaultRepository(operation?: string): string {
-  const context = detectRepositoryContext(operation);
-  return getDefaultRepository(context);
-}

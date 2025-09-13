@@ -1,7 +1,6 @@
 import { simpleGit } from 'simple-git';
 import { promises as fs } from 'fs';
 import { join, dirname, basename } from 'path';
-import { glob } from 'glob';
 import { KNOWN_REPOSITORIES_LIST } from '../config/repositories.js';
 
 export class LoqaWorkspaceManager {
@@ -108,14 +107,14 @@ export class LoqaWorkspaceManager {
   }
 
   /**
-   * Get backlog health across all repositories
+   * Get issue management health across all repositories
    * 
    * NOTE: This is a simplified implementation. The full version includes:
    * - getWorkspaceHealth()
    * - runQualityChecks()
-   * - createBranchFromTask()
+   * - createBranchFromIssue()
    * - runIntegrationTests()
-   * - getTaskRecommendations()
+   * - getIssueRecommendations()
    * And many other workspace management methods.
    * 
    * The complete implementation is ~1300 lines and would need to be
@@ -124,35 +123,35 @@ export class LoqaWorkspaceManager {
   async getWorkspaceHealth(): Promise<{
     repositories: Array<{
       name: string;
-      backlogExists: boolean;
-      tasksCount?: number;
+      issueManagementActive: boolean;
+      issuesCount?: number;
       draftsCount?: number;
       recentActivity?: string;
       status: string;
     }>;
     summary: {
-      totalBacklogs: number;
-      totalTasks: number;
+      totalRepositories: number;
+      totalIssues: number;
       totalDrafts: number;
-      healthyBacklogs: number;
+      activeRepositories: number;
     };
   }> {
     // Placeholder implementation - full version needed
     return {
       repositories: [],
       summary: {
-        totalBacklogs: 0,
-        totalTasks: 0,
+        totalRepositories: 0,
+        totalIssues: 0,
         totalDrafts: 0,
-        healthyBacklogs: 0
+        activeRepositories: 0
       }
     };
   }
 
   // TODO: Add remaining methods from original implementation:
   // - runQualityChecks()
-  // - createBranchFromTask() 
+  // - createBranchFromIssue() 
   // - runIntegrationTests()
-  // - getTaskRecommendations()
+  // - getIssueRecommendations()
   // - And many others (~1300 lines total)
 }

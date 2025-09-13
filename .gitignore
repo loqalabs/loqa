@@ -50,4 +50,4 @@ models/
 *.gguf
 # Individual service repositories - maintained separately
 loqa-proto/
-loqa-relay/
+loqa-relay/.claude-code.json
