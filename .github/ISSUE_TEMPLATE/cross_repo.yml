@@ -1,0 +1,85 @@
+name: Cross-Repository Coordination
+description: Issues that span multiple repositories
+title: "[Cross-Repo]: "
+labels: ["template-cross-repo", "priority-high"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Cross-repository issues require coordination across multiple services.
+
+  - type: textarea
+    id: overview
+    attributes:
+      label: Overview
+      description: High-level description of what needs to be done across repositories
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: repositories
+    attributes:
+      label: Affected Repositories
+      description: Which repositories are involved?
+      options:
+        - label: loqa (main orchestration)
+        - label: loqa-hub (central service)
+        - label: loqa-commander (UI dashboard)
+        - label: loqa-skills (plugin system)
+        - label: loqa-proto (protocol definitions)
+        - label: loqa-relay (audio client)
+        - label: www-loqalabs-com (website)
+        - label: .github (shared workflows)
+
+  - type: textarea
+    id: coordination_plan
+    attributes:
+      label: Coordination Plan
+      description: Detailed plan for implementing changes across repositories
+      placeholder: |
+        1. Repository A: ...
+        2. Repository B: ...
+        3. Testing: ...
+        4. Deployment order: ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: What dependencies exist between the repository changes?
+
+  - type: dropdown
+    id: merge_order
+    attributes:
+      label: Merge Order Critical
+      description: Is the merge order critical for this change?
+      options:
+        - "No - can be done in parallel"
+        - "Yes - specific order required"
+        - "Partial - some dependencies exist"
+    validations:
+      required: true
+
+  - type: textarea
+    id: testing_strategy
+    attributes:
+      label: Testing Strategy
+      description: How will the integrated changes be tested?
+
+  - type: textarea
+    id: rollback_plan
+    attributes:
+      label: Rollback Plan
+      description: How can these changes be reverted if needed?
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our Code of Conduct
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
