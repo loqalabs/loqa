@@ -14,7 +14,7 @@ export const workspaceTools = [
   },
   {
     name: "workspace:Health",
-    description: "Get backlog health and task statistics across all repositories",
+    description: "Get GitHub Issues health and issue statistics across all repositories",
     inputSchema: {
       type: "object",
       properties: {}
@@ -34,21 +34,21 @@ export const workspaceTools = [
     }
   },
   {
-    name: "workspace:CreateBranchFromTask",
-    description: "Create a feature branch based on a task",
+    name: "workspace:CreateBranchFromIssue",
+    description: "Create a feature branch based on an issue",
     inputSchema: {
       type: "object",
       properties: {
-        taskId: {
+        issueId: {
           type: "string",
-          description: "Task ID to create branch from"
+          description: "Issue ID to create branch from"
         },
         repository: {
           type: "string", 
           description: "Repository to create branch in"
         }
       },
-      required: ["taskId"]
+      required: ["issueId"]
     }
   },
   {
@@ -66,14 +66,14 @@ export const workspaceTools = [
     }
   },
   {
-    name: "workspace:CreatePRFromTask",
-    description: "Create a pull request from a completed task",
+    name: "workspace:CreatePRFromIssue",
+    description: "Create a pull request from a completed issue",
     inputSchema: {
       type: "object",
       properties: {
-        taskId: {
+        issueId: {
           type: "string",
-          description: "Task ID to create PR from"
+          description: "Issue ID to create PR from"
         },
         repository: {
           type: "string",
@@ -92,7 +92,7 @@ export const workspaceTools = [
           description: "Enable auto-merge when checks pass"
         }
       },
-      required: ["taskId"]
+      required: ["issueId"]
     }
   },
   {
@@ -115,8 +115,8 @@ export const workspaceTools = [
     }
   },
   {
-    name: "workspace:IntelligentTaskPrioritization",
-    description: "Get intelligent task prioritization recommendations",
+    name: "workspace:IntelligentIssuePrioritization",
+    description: "Get intelligent issue prioritization recommendations",
     inputSchema: {
       type: "object",
       properties: {
@@ -138,8 +138,8 @@ export const workspaceTools = [
   }
 ];
 
-// Import workspace manager at the function level to avoid circular dependencies
-async function getWorkspaceManager() {
+// Import workspace manager at the function level to avoid circular dependencies - currently unused
+async function _getWorkspaceManager() {
   // This will be defined in the main index.ts file as MCPWorkspaceManager
   // We'll handle this through the main tool handler
   throw new Error("Workspace manager should be handled by main tool handler");
@@ -185,19 +185,19 @@ export async function handleWorkspaceTool(name: string, args: any, workspaceMana
         const health = await workspaceManager.getWorkspaceHealth();
         
         let healthText = `🏥 **Workspace Health Summary**\n\n`;
-        healthText += `📋 **Total Backlogs**: ${health.summary.totalBacklogs}\n`;
-        healthText += `📝 **Total Tasks**: ${health.summary.totalTasks}\n`;
-        healthText += `💭 **Total Drafts**: ${health.summary.totalDrafts}\n`;
-        healthText += `✅ **Healthy Backlogs**: ${health.summary.healthyBacklogs}\n\n`;
+        healthText += `📋 **Total Repositories**: ${health.summary.totalRepositories || 0}\n`;
+        healthText += `📝 **Total Issues**: ${health.summary.totalIssues || 0}\n`;
+        healthText += `💭 **Open Issues**: ${health.summary.openIssues || 0}\n`;
+        healthText += `✅ **Healthy Repositories**: ${health.summary.healthyRepositories || 0}\n\n`;
         
         if (health.repositories.length > 0) {
-          healthText += `**Repository Backlog Status**:\n`;
+          healthText += `**Repository Issues Status**:\n`;
           for (const repo of health.repositories) {
             const healthIcon = repo.status === 'Healthy' ? '✅' : '⚠️';
-            healthText += `${healthIcon} **${repo.name}**: ${repo.tasksCount || 0} tasks, ${repo.draftsCount || 0} drafts\n`;
+            healthText += `${healthIcon} **${repo.name}**: ${repo.issuesCount || 0} issues\n`;
           }
         } else {
-          healthText += `📝 **Note**: Initialize backlogs with \`backlog init\` in repositories for detailed health tracking.`;
+          healthText += `📝 **Note**: GitHub Issues integration provides health tracking across repositories.`;
         }
 
         return {
@@ -265,17 +265,17 @@ export async function handleWorkspaceTool(name: string, args: any, workspaceMana
       }
     }
 
-    case "workspace:CreateBranchFromTask": {
+    case "workspace:CreateBranchFromIssue": {
       try {
-        const result = await workspaceManager.createBranchFromTask(args);
+        const result = await workspaceManager.createBranchFromIssue(args);
         
         if (result.success) {
           let successText = `✅ **Branch Created Successfully**\n\n`;
           successText += `🌿 **Branch**: \`${result.branchName}\`\n`;
           successText += `📁 **Repository**: ${result.repository}\n`;
-          successText += `📝 **Task**: ${result.taskFile}\n`;
-          successText += `📋 **Title**: ${result.taskTitle}\n\n`;
-          successText += `The feature branch has been created and checked out. You can now start working on the task.`;
+          successText += `📝 **Issue**: ${result.issueFile}\n`;
+          successText += `📋 **Title**: ${result.issueTitle}\n\n`;
+          successText += `The feature branch has been created and checked out. You can now start working on the issue.`;
           
           return {
             content: [{
@@ -348,16 +348,16 @@ export async function handleWorkspaceTool(name: string, args: any, workspaceMana
       }
     }
 
-    case "workspace:CreatePRFromTask": {
+    case "workspace:CreatePRFromIssue": {
       try {
-        const result = await workspaceManager.createPullRequestFromTask(args);
+        const result = await workspaceManager.createPullRequestFromIssue(args);
         
         if (result.success) {
           let successText = `✅ **Pull Request Created Successfully**\n\n`;
           successText += `🔗 **URL**: ${result.prUrl}\n`;
           successText += `🌿 **Branch**: \`${result.branchName}\` → \`${result.baseBranch}\`\n`;
           successText += `📁 **Repository**: ${result.repository}\n`;
-          successText += `📝 **Task**: ${result.taskFile}\n`;
+          successText += `📝 **Issue**: ${result.issueFile}\n`;
           successText += `📋 **Title**: ${result.title}\n`;
           if (result.draft) {
             successText += `📝 **Status**: Draft PR\n`;
@@ -407,7 +407,7 @@ export async function handleWorkspaceTool(name: string, args: any, workspaceMana
         analysisText += `- Changed files: ${result.analysis.changedFiles.length}\n`;
         analysisText += `- Affected repositories: ${result.summary.highImpactRepos}\n`;
         analysisText += `- Breaking changes: ${result.summary.breakingChanges}\n`;
-        analysisText += `- Coordination required: ${result.summary.coordinationRequired ? '⚠️ Yes' : '✅ No'}\n\n`;
+        analysisText += `- Multi-repo changes: ${result.summary.coordinationRequired ? '⚠️ Yes' : '✅ No'}\n\n`;
         
         if (result.analysis.affectedRepositories.length > 0) {
           analysisText += `🏢 **Affected Repositories**:\n`;
@@ -471,37 +471,37 @@ export async function handleWorkspaceTool(name: string, args: any, workspaceMana
       }
     }
 
-    case "workspace:IntelligentTaskPrioritization": {
+    case "workspace:IntelligentIssuePrioritization": {
       try {
-        const result = await workspaceManager.intelligentTaskPrioritization(args);
+        const result = await workspaceManager.intelligentIssuePrioritization(args);
         
-        let priorityText = `🎯 **Intelligent Task Prioritization**\n\n`;
+        let priorityText = `🎯 **Intelligent Issue Prioritization**\n\n`;
         priorityText += `📊 **Analysis Summary**:\n`;
-        priorityText += `- Total tasks found: ${result.analysis.totalTasks}\n`;
-        priorityText += `- Eligible tasks: ${result.analysis.eligibleTasks}\n`;
+        priorityText += `- Total issues found: ${result.analysis.totalIssues}\n`;
+        priorityText += `- Eligible issues: ${result.analysis.eligibleIssues}\n`;
         priorityText += `- Context: ${result.analysis.context.role} role, ${result.analysis.context.timeAvailable} time, ${result.analysis.context.repositoryFocus} repository focus\n\n`;
         
-        if (result.recommendedTask) {
-          priorityText += `⭐ **Recommended Task**:\n`;
-          priorityText += `- **${result.recommendedTask.title}** (${result.recommendedTask.repository})\n`;
-          priorityText += `- Priority: ${result.recommendedTask.priority}\n`;
-          priorityText += `- Status: ${result.recommendedTask.status}\n`;
-          priorityText += `- Score: ${result.recommendedTask.score}/10\n\n`;
+        if (result.recommendedIssue) {
+          priorityText += `⭐ **Recommended Issue**:\n`;
+          priorityText += `- **${result.recommendedIssue.title}** (${result.recommendedIssue.repository})\n`;
+          priorityText += `- Priority: ${result.recommendedIssue.priority}\n`;
+          priorityText += `- Status: ${result.recommendedIssue.status}\n`;
+          priorityText += `- Score: ${result.recommendedIssue.score}/10\n\n`;
         }
         
-        if (result.alternativeTasks.length > 0) {
-          priorityText += `🔄 **Alternative Tasks**:\n`;
-          for (const task of result.alternativeTasks) {
-            priorityText += `- **${task.title}** (${task.repository}) - Score: ${task.score}/10\n`;
+        if (result.alternativeIssues.length > 0) {
+          priorityText += `🔄 **Alternative Issues**:\n`;
+          for (const issue of result.alternativeIssues) {
+            priorityText += `- **${issue.title}** (${issue.repository}) - Score: ${issue.score}/10\n`;
           }
           priorityText += `\n`;
         }
         
         // AI-Enhanced Analysis Section
         if (result.aiAnalysis) {
-          priorityText += `🧠 **AI Strategic Analysis**:\n\n`;
-          
-          priorityText += `📈 **Strategic Alignment**: ${result.aiAnalysis.strategicAlignment}\n`;
+          priorityText += `🧠 **Enhanced Analysis**:\n\n`;
+
+          priorityText += `📈 **Work Focus**: ${result.aiAnalysis.workFocus}\n`;
           priorityText += `🏥 **Project Health**: ${result.aiAnalysis.projectHealth}\n`;
           priorityText += `⏰ **Timeline Insight**: ${result.aiAnalysis.timelineInsights}\n\n`;
           
@@ -530,15 +530,15 @@ export async function handleWorkspaceTool(name: string, args: any, workspaceMana
           }
           
           priorityText += `🚀 **Next Steps**:\n`;
-          priorityText += `• Use \`/loqa dev work\` to begin working on the recommended task\n`;
-          priorityText += `• Create feature branch: \`smart-git_branch(branchName: "feature/[task-name]")\`\n`;
+          priorityText += `• Use natural language: "Create a feature branch for issue #[number]"\n`;
+          priorityText += `• Or MCP tool: \`smart-git_branch(branchName: "feature/[issue-name]")\`\n`;
           priorityText += `• Run quality checks before committing\n\n`;
         }
         
-        if (result.analysis.totalTasks === 0) {
-          priorityText += `📝 **No tasks found**. Consider:\n`;
-          priorityText += `- Initializing backlogs in repositories: \`backlog init\`\n`;
-          priorityText += `- Creating tasks: \`/add-todo "Task title"\`\n`;
+        if (result.analysis.totalIssues === 0) {
+          priorityText += `📝 **No issues found**. Consider:\n`;
+          priorityText += `- Creating GitHub Issues in repositories\n`;
+          priorityText += `- Creating issues: \`/add-todo "Issue title"\`\n`;
         }
         
         return {
@@ -551,7 +551,7 @@ export async function handleWorkspaceTool(name: string, args: any, workspaceMana
         return {
           content: [{
             type: "text",
-            text: `❌ Failed to get task prioritization: ${error instanceof Error ? error.message : 'Unknown error'}`
+            text: `❌ Failed to get issue prioritization: ${error instanceof Error ? error.message : 'Unknown error'}`
           }]
         };
       }

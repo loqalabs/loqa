@@ -21,7 +21,6 @@ CODE_OF_CONDUCT.md @annabarnes1138
 
 # Site configuration
 mkdocs.yml @annabarnes1138
-.markdown-link-check.json @annabarnes1138
 
 # CI/CD
 /.github/ @annabarnes1138

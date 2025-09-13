@@ -3,11 +3,10 @@ import { LoqaRoleManager } from './role-manager.js';
 import { REPOSITORIES } from '../config/repositories.js';
 
 export class LoqaModelSelector {
-  private workspaceRoot: string;
   private roleManager: LoqaRoleManager;
 
   constructor(workspaceRoot?: string) {
-    this.workspaceRoot = workspaceRoot || process.cwd();
+    // workspaceRoot is only used to initialize the role manager
     this.roleManager = new LoqaRoleManager(workspaceRoot);
   }
 
@@ -40,7 +39,7 @@ export class LoqaModelSelector {
       }
     }
 
-    // Task complexity analysis
+    // Issue complexity analysis
     const complexityScore = this.analyzeComplexity(context);
     if (complexityScore.level === 'high') {
       if (selectedModel !== 'sonnet-4') {
@@ -112,7 +111,7 @@ export class LoqaModelSelector {
   }
 
   /**
-   * Analyze task complexity based on various factors
+   * Analyze issue complexity based on various factors
    */
   private analyzeComplexity(context: ModelSelectionContext): { level: 'low' | 'medium' | 'high'; score: number } {
     let complexityScore = 0;
@@ -124,8 +123,8 @@ export class LoqaModelSelector {
       return { level: context.complexity, score: scoreMap[context.complexity] };
     }
 
-    // Analyze task title and description
-    const text = [context.taskTitle || '', context.taskDescription || ''].join(' ').toLowerCase();
+    // Analyze issue title and description
+    const text = [context.issueTitle || '', context.issueDescription || ''].join(' ').toLowerCase();
     
     // High complexity indicators
     const highComplexityPatterns = [
@@ -309,7 +308,7 @@ export class LoqaModelSelector {
       'haiku': {
         strengths: [
           'Fast response times',
-          'Efficient for straightforward tasks',
+          'Efficient for straightforward issues',
           'Good for documentation and simple code',
           'Cost-effective for high-volume work'
         ],
@@ -318,7 +317,7 @@ export class LoqaModelSelector {
           'Simple bug fixes',
           'Code formatting and style',
           'Configuration updates',
-          'Basic testing tasks'
+          'Basic testing issues'
         ],
         performance: 'Lower latency, optimized for efficiency'
       }

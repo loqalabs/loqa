@@ -12,14 +12,8 @@ export interface RepositoryInfo {
   isLoqaRepository: boolean;
 }
 
-// Task management types
-export interface TaskTemplate {
-  name: string;
-  description: string;
-  content: string;
-}
-
-export interface TaskCreationOptions {
+// Issue management types
+export interface IssueCreationOptions {
   title: string;
   description?: string;
   template?: string;
@@ -35,41 +29,7 @@ export interface CapturedThought {
   context?: string;
 }
 
-// Enhanced task creation types
-export interface TaskInterviewState {
-  id: string;
-  originalInput: string;
-  currentQuestion: string;
-  questionsAsked: string[];
-  answersReceived: { question: string; answer: string }[];
-  accumulatedInfo: {
-    title?: string;
-    description?: string;
-    acceptanceCriteria?: string[];
-    dependencies?: string[];
-    repositories?: string[];
-    estimatedComplexity?: 'low' | 'medium' | 'high';
-    suggestedBreakdown?: TaskBreakdownSuggestion[];
-  };
-  interviewComplete: boolean;
-  timestamp: Date;
-}
-
-export interface TaskBreakdownSuggestion {
-  title: string;
-  description: string;
-  repository: string;
-  dependencies?: string[];
-  estimatedEffort: string;
-}
-
-export interface ComprehensiveTaskCreationOptions extends TaskCreationOptions {
-  description: string;
-  acceptanceCriteria: string[];
-  dependencies?: string[];
-  repositories: string[];
-  breakdown?: TaskBreakdownSuggestion[];
-}
+// Removed interview-related types to simplify issue creation
 
 // Role management types
 export interface RoleConfig {
@@ -79,7 +39,7 @@ export interface RoleConfig {
   capabilities: string[];
   detection_patterns: string[];
   model_preference: string;
-  task_templates_preferred: string[];
+  issue_templates_preferred: string[];
 }
 
 export interface RoleDetectionResult {
@@ -92,8 +52,8 @@ export interface RoleDetectionResult {
 // Model selection types
 export interface ModelSelectionContext {
   roleId?: string;
-  taskTitle?: string;
-  taskDescription?: string;
+  issueTitle?: string;
+  issueDescription?: string;
   complexity?: 'low' | 'medium' | 'high';
   filePaths?: string[];
   repositoryType?: string;
@@ -106,3 +66,18 @@ export interface ModelRecommendation {
   confidence: number;
   alternatives: { model: string; reasoning: string; score: number }[];
 }
+
+// Re-export IssueProvider types for convenience
+export {
+  IssueProvider,
+  IssueStatus,
+  IssuePriority,
+  Issue,
+  IssueCreationOptions as UnifiedIssueCreationOptions,
+  IssueFilters,
+  IssueOperationResult,
+  ProviderHealthStatus,
+  ProviderCapabilities,
+  IssueProviderBase,
+  GitHubIssueData
+} from './issue-provider.js';

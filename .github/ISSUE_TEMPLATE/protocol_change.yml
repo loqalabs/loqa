@@ -1,39 +1,46 @@
 name: Protocol Change
-description: Request changes to gRPC protocols or API contracts
+description: Changes to loqa-proto affecting multiple services
 title: "[Protocol]: "
-labels: ["template-protocol-change", "priority-high"]
+labels: ["protocol", "coordination", "loqa-proto"]
 
 body:
   - type: markdown
     attributes:
       value: |
-        Protocol changes affect multiple services and require careful coordination.
+        ## Protocol Change Coordination
+        
+        This template is for changes to the gRPC protocol definitions in loqa-proto
+        that affect consumer services. This will automatically coordinate updates
+        across loqa-hub, loqa-relay, and loqa-skills repositories.
 
-  - type: textarea
-    id: motivation
+  - type: dropdown
+    id: breaking_change
     attributes:
-      label: Motivation
-      description: Why is this protocol change needed?
+      label: Breaking Change Analysis
+      description: Does this protocol change break compatibility?
+      options:
+        - "No - fully backward compatible (new fields, new methods)"
+        - "Minor - deprecation only (existing methods marked deprecated)"
+        - "Major - breaking changes (method signatures changed, fields removed)"
+        - "Critical - immediate breaking change (security or stability)"
     validations:
       required: true
 
   - type: textarea
-    id: current_protocol
+    id: protocol_description
     attributes:
-      label: Current Protocol
-      description: Describe the current protocol/API behavior
-    validations:
-      required: true
-
-  - type: textarea
-    id: proposed_changes
-    attributes:
-      label: Proposed Changes
+      label: Protocol Change Description
       description: Detailed description of the protocol changes
       placeholder: |
-        - Add new field: ...
-        - Modify message: ...
-        - Remove deprecated: ...
+        ## Changes Made
+        - Added new AudioMetadata message
+        - Extended StreamAudioRequest with metadata field
+        - Added GetRelayStatus RPC method
+        
+        ## Backward Compatibility
+        - New fields are optional
+        - Existing RPC methods unchanged
+        - Deprecated old status endpoint (will be removed in v2.0)
     validations:
       required: true
 
@@ -41,47 +48,149 @@ body:
     id: affected_services
     attributes:
       label: Affected Services
-      description: Which services will need updates?
+      description: Which services use this protocol? (Auto-detected from imports)
       options:
-        - label: loqa-hub
-        - label: loqa-relay
-        - label: loqa-commander
-        - label: loqa-skills
-        - label: Other services
+        - label: loqa-hub (gRPC server implementation)
+        - label: loqa-relay (gRPC client for audio streaming)
+        - label: loqa-skills/homeassistant-skill (uses protocol types)
+        - label: loqa-skills/example-skill (example skill template)
 
-  - type: dropdown
-    id: breaking_change
+  - type: textarea
+    id: migration_strategy
     attributes:
-      label: Breaking Change
-      description: Is this a breaking change?
-      options:
-        - "No - backward compatible"
-        - "Yes - requires migration"
-        - "Unsure - needs analysis"
+      label: Migration Strategy
+      description: How will consumer services be updated to use the new protocol?
+      placeholder: |
+        ## Update Sequence
+        1. Merge protocol changes to loqa-proto
+        2. Update loqa-hub to support new protocol (maintain backward compatibility)
+        3. Update loqa-relay to use new protocol features
+        4. Update skills to use new protocol types if needed
+        5. Remove deprecated features in next major version
+        
+        ## Compatibility Period
+        - Support both old and new protocol for 1 release cycle
+        - Add deprecation warnings for old methods
+        - Provide migration guide for external skills
     validations:
       required: true
 
-  - type: textarea
-    id: migration_plan
+  - type: dropdown
+    id: protocol_version
     attributes:
-      label: Migration Plan
-      description: How will existing services migrate to the new protocol?
-      placeholder: |
-        1. Update loqa-proto
-        2. Update service X
-        3. Deploy in order: ...
+      label: Protocol Version Impact
+      description: How should this affect the protocol version?
+      options:
+        - Patch (v0.0.X) - bug fixes, clarifications
+        - Minor (v0.X.0) - new features, backward compatible
+        - Major (vX.0.0) - breaking changes
+    validations:
+      required: true
 
   - type: textarea
     id: testing_plan
     attributes:
       label: Testing Plan
-      description: How will these changes be tested?
+      description: How will the protocol changes be tested across services?
+      placeholder: |
+        ## Protocol Testing
+        - [ ] Protocol buffer compilation tests
+        - [ ] Go binding generation tests
+        - [ ] gRPC service compatibility tests
+        
+        ## Service Integration Testing
+        - [ ] loqa-hub implements new protocol correctly
+        - [ ] loqa-relay connects and communicates successfully
+        - [ ] Skills can access new protocol features
+        - [ ] Backward compatibility with old clients
+        
+        ## End-to-End Testing
+        - [ ] Full voice pipeline with new protocol
+        - [ ] Performance impact assessment
+        - [ ] Error handling and recovery testing
+      value: |
+        ## Protocol Testing
+        - [ ] Protocol buffer compilation tests
+        - [ ] Go binding generation tests
+        - [ ] gRPC service compatibility tests
+        
+        ## Service Integration Testing
+        - [ ] loqa-hub implements new protocol correctly
+        - [ ] loqa-relay connects and communicates successfully
+        - [ ] Skills can access new protocol features
+        - [ ] Backward compatibility with old clients
+        
+        ## End-to-End Testing
+        - [ ] Full voice pipeline with new protocol
+        - [ ] Performance impact assessment
+        - [ ] Error handling and recovery testing
+    validations:
+      required: true
+
+  - type: textarea
+    id: documentation_updates
+    attributes:
+      label: Documentation Updates Required
+      description: What documentation needs to be updated?
+      placeholder: |
+        - Protocol reference documentation
+        - API documentation for affected services
+        - Migration guide for skill developers
+        - Docker Compose configuration if needed
+        - Developer setup instructions
+    validations:
+      required: true
+
+  - type: input
+    id: protocol_pr
+    attributes:
+      label: Protocol PR Link
+      description: Link to the pull request with protocol changes
+      placeholder: "https://github.com/loqalabs/loqa-proto/pull/123"
+
+  - type: checkboxes
+    id: protocol_checklist
+    attributes:
+      label: Protocol Change Checklist
+      description: Track protocol update progress
+      options:
+        - label: Protocol changes implemented and tested
+        - label: Go bindings generated and committed
+        - label: Protocol version updated appropriately
+        - label: Breaking change analysis completed
+        - label: Migration strategy documented
+        - label: Child issues created in consumer repositories
+        - label: loqa-hub updated and tested
+        - label: loqa-relay updated and tested
+        - label: Skills compatibility verified or updated
+        - label: Integration tests passing across all services
+        - label: Documentation updated (protocol docs, API docs, guides)
+        - label: Backward compatibility verified (if applicable)
+        - label: Performance impact assessed
+        - label: Release notes updated
+
+  - type: textarea
+    id: rollback_plan
+    attributes:
+      label: Rollback Plan
+      description: How to rollback if issues are discovered
+      placeholder: |
+        ## Immediate Rollback
+        - Revert protocol changes in loqa-proto
+        - Revert service updates in consuming repositories
+        - Redeploy previous versions
+        
+        ## Data Migration Rollback
+        - No data migration required for this change
+        OR
+        - Restore database from backup before migration
+        - Run reverse migration scripts
 
   - type: checkboxes
     id: terms
     attributes:
       label: Code of Conduct
-      description: By submitting this issue, you agree to follow our Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/loqalabs/loqa/blob/main/CODE_OF_CONDUCT.md)
       options:
         - label: I agree to follow this project's Code of Conduct
           required: true

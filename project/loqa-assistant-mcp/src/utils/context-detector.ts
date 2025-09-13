@@ -198,13 +198,13 @@ export async function resolveWorkspaceRootWithContext(args: any = {}): Promise<{
     }
   }
   
-  // Special handling for backlog-related operations
+  // Special handling for issue-related operations
   // If we're in workspace root and no specific repo is requested,
-  // we should find a repository that actually has a backlog
+  // we should find a repository that has GitHub integration
   if (context.type === 'workspace-root' && !repository) {
-    const repoWithBacklog = await findRepositoryWithBacklog(context.workspaceRoot!, context.availableRepositories);
-    if (repoWithBacklog) {
-      const repoPath = join(context.workspaceRoot!, repoWithBacklog);
+    const repoWithGithub = await findRepositoryWithGithub(context.workspaceRoot!, context.availableRepositories);
+    if (repoWithGithub) {
+      const repoPath = join(context.workspaceRoot!, repoWithGithub);
       return { path: repoPath, context };
     }
   }
@@ -224,20 +224,20 @@ export async function resolveWorkspaceRootWithContext(args: any = {}): Promise<{
 }
 
 /**
- * Find the first repository that has a backlog directory
+ * Find the first repository that has GitHub integration (.git directory)
  */
-async function findRepositoryWithBacklog(workspaceRoot: string, repositories: string[]): Promise<string | null> {
-  // Priority order for repositories with backlogs
+async function findRepositoryWithGithub(workspaceRoot: string, repositories: string[]): Promise<string | null> {
+  // Priority order for repositories with GitHub integration
   const priority = WORKSPACE_DETECTION_ORDER;
   
   // Check priority repositories first
   for (const repo of priority) {
     if (repositories.includes(repo)) {
       try {
-        await fs.access(join(workspaceRoot, repo, 'backlog'));
+        await fs.access(join(workspaceRoot, repo, '.git'));
         return repo;
       } catch {
-        // No backlog in this repo, continue
+        // No git directory in this repo, continue
       }
     }
   }
@@ -246,10 +246,10 @@ async function findRepositoryWithBacklog(workspaceRoot: string, repositories: st
   for (const repo of repositories) {
     if (!priority.includes(repo)) {
       try {
-        await fs.access(join(workspaceRoot, repo, 'backlog'));
+        await fs.access(join(workspaceRoot, repo, '.github/ISSUE_TEMPLATE'));
         return repo;
       } catch {
-        // No backlog in this repo, continue
+        // No git directory in this repo, continue
       }
     }
   }

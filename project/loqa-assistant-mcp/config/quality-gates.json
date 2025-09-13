@@ -1,0 +1,298 @@
+{
+  "description": "Pragmatic quality gates configuration for Loqa ecosystem",
+  "version": "1.0.0",
+
+  "default": {
+    "description": "Default quality checks for unknown repositories",
+    "checks": {
+      "lint": {
+        "command": "make lint",
+        "description": "Run linting checks",
+        "required": true,
+        "autofix": "make lint-fix"
+      },
+      "test": {
+        "command": "make test",
+        "description": "Run test suite",
+        "required": true
+      },
+      "build": {
+        "command": "make build",
+        "description": "Build the project",
+        "required": true
+      }
+    }
+  },
+
+  "repositoryOverrides": {
+    "loqa-hub": {
+      "description": "Core Go service with gRPC API and LLM pipeline",
+      "inherit": "default",
+      "checks": {
+        "go-fmt": {
+          "command": "go fmt ./...",
+          "description": "Format Go code",
+          "required": true,
+          "autofix": "go fmt ./..."
+        },
+        "go-vet": {
+          "command": "go vet ./...",
+          "description": "Vet Go code for suspicious constructs",
+          "required": true
+        },
+        "golangci-lint": {
+          "command": "golangci-lint run",
+          "description": "Advanced Go linting",
+          "required": true
+        },
+        "test": {
+          "command": "go test ./...",
+          "description": "Run Go tests",
+          "required": true
+        },
+        "build": {
+          "command": "go build ./cmd",
+          "description": "Build Hub binary",
+          "required": true
+        },
+        "quality-check": {
+          "command": "make quality-check",
+          "description": "Complete quality validation",
+          "required": true
+        },
+        "docker": {
+          "command": "docker build -t loqa-hub .",
+          "description": "Build Docker image",
+          "required": false
+        }
+      }
+    },
+
+    "loqa-commander": {
+      "description": "Vue.js administrative dashboard",
+      "inherit": "default",
+      "checks": {
+        "typescript": {
+          "command": "npm run build",
+          "description": "TypeScript compilation check",
+          "required": true
+        },
+        "eslint": {
+          "command": "npm run lint:check",
+          "description": "ESLint code quality checks",
+          "required": true,
+          "autofix": "npm run lint"
+        },
+        "prettier": {
+          "command": "npm run format:check",
+          "description": "Prettier formatting checks",
+          "required": true,
+          "autofix": "npm run format"
+        },
+        "type-check": {
+          "command": "npm run type-check",
+          "description": "Vue TypeScript type checking",
+          "required": true
+        },
+        "quality-check": {
+          "command": "npm run quality-check",
+          "description": "Complete quality validation",
+          "required": true
+        },
+        "test": {
+          "command": "npm test",
+          "description": "Run test suite",
+          "required": false
+        }
+      }
+    },
+
+    "loqa-relay": {
+      "description": "Audio capture client (Go)",
+      "inherit": "default",
+      "checks": {
+        "go-fmt": {
+          "command": "go fmt ./...",
+          "description": "Format Go code",
+          "required": true,
+          "autofix": "go fmt ./..."
+        },
+        "go-vet": {
+          "command": "go vet ./...",
+          "description": "Vet Go code for suspicious constructs",
+          "required": true
+        },
+        "test": {
+          "command": "go test ./test-go/...",
+          "description": "Run Go tests",
+          "required": true
+        },
+        "build": {
+          "command": "make build",
+          "description": "Build relay binary",
+          "required": true
+        },
+        "quality-check": {
+          "command": "make quality-check",
+          "description": "Complete quality validation",
+          "required": true
+        }
+      }
+    },
+
+    "loqa-proto": {
+      "description": "gRPC protocol definitions",
+      "inherit": "default",
+      "checks": {
+        "format": {
+          "command": "make format",
+          "description": "Format protocol buffer files",
+          "required": true,
+          "autofix": "make format"
+        },
+        "lint": {
+          "command": "make lint",
+          "description": "Lint protocol definitions",
+          "required": true
+        },
+        "validate": {
+          "command": "make validate",
+          "description": "Validate protocol definitions",
+          "required": true
+        },
+        "generate": {
+          "command": "./generate.sh",
+          "description": "Generate Go bindings",
+          "required": true
+        },
+        "quality-check": {
+          "command": "make quality-check",
+          "description": "Complete quality validation",
+          "required": true
+        },
+        "breaking-changes": {
+          "command": "make breaking-check",
+          "description": "Check for breaking changes",
+          "required": false
+        }
+      }
+    },
+
+    "loqa-skills": {
+      "description": "Modular skill plugin system",
+      "inherit": "default",
+      "checks": {
+        "go-fmt": {
+          "command": "find . -name '*.go' -exec go fmt {} \\;",
+          "description": "Format Go code in all skills",
+          "required": true,
+          "autofix": "find . -name '*.go' -exec go fmt {} \\;"
+        },
+        "build-all": {
+          "command": "make build-all",
+          "description": "Build all skill plugins",
+          "required": true
+        },
+        "validate-manifests": {
+          "command": "make validate-manifests",
+          "description": "Validate skill manifests",
+          "required": true
+        },
+        "quality-check": {
+          "command": "make quality-check",
+          "description": "Complete quality validation",
+          "required": true
+        }
+      }
+    },
+
+    "www-loqalabs-com": {
+      "description": "Marketing website (Vue.js)",
+      "inherit": "default",
+      "checks": {
+        "typescript": {
+          "command": "npm run build",
+          "description": "TypeScript compilation check",
+          "required": true
+        },
+        "eslint": {
+          "command": "npm run lint:check",
+          "description": "ESLint code quality checks",
+          "required": true,
+          "autofix": "npm run lint"
+        },
+        "prettier": {
+          "command": "npm run format:check",
+          "description": "Prettier formatting checks",
+          "required": true,
+          "autofix": "npm run format"
+        },
+        "quality-check": {
+          "command": "npm run quality-check",
+          "description": "Complete quality validation",
+          "required": true
+        }
+      }
+    },
+
+    "loqalabs-github-config": {
+      "description": "GitHub configuration and workflows",
+      "inherit": false,
+      "checks": {
+        "yaml-lint": {
+          "command": "yamllint .github/",
+          "description": "Validate YAML syntax",
+          "required": false
+        },
+        "workflow-validate": {
+          "command": "actionlint",
+          "description": "Validate GitHub Actions workflows",
+          "required": false
+        }
+      }
+    },
+
+    "loqa": {
+      "description": "Main documentation and orchestration",
+      "inherit": false,
+      "checks": {
+        "markdown-lint": {
+          "command": "markdownlint *.md",
+          "description": "Lint Markdown files",
+          "required": false
+        },
+        "compose-validate": {
+          "command": "docker-compose config",
+          "description": "Validate Docker Compose configuration",
+          "required": false
+        }
+      }
+    }
+  },
+
+  "globalSettings": {
+    "parallel": true,
+    "stopOnFirstFailure": false,
+    "timeout": 300,
+    "retries": 1,
+    "workingDirectory": "auto-detect",
+    "environment": {
+      "CI": "false"
+    }
+  },
+
+  "integrations": {
+    "github": {
+      "matchLocalCI": true,
+      "description": "Ensure local quality gates match GitHub Actions"
+    },
+    "preCommitHooks": {
+      "enabled": true,
+      "description": "Integration with pre-commit hook system"
+    },
+    "mcp": {
+      "enabled": true,
+      "description": "Integration with MCP server validation tools"
+    }
+  }
+}

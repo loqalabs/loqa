@@ -3,6 +3,7 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 import { ValidationResult, RepositoryInfo } from '../types/index.js';
 import { resolveWorkspaceRoot } from '../utils/workspace-resolver.js';
+import { AI_ATTRIBUTION_PATTERNS, UNIVERSAL_BLOCKING_RULES } from '../config/embedded-rules.js';
 
 export class LoqaRulesValidator {
   private git: SimpleGit | undefined;
@@ -39,17 +40,8 @@ export class LoqaRulesValidator {
     const violations: string[] = [];
     const warnings: string[] = [];
 
-    // Rule: NEVER use AI attribution in commit messages
-    const aiAttributionPatterns = [
-      /🤖.*generated.*with.*claude/i,
-      /co-authored-by:.*claude/i,
-      /generated.*with.*ai/i,
-      /ai.*generated/i,
-      /claude.*code/i,
-      /anthropic\.com/i
-    ];
-
-    for (const pattern of aiAttributionPatterns) {
+    // Rule: NEVER use AI attribution in commit messages (using embedded patterns)
+    for (const pattern of AI_ATTRIBUTION_PATTERNS) {
       if (pattern.test(message)) {
         violations.push(`Commit message contains AI attribution. Rule: "NEVER use AI attribution in commit messages"`);
         break;
@@ -201,6 +193,35 @@ export class LoqaRulesValidator {
       valid: violations.length === 0,
       violations,
       warnings
+    };
+  }
+
+  /**
+   * Get workflow rules for current repository (configuration-free approach)
+   */
+  async getWorkflowRules(repoPath?: string): Promise<{
+    blocking: string[];
+    quality_gates: string[];
+    branch_protection: string[];
+    ai_attribution_patterns: string[];
+  }> {
+    const path = repoPath || await this.getWorkspaceRoot();
+    const repoInfo = await this.getRepositoryInfo();
+
+    // Import embedded rules
+    const { getWorkflowRulesForRepo } = await import('../config/embedded-rules.js');
+
+    // Get repository name from path
+    const repoName = path.split('/').pop() || 'unknown';
+
+    // Get rules dynamically based on repository detection
+    const rules = getWorkflowRulesForRepo(repoName, path);
+
+    return {
+      blocking: rules.blocking,
+      quality_gates: rules.quality_gates[Object.keys(rules.quality_gates)[0]] || ['make test'],
+      branch_protection: rules.branch_protection,
+      ai_attribution_patterns: rules.ai_attribution
     };
   }
 

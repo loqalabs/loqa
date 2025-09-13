@@ -1,6 +1,6 @@
 # Loqa Assistant MCP Server & Pre-commit Hooks
 
-Comprehensive development workflow assistance for the Loqa ecosystem. This system provides interactive commands, task management, role-based specialization, and automated rule enforcement to streamline development across all repositories.
+Comprehensive development workflow assistance for the Loqa ecosystem. This system provides interactive commands, issue management, role-based specialization, and automated rule enforcement to streamline development across all repositories.
 
 ## ✨ Recent Updates
 
@@ -72,7 +72,7 @@ npm run build        # Build MCP server
 ### MCP Server
 - **Purpose**: Comprehensive development workflow assistance for Claude Code sessions
 - **Location**: `loqa/project/loqa-assistant-mcp/dist/index.js`  
-- **Capabilities**: Interactive commands, task management, role specialization, validation tools
+- **Capabilities**: Interactive commands, issue management, role specialization, validation tools
 - **When**: Used during Claude Code development sessions for workflow automation and assistance
 
 ## 🛠️ Developer Usage
@@ -129,70 +129,70 @@ For GitHub operations, use the **official GitHub MCP server** instead of custom 
 
 **Migration Note**: The `github-cli-specialist` role has been removed in favor of the official solution.
 
-## 🚨 CRITICAL: CLI-First Workflow Integration
+## 🚀 GitHub Issues Integration
 
-**NEW POLICY**: The MCP server now enforces **CLI-first** development by calling official backlog CLI commands underneath instead of bypassing them. This ensures consistency with official Backlog.md workflow.
+**NEW ARCHITECTURE**: The MCP server now focuses on **GitHub Issues** as the primary issue tracking system, providing seamless integration with GitHub's native issue management.
 
 ### Key Changes:
-- ✅ **All MCP task commands** now call `backlog task create` underneath
-- ✅ **Directory validation** ensures commands run from correct repository root
-- ✅ **No more task bypassing** - eliminates manual task file creation
-- ✅ **Official compatibility** maintained with Backlog.md standards
+- ✅ **GitHub Issues Primary**: Direct integration with GitHub Issues API
+- ✅ **Enhanced Issue Provider**: Intelligent fallback and provider selection
+- ✅ **Cross-Repository Support**: Work with issues across multiple repositories
+- ✅ **Native GitHub Features**: Labels, assignments, comments, and linking
 
-### CLI-First Integration Benefits:
-- 🎯 **Consistent Numbering**: Tasks created with proper IDs, no duplicates
-- 🔄 **Workflow Automation**: Full Backlog.md lifecycle management
-- 📊 **Database Integrity**: CLI maintains proper task relationships
-- 🛡️ **Error Prevention**: No broken references or malformed tasks
+### GitHub Integration Benefits:
+- 🔗 **Cross-Repository Linking**: Issues can reference work across multiple repos
+- 👥 **Team Collaboration**: Native GitHub commenting, assignments, and notifications
+- 📊 **Project Tracking**: GitHub Projects, milestones, and advanced filtering
+- 🛡️ **Access Control**: GitHub's built-in permissions and security
 
-## 🏗️ MCP Server Tools (CLI-Backed)
+## 🏗️ MCP Server Tools (GitHub-Backed)
 
-All MCP tools now call official backlog CLI commands underneath while providing enhanced Claude Code integration:
+All MCP tools now work directly with GitHub Issues while providing enhanced Claude Code integration:
 
-### 🚨 Task Management (CLI-Backed)
+### 🚨 Issue Management (GitHub-Backed)
 
-**`add_todo` - Creates tasks via backlog CLI**
+**`issue:CaptureThought` - Quick idea capture**
 ```bash
-# MCP calls this underneath:
-backlog task create "Task title" --description "..." --priority high --ac "criteria"
+# Creates GitHub Issue or adds as comment
+# Intelligent provider selection based on repository context
 ```
 
-**`list_tasks` - Displays tasks via CLI**
+**`issue:ListIssues` - Displays GitHub Issues**
 ```bash  
-# MCP calls this underneath:
-backlog task list --plain
+# Lists open GitHub Issues with filtering and search
+# Cross-repository support for workspace-wide view
 ```
 
-**`capture_thought` - Quick idea capture**
+**`issue:CaptureComprehensiveThought` - Advanced idea capture**
 ```bash
-# MCP calls this underneath:  
-backlog task create "Quick thought: ..." --draft --labels idea
+# Full-featured thought capture with categorization
+# Automatic follow-up suggestions and task creation
 ```
 
 ### 🔍 Validation Tools
 
-**`validate_backlog_context` - Directory Safety**
+**`validation_RepositoryInfo` - Repository Context**
 ```json
 {
-  "name": "validate_backlog_context", 
+  "name": "validation_RepositoryInfo", 
   "arguments": {
-    "targetRepo": "loqa"
+    "repoPath": "/path/to/repository"
   }
 }
 ```
 
-**Purpose**: Validates current directory context is safe for backlog commands and prevents creating unwanted backlog directories.
+**Purpose**: Provides comprehensive repository information including branch status and GitHub integration.
 
 **Key Features**:
-- ✅ **Directory Validation**: Detects if you're in workspace root (unsafe) vs repository root (safe)
-- ⚠️ **Target Repository Check**: Warns if you're in wrong repository for your intended task
-- 📁 **Backlog Detection**: Checks for existing backlog directories
-- 💡 **Smart Recommendations**: Provides navigation guidance to correct location
+- ✅ **Repository Detection**: Identifies current repository and workspace context
+- ⚠️ **Branch Status**: Shows current branch, remote tracking, and clean/dirty status
+- 🔗 **GitHub Integration**: Validates GitHub API access and repository configuration
+- 💡 **Smart Recommendations**: Provides guidance for repository operations
 
 **Use Cases**:
-- Before running any backlog CLI commands
-- When unsure which repository you're currently in
-- To prevent accidentally creating backlog directories in workspace root
+- Before running GitHub Issues operations
+- When unsure about repository context or GitHub access
+- To verify proper repository configuration
 
 **`validate_commit_message` - Commit Quality**
 ```json
@@ -222,11 +222,11 @@ backlog task create "Quick thought: ..." --draft --labels idea
 - Inconsistent formatting
 - Database inconsistencies
 
-**NEW (CLI-First)**: ✅
-- All tasks created via `backlog task create`
-- Official numbering and formatting
+**NEW (GitHub Issues)**: ✅
+- All issues created via GitHub Issues API
+- Native GitHub numbering and formatting
 - Consistent workflow automation
-- Full Backlog.md compliance
+- Full GitHub ecosystem integration
 
 ## 📁 File Structure
 

@@ -106,9 +106,38 @@ Then open http://localhost:5173 to see the voice assistant UI
 **All repositories now feature:**
 - Automated CI/CD pipelines with status badges
 - Security vulnerability scanning with Trivy
-- Modern Go 1.24+ with static analysis  
+- Modern Go 1.24+ with static analysis
 - Protocol buffer integration and code generation
 - Comprehensive documentation and security policies
+
+---
+
+## 🤖 MCP-Powered Development Workflow
+
+Loqa now includes a powerful **Model Context Protocol (MCP) server** that transforms development experience with Claude Code:
+
+### GitHub Issues-First Development
+```bash
+# Claude Code + MCP integration provides:
+"Create a new issue for implementing JWT authentication with high priority"
+"Show me what issues I should work on next"
+"Create a feature branch for issue #123"
+"Run quality checks across all repositories"
+```
+
+### Smart Multi-Repository Coordination
+- **Cross-Repository Impact Analysis** - AI-powered change impact detection across 8 service repositories
+- **Dependency-Aware Quality Gates** - Automated quality validation in proper dependency order
+- **Coordinated Feature Branches** - Create matching branches across affected repositories
+- **GitHub Issues Templates** - Structured issue creation with AI-enhanced acceptance criteria
+
+### AI-Enhanced Development Tools
+- **Quality Gates Integration** - `make quality-check` automation across all repositories
+- **Smart Git Operations** - Repository-aware git commands with multi-repo context
+- **Cross-Repository Workflows** - Breaking change coordination and protocol update management
+- **Role-Based Specialization** - Developer, architect, DevOps contexts with specialized tooling
+
+👉 **[MCP Server Setup Guide](./project/loqa-assistant-mcp/README.md)** for Claude Code integration
 
 ---
 
@@ -140,13 +169,14 @@ This clones all repositories and builds Docker images locally from source.
 ### 📋 Development Roadmap
 
 - **[TODO.md](./project/TODO.md)** - Priority 1 & 2 tasks: Must-fix issues and high-impact UX improvements
-- **[BACKLOG.md](./project/BACKLOG.md)** - Priority 3 features: Optional post-MVP enhancements and future ideas
+- **[GitHub Issues](https://github.com/loqalabs/loqa/issues)** - All development tasks managed via GitHub Issues with proper labeling and projects
 
 ### 🔧 Developer Resources
 
 Building something with Loqa? Start here:
 
 - **[AI Development Commands](./DEVELOPER_COMMANDS.md)** - Interactive commands for AI-enhanced development workflows
+- **[Pragmatic Workflow System](./docs/workflow/README.md)** - GitHub Issues-first development with MCP-powered automation
 - **[Developer Guide](./docs/DEVELOPER.md)** - Repository structure, workflows, and contribution
 - **[Architecture Overview](./docs/architecture.md)** - How everything fits together  
 - **[Skills Development](./docs/skills.md)** - Build your own voice commands

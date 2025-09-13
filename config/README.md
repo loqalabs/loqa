@@ -1,9 +1,10 @@
 # Configuration Files
 
-This directory contains configuration files and development settings:
+This directory contains configuration files and development tools:
 
-- **CLAUDE.md** - Claude Code configuration and guidance for this repository
-- **.cspell.json** - Spell checking configuration for documentation
-- **.markdown-link-check.json** - Link validation configuration for Markdown files
+- **quality-gate-loader.js** - Pragmatic quality gate configuration processing with CLI interface
+- **.cspell.json** - Spell checking configuration for documentation (used in CI/CD)
 
-These files configure development tools and AI assistants for consistent project maintenance.
+These files configure development tools for consistent project maintenance.
+
+**Note**: Claude Code configuration is in the root `CLAUDE.md` file.
