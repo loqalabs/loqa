@@ -179,9 +179,38 @@ export function getRepositoryPath(context: WorkspaceContext, repository: string)
 }
 
 /**
- * Enhanced workspace resolution using context detection
+ * Get the true workspace root (parent directory containing all repositories)
+ * Used for workspace-level operations like thought storage
  */
-export async function resolveWorkspaceRootWithContext(args: any = {}): Promise<{
+export async function getWorkspaceRoot(args: any = {}): Promise<string> {
+  const context = await detectWorkspaceContext();
+  const { repoPath } = args;
+
+  // If explicit repoPath is provided, use it
+  if (repoPath) {
+    try {
+      await fs.access(repoPath);
+      return repoPath;
+    } catch {
+      console.warn(`Explicit repoPath ${repoPath} is not valid`);
+    }
+  }
+
+  // Always return the true workspace root if available
+  if (context.workspaceRoot) {
+    return context.workspaceRoot;
+  }
+
+  // Fallback to current directory with warning
+  console.warn('Could not resolve workspace context, using current directory');
+  return process.cwd();
+}
+
+/**
+ * Find and return a specific repository root within the workspace
+ * Used for repository-specific operations like GitHub issue management
+ */
+export async function resolveRepositoryRoot(args: any = {}): Promise<{
   path: string;
   context: WorkspaceContext;
 }> {

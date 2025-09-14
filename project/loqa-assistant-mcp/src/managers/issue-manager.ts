@@ -9,6 +9,8 @@
  */
 
 import { basename } from "path";
+import { ThoughtStorage } from "../storage/thought-storage.js";
+import { CapturedThought } from "../types/index.js";
 
 // GitHub-style issue interface to match existing codebase expectations
 export interface GitHubStyleIssue {
@@ -65,10 +67,17 @@ export interface LegacyIssueOperationResult {
 export class LoqaIssueManager {
   private repoPath: string;
   private repoName: string;
+  private thoughtStorage: ThoughtStorage;
 
-  constructor(repoPath: string) {
-    this.repoPath = repoPath;
-    this.repoName = basename(repoPath);
+  constructor(workspaceRoot: string) {
+    this.repoPath = workspaceRoot;
+    this.repoName = basename(workspaceRoot);
+
+    // Initialize persistent thought storage using the workspace root directly
+    this.thoughtStorage = new ThoughtStorage({
+      workspaceRoot: workspaceRoot,
+      storageDir: '.loqa-assistant/thoughts'
+    });
   }
 
   /**
@@ -163,17 +172,132 @@ export class LoqaIssueManager {
   }
 
   /**
-   * Capture thought - Placeholder implementation for compatibility
+   * Capture thought - Now uses persistent file-based storage
    */
-  async captureThought(_thought: any): Promise<LegacyIssueOperationResult> {
-    console.warn(
-      `captureThought called for ${this.repoName}, but implementation is pending GitHub Issues migration`
-    );
-    return {
-      success: false,
-      error: "GitHub Issues integration not yet implemented",
-      warnings: ["Using legacy LoqaIssueManager placeholder for thought capture"],
-    };
+  async captureThought(thought: CapturedThought): Promise<LegacyIssueOperationResult> {
+    try {
+      const storedThought = await this.thoughtStorage.storeThought(thought);
+
+      return {
+        success: true,
+        warnings: [`Thought "${storedThought.id}" stored persistently in ${this.repoName}/.loqa-assistant/thoughts/`],
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: `Failed to store thought: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      };
+    }
+  }
+
+  /**
+   * Get stored thoughts - New functionality for accessing persistent thoughts
+   */
+  async getStoredThoughts(options?: {
+    tags?: string[];
+    content?: string;
+    limit?: number;
+  }): Promise<any[]> {
+    try {
+      const criteria = {
+        tags: options?.tags,
+        content: options?.content,
+        limit: options?.limit || 50,
+      };
+      return await this.thoughtStorage.findThoughts(criteria);
+    } catch (error) {
+      console.warn(`Failed to retrieve thoughts for ${this.repoName}:`, error);
+      return [];
+    }
+  }
+
+  /**
+   * Get thought storage statistics
+   */
+  async getThoughtStats(): Promise<any> {
+    try {
+      return await this.thoughtStorage.getStats();
+    } catch (error) {
+      console.warn(`Failed to get thought stats for ${this.repoName}:`, error);
+      return {
+        totalThoughts: 0,
+        recentThoughts: 0,
+        topTags: [],
+        storageSize: '0 KB',
+        lastUpdated: 'Never',
+      };
+    }
+  }
+
+  /**
+   * Find similar thoughts for potential merging
+   */
+  async findSimilarThoughts(thought: CapturedThought): Promise<any[]> {
+    try {
+      return await this.thoughtStorage.findSimilarThoughts(thought);
+    } catch (error) {
+      console.warn(`Failed to find similar thoughts for ${this.repoName}:`, error);
+      return [];
+    }
+  }
+
+  /**
+   * Update an existing thought with additional content
+   */
+  async updateThought(thoughtId: string, additionalContent: string, newTags: string[] = []): Promise<LegacyIssueOperationResult> {
+    try {
+      const updatedThought = await this.thoughtStorage.updateThought(thoughtId, additionalContent, newTags);
+      return {
+        success: true,
+        warnings: [`Thought "${updatedThought.id}" updated successfully`],
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: `Failed to update thought: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      };
+    }
+  }
+
+  /**
+   * Delete a thought by ID
+   */
+  async deleteThought(thoughtId: string): Promise<LegacyIssueOperationResult> {
+    try {
+      const deleted = await this.thoughtStorage.deleteThought(thoughtId);
+      if (deleted) {
+        return {
+          success: true,
+          warnings: [`Thought "${thoughtId}" deleted successfully`],
+        };
+      } else {
+        return {
+          success: false,
+          error: `Thought with ID "${thoughtId}" not found`,
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: `Failed to delete thought: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      };
+    }
+  }
+
+  /**
+   * Get aging thoughts that need attention
+   */
+  async getAgingThoughts(daysOld: number = 7): Promise<any> {
+    try {
+      return await this.thoughtStorage.getAgingThoughts(daysOld);
+    } catch (error) {
+      console.warn(`Failed to get aging thoughts for ${this.repoName}:`, error);
+      return {
+        aging: [],
+        stale: [],
+        stats: { totalThoughts: 0, agingCount: 0, staleCount: 0, averageAge: 0 },
+      };
+    }
   }
 
   /**

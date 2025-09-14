@@ -9,12 +9,55 @@ import {
 import { IssueProvider } from "../types/issue-provider.js";
 import { resolveWorkspaceRoot } from "../utils/workspace-resolver.js";
 
+// Interview system imports
+import { TaskCreationInterviewer } from "../utils/task-creation-interviewer.js";
+import { TaskInterviewStorage } from "../utils/task-interview-storage.js";
+import { InterviewContextManager } from "../utils/interview-context-manager.js";
+
 // Import from split modules
 import {
   deriveIssueTitle,
   detectThoughtCategory,
   createSimpleIssue,
 } from "./handlers.js";
+
+/**
+ * Create comprehensive issue text from interview data for existing issue management system
+ */
+function createIssueTextFromInterview(interview: any): string {
+  const answers = interview.answers;
+
+  let issueText = `# ${answers.title || 'Untitled Task'}\n\n`;
+
+  if (answers.description) {
+    issueText += `## Description\n\n${answers.description}\n\n`;
+  }
+
+  if (answers.acceptance_criteria) {
+    issueText += `## Acceptance Criteria\n\n${answers.acceptance_criteria}\n\n`;
+  }
+
+  if (answers.technical_notes) {
+    issueText += `## Technical Notes\n\n${answers.technical_notes}\n\n`;
+  }
+
+  if (answers.affected_repos) {
+    issueText += `## Affected Repositories\n\n${answers.affected_repos}\n\n`;
+  }
+
+  if (answers.breaking_change === 'yes') {
+    issueText += `## ⚠️ Breaking Change\n\nThis change will affect other services and requires coordinated deployment.\n\n`;
+  }
+
+  issueText += `## Metadata\n\n`;
+  issueText += `- **Type**: ${interview.issueType}\n`;
+  issueText += `- **Priority**: ${interview.priority}\n`;
+  issueText += `- **Repository**: ${answers.repository}\n`;
+  issueText += `- **Created from**: ${interview.originalInput}\n`;
+  issueText += `- **Interview ID**: ${interview.id}\n`;
+
+  return issueText;
+}
 import {
   analyzeCurrentProjectState,
   evaluateComprehensiveThought,
@@ -41,8 +84,73 @@ export const issueManagementTools = [
           type: "string",
           description: "Optional context about where this thought came from",
         },
+        forceNew: {
+          type: "boolean",
+          description: "Force creation of new thought even if similar ones exist",
+        },
       },
       required: ["content"],
+    },
+  },
+  {
+    name: "issue:UpdateThought",
+    description: "Update an existing thought with additional content",
+    inputSchema: {
+      type: "object",
+      properties: {
+        thoughtId: { type: "string", description: "ID of the thought to update" },
+        additionalContent: { type: "string", description: "New content to append to the thought" },
+        newTags: {
+          type: "array",
+          items: { type: "string" },
+          description: "Optional new tags to add to the thought",
+        },
+      },
+      required: ["thoughtId", "additionalContent"],
+    },
+  },
+  {
+    name: "issue:DeleteThought",
+    description: "Delete a thought by ID",
+    inputSchema: {
+      type: "object",
+      properties: {
+        thoughtId: { type: "string", description: "ID of the thought to delete" },
+      },
+      required: ["thoughtId"],
+    },
+  },
+  {
+    name: "issue:ManageThoughts",
+    description: "Get aging thoughts and thought management recommendations",
+    inputSchema: {
+      type: "object",
+      properties: {
+        daysOld: { type: "number", description: "Number of days to consider thoughts as aging (default: 7)" },
+        action: {
+          type: "string",
+          description: "Management action to perform",
+          enum: ["review", "cleanup", "stats"]
+        },
+      },
+    },
+  },
+  {
+    name: "issue:ConvertThoughtToIssue",
+    description: "Convert a thought to a GitHub issue",
+    inputSchema: {
+      type: "object",
+      properties: {
+        thoughtId: { type: "string", description: "ID of the thought to convert" },
+        repository: { type: "string", description: "Target repository for the GitHub issue (optional)" },
+        priority: {
+          type: "string",
+          description: "Issue priority",
+          enum: ["High", "Medium", "Low"]
+        },
+        assignee: { type: "string", description: "GitHub username to assign the issue to (optional)" },
+      },
+      required: ["thoughtId"],
     },
   },
   {
@@ -198,6 +306,68 @@ export const issueManagementTools = [
       required: ["issueFile", "repository", "content"],
     },
   },
+  {
+    name: "issue:StartInterview",
+    description: "Start an intelligent interview to create a fully-fleshed GitHub issue",
+    inputSchema: {
+      type: "object",
+      properties: {
+        initialInput: {
+          type: "string",
+          description: "Initial description or idea for the issue",
+        },
+        skipKnownAnswers: {
+          type: "boolean",
+          description: "Skip questions where answers can be inferred from input",
+        },
+      },
+      required: ["initialInput"],
+    },
+  },
+  {
+    name: "issue:AnswerInterviewQuestion",
+    description: "Answer a question in an active interview",
+    inputSchema: {
+      type: "object",
+      properties: {
+        interviewId: {
+          type: "string",
+          description: "The interview ID to respond to",
+        },
+        answer: {
+          type: "string",
+          description: "Answer to the current question",
+        },
+      },
+      required: ["interviewId", "answer"],
+    },
+  },
+  {
+    name: "issue:ListActiveInterviews",
+    description: "List all active interviews that can be resumed",
+    inputSchema: {
+      type: "object",
+      properties: {},
+    },
+  },
+  {
+    name: "issue:ProcessConversationalResponse",
+    description: "Process a conversational response, automatically handling active interviews",
+    inputSchema: {
+      type: "object",
+      properties: {
+        message: {
+          type: "string",
+          description: "The user's conversational message",
+        },
+        contextHint: {
+          type: "string",
+          description: "Optional context hint for processing",
+        },
+      },
+      required: ["message"],
+    },
+  },
 ];
 
 /**
@@ -214,7 +384,7 @@ export async function handleIssueManagementTool(
 
   switch (name) {
     case "issue:CaptureThought": {
-      const { content, tags = [], context } = args;
+      const { content, tags = [], context, forceNew = false } = args;
 
       const thought: CapturedThought = {
         content,
@@ -254,7 +424,19 @@ export async function handleIssueManagementTool(
           context,
           workspaceRoot
         );
-        const _result = await issueManager.captureThought(thought);
+
+        // Check for similar existing thoughts before storing (unless forceNew is true)
+        const similarThoughts = !forceNew ? await issueManager.findSimilarThoughts(thought) : [];
+        let thoughtResult: any;
+
+        if (!forceNew && similarThoughts.length > 0 && similarThoughts[0].similarity > 25) {
+          // High similarity - suggest updating existing thought
+          const bestMatch = similarThoughts[0];
+          thoughtResult = { success: true, updatedExisting: true, similarThought: bestMatch };
+        } else {
+          // No similar thoughts, low similarity, or forced new - create new thought
+          thoughtResult = await issueManager.captureThought(thought);
+        }
 
         let responseText = `🧠 **Smart Thought Analysis**\n🏷️ **Tags**: ${
           tags.join(", ") || "None"
@@ -267,6 +449,29 @@ export async function handleIssueManagementTool(
             ? ` | Affects: ${advancedAnalysis.crossServiceImpact.join(", ")}`
             : ""
         }\n`;
+
+        // Handle similar thought detection
+        if (thoughtResult.updatedExisting) {
+          const similarThought = thoughtResult.similarThought;
+          responseText += `\n🔗 **Similar Thought Found!**\n\n`;
+          responseText += `**📋 Existing Thought**: "${similarThought.thought.content.substring(0, 100)}${similarThought.thought.content.length > 100 ? '...' : ''}"\n`;
+          responseText += `**🎯 Similarity Score**: ${similarThought.similarity}%\n`;
+          responseText += `**🔍 Reasons**: ${similarThought.reasons.join(' • ')}\n\n`;
+          responseText += `**💡 Recommendation**: This thought is very similar to an existing one. Would you like to:\n\n`;
+          responseText += `**Option 1**: Update the existing thought with your new content\n`;
+          responseText += `**Option 2**: Create a new thought anyway\n\n`;
+          responseText += `**To update existing**: Use \`issue:UpdateThought\` with ID "${similarThought.thought.id}"\n`;
+          responseText += `**To create new**: Use \`issue:CaptureThought\` again with \`forceNew: true\`\n`;
+
+          return {
+            content: [
+              {
+                type: "text",
+                text: responseText,
+              },
+            ],
+          };
+        }
 
         // Prioritize suggesting addition to existing issues over creating new ones
         if (relatedIssues.length > 0) {
@@ -727,6 +932,376 @@ export async function handleIssueManagementTool(
           ],
         };
       }
+    }
+
+    case "issue:UpdateThought": {
+      const { thoughtId, additionalContent, newTags = [] } = args;
+
+      try {
+        const result = await issueManager.updateThought(thoughtId, additionalContent, newTags);
+
+        if (result.success) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `✅ **Thought Updated Successfully!**\n\n📋 **Thought ID**: ${thoughtId}\n📝 **Added Content**: ${additionalContent.substring(0, 100)}${additionalContent.length > 100 ? '...' : ''}\n🏷️ **New Tags**: ${newTags.length > 0 ? newTags.join(', ') : 'None'}\n\n**Next Steps**: The thought has been updated with your additional content and is available in your thought storage.`,
+              },
+            ],
+          };
+        } else {
+          throw new Error(result.error || 'Failed to update thought');
+        }
+      } catch (error) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `❌ Failed to update thought: ${
+                error instanceof Error ? error.message : "Unknown error"
+              }\n\nPlease check that the thought ID is correct and try again.`,
+            },
+          ],
+        };
+      }
+    }
+
+    case "issue:DeleteThought": {
+      const { thoughtId } = args;
+
+      try {
+        const result = await issueManager.deleteThought(thoughtId);
+
+        if (result.success) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `🗑️ **Thought Deleted Successfully!**\n\n📋 **Thought ID**: ${thoughtId}\n\n**Status**: The thought has been permanently removed from your thought storage.`,
+              },
+            ],
+          };
+        } else {
+          throw new Error(result.error || 'Failed to delete thought');
+        }
+      } catch (error) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `❌ Failed to delete thought: ${
+                error instanceof Error ? error.message : "Unknown error"
+              }\n\nPlease check that the thought ID is correct and try again.`,
+            },
+          ],
+        };
+      }
+    }
+
+    case "issue:ManageThoughts": {
+      const { daysOld = 7, action = "review" } = args;
+
+      try {
+        const agingData = await issueManager.getAgingThoughts(daysOld);
+
+        if (action === "stats") {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `📊 **Thought Storage Statistics**\n\n📈 **Overview**:\n• Total Thoughts: ${agingData.stats.totalThoughts}\n• Aging Thoughts (${daysOld}+ days): ${agingData.stats.agingCount}\n• Stale Thoughts (${daysOld * 2}+ days): ${agingData.stats.staleCount}\n• Average Age: ${agingData.stats.averageAge} days\n\n${agingData.stats.agingCount > 0 || agingData.stats.staleCount > 0 ? '💡 **Recommendation**: Use `issue:ManageThoughts` with `action: "review"` to see specific thoughts that need attention.' : '✅ **All thoughts are fresh!** No aging thoughts found.'}`,
+              },
+            ],
+          };
+        }
+
+        let responseText = `🧠 **Thought Lifecycle Management**\n\n`;
+
+        if (agingData.stats.staleCount > 0) {
+          responseText += `🚨 **Stale Thoughts (${daysOld * 2}+ days old)**: ${agingData.stats.staleCount}\n`;
+          agingData.stale.slice(0, 3).forEach((thought: any) => {
+            const age = Math.round((Date.now() - new Date(thought.createdAt).getTime()) / (24 * 60 * 60 * 1000));
+            responseText += `• **${thought.id}** (${age} days): "${thought.content.substring(0, 60)}..."\n`;
+          });
+          if (agingData.stale.length > 3) {
+            responseText += `• ... and ${agingData.stale.length - 3} more\n`;
+          }
+          responseText += `\n`;
+        }
+
+        if (agingData.stats.agingCount > 0) {
+          responseText += `⚠️ **Aging Thoughts (${daysOld}-${daysOld * 2} days old)**: ${agingData.stats.agingCount}\n`;
+          agingData.aging.slice(0, 3).forEach((thought: any) => {
+            const age = Math.round((Date.now() - new Date(thought.createdAt).getTime()) / (24 * 60 * 60 * 1000));
+            responseText += `• **${thought.id}** (${age} days): "${thought.content.substring(0, 60)}..."\n`;
+          });
+          if (agingData.aging.length > 3) {
+            responseText += `• ... and ${agingData.aging.length - 3} more\n`;
+          }
+          responseText += `\n`;
+        }
+
+        if (agingData.stats.agingCount === 0 && agingData.stats.staleCount === 0) {
+          responseText += `✅ **All thoughts are fresh!** No thoughts older than ${daysOld} days.\n\n`;
+        } else {
+          responseText += `💡 **Recommended Actions**:\n`;
+          responseText += `• **Convert to Issues**: Use \`issue:ConvertThoughtToIssue\` for important thoughts\n`;
+          responseText += `• **Delete Old Thoughts**: Use \`issue:DeleteThought\` for outdated ideas\n`;
+          responseText += `• **Update Existing**: Use \`issue:UpdateThought\` to refresh with new insights\n\n`;
+        }
+
+        responseText += `📈 **Summary**: ${agingData.stats.totalThoughts} total thoughts, average age ${agingData.stats.averageAge} days`;
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: responseText,
+            },
+          ],
+        };
+      } catch (error) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `❌ Failed to manage thoughts: ${
+                error instanceof Error ? error.message : "Unknown error"
+              }`,
+            },
+          ],
+        };
+      }
+    }
+
+    case "issue:ConvertThoughtToIssue": {
+      const { thoughtId, priority = "Medium", assignee } = args;
+
+      try {
+        // First, get the thought
+        const thoughts = await issueManager.getStoredThoughts();
+        const thought = thoughts.find((t: any) => t.id === thoughtId);
+
+        if (!thought) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `❌ **Thought Not Found**\n\nThought with ID "${thoughtId}" could not be found. Please check the ID and try again.`,
+              },
+            ],
+          };
+        }
+
+        // Use existing issue creation logic
+        const options = {
+          title: `${thought.content.substring(0, 80)}${thought.content.length > 80 ? '...' : ''}`,
+          description: `**Original Thought**: ${thought.content}\n\n**Context**: ${thought.context || 'None'}\n\n**Tags**: ${thought.tags.join(', ')}\n\n---\n*Converted from thought ${thoughtId} created on ${new Date(thought.createdAt).toLocaleDateString()}*`,
+          priority,
+          assignee,
+          labels: [...thought.tags, 'from-thought'],
+          template: 'general',
+        };
+
+        const result = await issueManager.createIssueFromTemplate(options);
+
+        if (result.success) {
+          // Delete the thought after successful conversion
+          await issueManager.deleteThought(thoughtId);
+
+          return {
+            content: [
+              {
+                type: "text",
+                text: `🎯 **Thought Converted to GitHub Issue!**\n\n📋 **Issue Created**: ${result.issue?.number || 'N/A'}\n📝 **Title**: ${options.title}\n⭐ **Priority**: ${priority}\n🏷️ **Labels**: ${options.labels?.join(', ')}\n\n**Original Thought**: "${thought.content.substring(0, 100)}${thought.content.length > 100 ? '...' : ''}"\n\n✅ **Thought deleted** from temporary storage\n\n**Next Steps**: The GitHub issue is now ready for work and tracking.`,
+              },
+            ],
+          };
+        } else {
+          throw new Error(result.error || 'Failed to create GitHub issue');
+        }
+      } catch (error) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `❌ Failed to convert thought to issue: ${
+                error instanceof Error ? error.message : "Unknown error"
+              }\n\nNote: GitHub Issues integration may not be fully implemented yet.`,
+            },
+          ],
+        };
+      }
+    }
+
+    case "issue:StartInterview": {
+      const { initialInput, skipKnownAnswers = true } = args;
+
+      try {
+        const storage = new TaskInterviewStorage(workspaceRoot);
+        const interview = await TaskCreationInterviewer.startInterview(
+          initialInput,
+          workspaceRoot,
+          storage
+        );
+
+        // Set active interview context for seamless conversation
+        const contextManager = InterviewContextManager.getInstance();
+        contextManager.setActiveInterview(interview.id, interview.currentQuestion);
+
+        return {
+          content: [{
+            type: "text",
+            text: `🎯 **Starting Intelligent Issue Creation Interview**\n\n**Original Input**: "${initialInput}"\n\n**Interview ID**: \`${interview.id}\`\n\n**First Question**: ${interview.currentQuestion}\n\n*Just reply with your answer - no special commands needed.*`
+          }]
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: "text",
+            text: `❌ Failed to start interview: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }]
+        };
+      }
+    }
+
+    case "issue:AnswerInterviewQuestion": {
+      const { interviewId, answer } = args;
+
+      try {
+        const storage = new TaskInterviewStorage(workspaceRoot);
+        const interview = await TaskCreationInterviewer.processAnswer(interviewId, answer, storage);
+
+        if (!interview) {
+          return {
+            content: [{
+              type: "text",
+              text: `❌ Interview not found. It may have expired or been completed.`
+            }]
+          };
+        }
+
+        if (interview.interviewComplete) {
+          // Interview completed - prepare GitHub issue data for Claude Code to create
+          try {
+            const answers = interview.answers;
+            const issueData = {
+              title: answers.title || 'Untitled Task',
+              body: createIssueTextFromInterview(interview),
+              repository: answers.repository || 'loqa-hub',
+              labels: [
+                `type: ${interview.issueType}`,
+                `priority: ${interview.priority.toLowerCase()}`,
+                ...(answers.breaking_change === 'yes' ? ['type: breaking-change'] : []),
+                ...(answers.affected_repos ? ['scope: cross-repo'] : []),
+                ...(answers.technical_notes ? ['needs-technical-review'] : [])
+              ].filter(Boolean)
+            };
+
+            // Clean up completed interview
+            await storage.deleteInterview(interviewId);
+
+            const contextManager = InterviewContextManager.getInstance();
+            contextManager.clearActiveInterview();
+
+            return {
+              content: [{
+                type: "text",
+                text: `✅ **Interview Complete!** Here's the comprehensive GitHub issue ready to be created:\n\n## Issue Details\n**Title**: ${issueData.title}\n**Repository**: loqalabs/${issueData.repository}\n**Labels**: ${issueData.labels.join(', ')}\n\n## Issue Body\n${issueData.body}\n\n---\n\n**Next Step**: I'll now create this GitHub issue using the GitHub MCP tools.`
+              }]
+            };
+          } catch (error) {
+            return {
+              content: [{
+                type: "text",
+                text: `❌ Failed to process interview completion: ${error instanceof Error ? error.message : 'Unknown error'}\n\nInterview data has been preserved. You can try again or create the issue manually.`
+              }]
+            };
+          }
+        } else {
+          // Continue with next question
+          const contextManager = InterviewContextManager.getInstance();
+          contextManager.updateLastQuestion(interview.currentQuestion);
+
+          return {
+            content: [{
+              type: "text",
+              text: `📝 **Answer recorded.**\n\n**Next Question**: ${interview.currentQuestion}\n\n*Continue with your answer...*`
+            }]
+          };
+        }
+      } catch (error) {
+        return {
+          content: [{
+            type: "text",
+            text: `❌ Failed to process answer: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }]
+        };
+      }
+    }
+
+    case "issue:ListActiveInterviews": {
+      try {
+        const storage = new TaskInterviewStorage(workspaceRoot);
+        const activeInterviews = await storage.listActiveInterviews();
+
+        if (activeInterviews.length === 0) {
+          return {
+            content: [{
+              type: "text",
+              text: `📝 **No Active Interviews**\n\nYou don't have any active interviews at the moment.\n\nUse \`issue:StartInterview\` to begin creating a new GitHub issue with guided questions.`
+            }]
+          };
+        }
+
+        const interviewList = activeInterviews.map(interview => {
+          const age = Math.round((Date.now() - interview.createdAt.getTime()) / (1000 * 60));
+          return `• **${interview.id}** - ${interview.originalInput.substring(0, 50)}${interview.originalInput.length > 50 ? '...' : ''}\n  *Created ${age} minutes ago, ${interview.questionIndex + 1} questions answered*`;
+        }).join('\n\n');
+
+        return {
+          content: [{
+            type: "text",
+            text: `📋 **Active Interviews** (${activeInterviews.length})\n\n${interviewList}\n\nUse \`issue:AnswerInterviewQuestion\` with the interview ID to continue any of these interviews.`
+          }]
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: "text",
+            text: `❌ Failed to list interviews: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }]
+        };
+      }
+    }
+
+    case "issue:ProcessConversationalResponse": {
+      const { message } = args;
+      const contextManager = InterviewContextManager.getInstance();
+
+      // Check if there's an active interview
+      if (contextManager.isInActiveInterview()) {
+        const interviewId = contextManager.getActiveInterviewId()!;
+
+        // Detect if this message is likely an interview response
+        if (contextManager.isLikelyInterviewResponse(message)) {
+          // Process the response seamlessly by calling the answer handler
+          return await handleIssueManagementTool("issue:AnswerInterviewQuestion", {
+            interviewId,
+            answer: message
+          });
+        }
+      }
+
+      // Not an interview response, return helpful message
+      return {
+        content: [{
+          type: "text",
+          text: `📝 **Message received**: "${message}"\n\n${contextManager.isInActiveInterview()
+            ? `💡 **Active Interview**: You're in an interview but your message doesn't look like an answer. The current question is:\n\n"${contextManager.getLastQuestion()}"\n\nPlease provide your answer, or use \`issue:ListActiveInterviews\` to see available interviews.`
+            : '💡 **No Active Interview**: Your message was received but there\'s no active interview. Use \`issue:StartInterview\` with your idea to start a new issue creation process.'}`
+        }]
+      };
     }
 
     default:
