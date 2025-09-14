@@ -130,7 +130,7 @@ export const issueManagementTools = [
         action: {
           type: "string",
           description: "Management action to perform",
-          enum: ["review", "cleanup", "stats"]
+          enum: ["review", "cleanup", "stats", "list"]
         },
       },
     },
@@ -1010,6 +1010,42 @@ export async function handleIssueManagementTool(
               {
                 type: "text",
                 text: `📊 **Thought Storage Statistics**\n\n📈 **Overview**:\n• Total Thoughts: ${agingData.stats.totalThoughts}\n• Aging Thoughts (${daysOld}+ days): ${agingData.stats.agingCount}\n• Stale Thoughts (${daysOld * 2}+ days): ${agingData.stats.staleCount}\n• Average Age: ${agingData.stats.averageAge} days\n\n${agingData.stats.agingCount > 0 || agingData.stats.staleCount > 0 ? '💡 **Recommendation**: Use `issue:ManageThoughts` with `action: "review"` to see specific thoughts that need attention.' : '✅ **All thoughts are fresh!** No aging thoughts found.'}`,
+              },
+            ],
+          };
+        }
+
+        if (action === "list") {
+          // Get all stored thoughts with their content
+          const allThoughts = await issueManager.getStoredThoughts({ limit: 100 });
+
+          if (allThoughts.length === 0) {
+            return {
+              content: [
+                {
+                  type: "text",
+                  text: `📝 **No Thoughts Found**\n\nYou don't have any captured thoughts yet.\n\n**Create your first thought**: Use \`issue:CaptureThought\` to capture an idea or insight.`,
+                },
+              ],
+            };
+          }
+
+          // Format thoughts for display
+          const thoughtsList = allThoughts.map((thought, index) => {
+            const age = Math.round((Date.now() - new Date(thought.createdAt).getTime()) / (24 * 60 * 60 * 1000));
+            const tagsDisplay = thought.tags && thought.tags.length > 0 ? ` 🏷️ ${thought.tags.join(', ')}` : '';
+            const contextDisplay = thought.context ? ` 📍 ${thought.context.substring(0, 50)}${thought.context.length > 50 ? '...' : ''}` : '';
+
+            return `${index + 1}. **${thought.id}** (${age} day${age === 1 ? '' : 's'} ago)${tagsDisplay}\n   "${thought.content}"${contextDisplay}`;
+          }).join('\n\n');
+
+          const statsInfo = `📊 **Total**: ${allThoughts.length} thought${allThoughts.length === 1 ? '' : 's'}`;
+
+          return {
+            content: [
+              {
+                type: "text",
+                text: `📝 **Your Captured Thoughts**\n\n${thoughtsList}\n\n---\n${statsInfo}\n\n**Actions**: Use \`issue:UpdateThought\`, \`issue:DeleteThought\`, or \`issue:ConvertThoughtToIssue\` with the thought ID.`,
               },
             ],
           };
