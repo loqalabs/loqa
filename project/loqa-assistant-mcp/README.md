@@ -169,6 +169,106 @@ All MCP tools now work directly with GitHub Issues while providing enhanced Clau
 # Automatic follow-up suggestions and task creation
 ```
 
+### 🎯 **NEW: Intelligent Interview System - Comprehensive Issue Creation**
+
+**Revolutionary GitHub issue creation through natural conversation** - The intelligent interview system guides users through targeted questions to create fully-fleshed out GitHub issues with professional structure and comprehensive details.
+
+#### **Key Features**
+- 🎯 **7-Question Interview Flow** - Covers title, description, type, priority, repository, acceptance criteria, technical notes
+- 💬 **Seamless Conversation** - Natural language responses without command syntax
+- 📊 **Smart Analysis** - Auto-detects issue type, priority, and repository from initial context
+- 💾 **Persistent Sessions** - Interview state survives MCP server restarts, can be resumed anytime
+- 🔗 **GitHub Integration** - Creates comprehensive GitHub issues with proper labels and formatting
+- 🧠 **Context Awareness** - Automatically distinguishes between answers and commands
+
+#### **Available Interview Commands**
+
+**`issue:StartInterview` - Begin intelligent interview**
+```typescript
+{
+  "name": "issue:StartInterview",
+  "arguments": {
+    "initialInput": "Add rate limiting to STT service API endpoints"
+  }
+}
+```
+
+**`issue:ProcessConversationalResponse` - Natural conversation processing**
+```typescript
+{
+  "name": "issue:ProcessConversationalResponse",
+  "arguments": {
+    "message": "JWT Authentication with secure session management and token expiration"
+  }
+}
+```
+
+**`issue:AnswerInterviewQuestion` - Direct question response**
+```typescript
+{
+  "name": "issue:AnswerInterviewQuestion",
+  "arguments": {
+    "interviewId": "uuid-of-interview",
+    "answer": "High priority - security is critical for production"
+  }
+}
+```
+
+**`issue:ListActiveInterviews` - View/resume interviews**
+```typescript
+{
+  "name": "issue:ListActiveInterviews",
+  "arguments": {}
+}
+```
+
+#### **Interview Question Flow**
+
+1. **Title** - Concise, descriptive issue title
+2. **Description** - Detailed explanation of requirements
+3. **Type** - feature, bug-fix, protocol-change, cross-repo, general
+4. **Priority** - High/Medium/Low with reasoning
+5. **Repository** - Target repository with validation
+6. **Acceptance Criteria** - Definition of "done" with specific requirements
+7. **Technical Notes** - Implementation considerations, dependencies, constraints
+
+#### **Generated GitHub Issues Include**
+
+- ✅ **Professional Structure** - Description, Acceptance Criteria, Technical Notes, Metadata sections
+- 🏷️ **Smart Labels** - Automatic type, priority, and scope labels
+- 🔗 **Cross-Repository Coordination** - Dependency tracking and coordination notes
+- ⚠️ **Breaking Change Detection** - Automatic warnings for breaking changes
+- 📋 **Comprehensive Metadata** - Interview ID, creation context, repository tracking
+
+#### **Usage Examples**
+
+**Natural Language (Recommended)**:
+```bash
+# Via Claude Code - most user-friendly approach
+"Start an interview to create a GitHub issue for implementing user authentication"
+"I need to create an issue for fixing the memory leak in voice processing"
+```
+
+**Direct MCP Tool Usage**:
+```javascript
+// Start interview
+await callTool("issue:StartInterview", {
+  initialInput: "Add comprehensive logging to all gRPC endpoints"
+});
+
+// Respond conversationally (no special syntax needed)
+await callTool("issue:ProcessConversationalResponse", {
+  message: "Structured logging with request IDs, duration, and error tracking"
+});
+```
+
+#### **Storage and Persistence**
+
+- **Location**: `{workspace}/.loqa-assistant/interviews/interviews.json`
+- **Format**: JSON with full interview state and metadata
+- **Cleanup**: Automatic cleanup of completed interviews
+- **Resume**: Interrupted interviews can be resumed anytime
+
 ### 🔍 Validation Tools
 
 **`validation_RepositoryInfo` - Repository Context**
