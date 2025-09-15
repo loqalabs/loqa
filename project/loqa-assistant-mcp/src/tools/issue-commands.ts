@@ -8,11 +8,11 @@ import {
 } from "../types/index.js";
 import { IssueProvider } from "../types/issue-provider.js";
 import { resolveWorkspaceRoot } from "../utils/workspace-resolver.js";
+import { PreviewStateManager } from "../utils/preview-state-manager.js";
 import {
   formatIssueCreationPreview,
   formatCommentCreationPreview,
 } from "../utils/preview-formatter.js";
-import { PreviewStateManager } from "../utils/preview-state-manager.js";
 
 // Interview system imports
 import { TaskCreationInterviewer } from "../utils/task-creation-interviewer.js";
@@ -1456,7 +1456,53 @@ export async function handleIssueManagementTool(
         }
       }
 
-      // Not a preview response or interview response, return helpful message
+      // Parse natural language for GitHub operations
+      const githubCommentMatch = message.match(/(?:add|post|create).*?comment.*?(?:issue|#)\s*(\d+)|comment.*?(?:issue|#)\s*(\d+)/i);
+
+      if (githubCommentMatch) {
+        const issueNumber = parseInt(githubCommentMatch[1] || githubCommentMatch[2]);
+
+        // Extract comment content (everything after the issue reference, or ask for it)
+        const fullMatch = githubCommentMatch[0];
+        const matchIndex = message.toLowerCase().indexOf(fullMatch.toLowerCase());
+        const afterMatch = message.substring(matchIndex + fullMatch.length).trim();
+
+        if (afterMatch.length < 10) {
+          return {
+            content: [{
+              type: "text",
+              text: `📝 **GitHub Comment Request Detected**\n\nI can help you add a comment to issue #${issueNumber}, but I need the comment content.\n\nPlease provide your message in this format:\n"Add a comment to issue #${issueNumber}: [your comment content here]"`
+            }]
+          };
+        }
+
+        // Generate preview for GitHub comment delegation
+        const commentContent = afterMatch.startsWith(':') ? afterMatch.substring(1).trim() : afterMatch;
+        const previewText = `## 📝 GitHub Comment Preview\n\n**Target**: Issue #${issueNumber}\n**Repository**: loqalabs/loqa (detected from context)\n\n**Comment Content:**\n\n${commentContent}\n\n---\n\n✅ Reply **"yes"** to post this comment\n❌ Reply **"no"** to cancel\n🔄 Reply with changes to revise the comment`;
+
+        // Store as pending operation for GitHub MCP delegation
+        const previewManager = PreviewStateManager.getInstance();
+        previewManager.storePendingOperation({
+          type: 'add_comment',
+          toolName: 'github:AddComment',
+          originalArgs: {
+            owner: 'loqalabs',
+            repo: 'loqa',
+            issue_number: issueNumber,
+            body: commentContent
+          },
+          previewText
+        });
+
+        return {
+          content: [{
+            type: "text",
+            text: previewText
+          }]
+        };
+      }
+
+      // Not a preview response, interview response, or GitHub operation - return helpful message
       return {
         content: [{
           type: "text",

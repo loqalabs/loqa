@@ -217,6 +217,31 @@ async function executeConfirmedOperation(pendingOp: PendingOperation): Promise<a
       };
     }
 
+    case "github:AddComment": {
+      // Delegate to Claude Code's GitHub MCP
+      const { owner, repo, issue_number, body } = pendingOp.originalArgs;
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: `🔄 **Delegating to GitHub MCP**\n\nExecuting: \`mcp__github__add_issue_comment\`\n- **Repository**: ${owner}/${repo}\n- **Issue**: #${issue_number}\n- **Comment**: ${body.substring(0, 100)}${body.length > 100 ? '...' : ''}`
+          }
+        ],
+        meta: {
+          delegation: {
+            tool: "mcp__github__add_issue_comment",
+            parameters: {
+              owner,
+              repo,
+              issue_number,
+              body
+            }
+          }
+        }
+      };
+    }
+
     default:
       throw new Error(`Unsupported tool for execution: ${pendingOp.toolName}`);
   }

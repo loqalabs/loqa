@@ -4,7 +4,10 @@ Comprehensive development workflow assistance for the Loqa ecosystem. This syste
 
 ## ✨ Recent Updates
 
-**September 2025**: 
+**September 2025**:
+- ✅ **NEW: GitHub Comment Preview Workflow**: Added conversational GitHub comment functionality with preview, confirmation, and delegation to GitHub MCP
+- ✅ **Fixed Critical Workflow Bug**: ProcessConversationalResponse now properly handles GitHub operations instead of bypassing preview workflow
+- ✅ **Enhanced Natural Language Parsing**: Intelligent detection of "add comment to issue #X" patterns with content extraction
 - ✅ **Fixed AI Attribution False Positives**: Updated pattern detection to avoid false positives with "claude-code-commands"
 - ✅ **Cleaned Up Development Files**: Removed obsolete test scripts and development documentation
 - ✅ **Streamlined Hook Management**: Enhanced `update-hooks.sh` for force-updating hooks across all repositories
@@ -194,7 +197,35 @@ All MCP tools now work directly with GitHub Issues while providing enhanced Clau
 ```
 
 **`issue:ProcessConversationalResponse` - Natural conversation processing**
+
+Handles multiple types of conversational input with intelligent parsing and preview workflows:
+
+**🎯 GitHub Comment Operations (NEW)**
 ```typescript
+// Add comment to GitHub issue with preview
+{
+  "name": "issue:ProcessConversationalResponse",
+  "arguments": {
+    "message": "Add a comment to issue #33: This is my test comment content"
+  }
+}
+// Returns: Preview with confirmation options (yes/no/revise)
+```
+
+**🔄 Preview Confirmations**
+```typescript
+// Confirm or cancel pending operations
+{
+  "name": "issue:ProcessConversationalResponse",
+  "arguments": {
+    "message": "yes"  // or "no" or revision details
+  }
+}
+```
+
+**💬 Interview Responses**
+```typescript
+// Answer interview questions naturally
 {
   "name": "issue:ProcessConversationalResponse",
   "arguments": {
@@ -202,6 +233,11 @@ All MCP tools now work directly with GitHub Issues while providing enhanced Clau
   }
 }
 ```
+
+**Key Features:**
+- ✅ **GitHub Comment Preview**: Natural language → Preview → Confirmation → Delegation to GitHub MCP
+- ✅ **Smart Context Detection**: Automatically detects operation type from message content
+- ✅ **Workflow Integration**: Seamlessly handles confirmations, revisions, and cancellations
 
 **`issue:AnswerInterviewQuestion` - Direct question response**
 ```typescript
