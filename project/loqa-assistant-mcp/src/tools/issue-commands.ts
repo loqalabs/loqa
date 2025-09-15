@@ -1457,6 +1457,15 @@ export async function handleIssueManagementTool(
       }
 
       // Parse natural language for GitHub operations
+
+      // TODO: Future expansion - PR creation, issue creation/editing patterns
+      // Foundation established for adding more GitHub operations:
+      // - Pull request creation and editing
+      // - Issue creation and editing
+      // - Advanced natural language parsing
+      // Current implementation focuses on proven GitHub comment functionality
+
+      // GitHub Comments (working functionality)
       const githubCommentMatch = message.match(/(?:add|post|create).*?comment.*?(?:issue|#)\s*(\d+)|comment.*?(?:issue|#)\s*(\d+)/i);
 
       if (githubCommentMatch) {

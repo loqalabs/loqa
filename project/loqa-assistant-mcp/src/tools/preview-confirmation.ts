@@ -242,6 +242,13 @@ async function executeConfirmedOperation(pendingOp: PendingOperation): Promise<a
       };
     }
 
+    // TODO: Future GitHub operations
+    // case "github:CreatePR": - Pull request creation delegation
+    // case "github:CreateIssue": - Issue creation delegation
+    // case "github:UpdateIssue": - Issue editing delegation
+    // case "github:UpdatePR": - Pull request editing delegation
+    // Foundation established for future expansion
+
     default:
       throw new Error(`Unsupported tool for execution: ${pendingOp.toolName}`);
   }
