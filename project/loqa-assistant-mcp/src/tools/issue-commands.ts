@@ -8,6 +8,11 @@ import {
 } from "../types/index.js";
 import { IssueProvider } from "../types/issue-provider.js";
 import { resolveWorkspaceRoot } from "../utils/workspace-resolver.js";
+import {
+  formatIssueCreationPreview,
+  formatCommentCreationPreview,
+} from "../utils/preview-formatter.js";
+import { PreviewStateManager } from "../utils/preview-state-manager.js";
 
 // Interview system imports
 import { TaskCreationInterviewer } from "../utils/task-creation-interviewer.js";
@@ -19,6 +24,7 @@ import {
   deriveIssueTitle,
   detectThoughtCategory,
   createSimpleIssue,
+  mapCategoryToIssueType,
 } from "./handlers.js";
 
 /**
@@ -65,7 +71,7 @@ import {
   findRelatedExistingIssues,
   performAdvancedThoughtAnalysis,
 } from "./thought-analysis.js";
-import { estimateThoughtUrgency, mapCategoryToIssueType } from "./utilities.js";
+import { estimateThoughtUrgency } from "./utilities.js";
 
 export const issueManagementTools = [
   {
@@ -252,6 +258,11 @@ export const issueManagementTools = [
           description:
             "Additional context or requirements to include in the issue",
         },
+        preview_mode: {
+          type: "boolean",
+          description: "Show preview of changes without executing",
+          default: false,
+        },
       },
       required: [
         "thoughtContent",
@@ -301,6 +312,11 @@ export const issueManagementTools = [
           type: "string",
           description:
             "Optional section title for the appended content (defaults to 'Additional Thoughts')",
+        },
+        preview_mode: {
+          type: "boolean",
+          description: "Show preview of changes without executing",
+          default: false,
         },
       },
       required: ["issueFile", "repository", "content"],
@@ -795,10 +811,34 @@ export async function handleIssueManagementTool(
         category,
         customTitle,
         _additionalContext,
+        preview_mode = false,
       } = args;
 
       // Simple issue creation for straightforward cases
       const title = customTitle || deriveIssueTitle(thoughtContent);
+
+      if (preview_mode) {
+        // Generate preview of issue that would be created
+        const issueType = mapCategoryToIssueType(category);
+        const previewData = {
+          title: title,
+          body: `## Description\n\n${thoughtContent}\n\n## Template\n\n${suggestedTemplate}\n\n## Category\n\n${category}\n\n## Type\n\n${issueType}`,
+          labels: [category.toLowerCase(), `${suggestedPriority.toLowerCase()}-priority`],
+          assignees: [],
+          milestone: undefined,
+        };
+
+        const preview = formatIssueCreationPreview(previewData, "current repository");
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: preview,
+            },
+          ],
+        };
+      }
 
       const options: LegacyIssueCreationOptions = {
         title,
@@ -837,13 +877,35 @@ export async function handleIssueManagementTool(
       const { initialInput } = args;
 
       try {
-        const result = await createSimpleIssue(initialInput, workspaceRoot);
+        // Generate preview and store as pending operation
+        const title = deriveIssueTitle(initialInput);
+        const category = detectThoughtCategory(initialInput, []);
+        const issueType = mapCategoryToIssueType(category);
+
+        const previewData = {
+          title: title,
+          body: `## Description\n\n${initialInput}\n\n## Type\n\n${issueType}`,
+          labels: [category.toLowerCase(), "medium-priority"],
+          assignees: [],
+          milestone: undefined,
+        };
+
+        const preview = formatIssueCreationPreview(previewData, "current repository");
+
+        // Store the pending operation
+        const previewManager = PreviewStateManager.getInstance();
+        const operationId = previewManager.storePendingOperation({
+          type: 'create_issue',
+          toolName: 'issue:CreateSimple',
+          originalArgs: args,
+          previewText: preview,
+        });
 
         return {
           content: [
             {
               type: "text",
-              text: result.message,
+              text: `${preview}\n\n---\n\n⏸️ **AWAITING YOUR RESPONSE**\n\n**Please review the preview above and respond:**\n✅ **"yes"** or **"confirm"** → Create this issue\n❌ **"no"** or **"cancel"** → Cancel operation\n🔄 **Provide feedback** → Revise with your input\n\n*I'll wait for your decision before proceeding.*`,
             },
           ],
         };
@@ -852,7 +914,7 @@ export async function handleIssueManagementTool(
           content: [
             {
               type: "text",
-              text: `❌ Failed to create simple issue: ${
+              text: `❌ Failed to preview issue creation: ${
                 error instanceof Error ? error.message : "Unknown error"
               }`,
             },
@@ -867,6 +929,7 @@ export async function handleIssueManagementTool(
         repository,
         content,
         sectionTitle = "Additional Thoughts",
+        preview_mode = false,
       } = args;
 
       try {
@@ -879,6 +942,26 @@ export async function handleIssueManagementTool(
               {
                 type: "text",
                 text: `❌ Invalid issue file format: \`${issueFile}\`. Expected format with issue number (e.g., "123.md" or "issue-123.md")`,
+              },
+            ],
+          };
+        }
+
+        if (preview_mode) {
+          // Generate preview of comment that would be added
+          const commentPreviewData = {
+            body: `## ${sectionTitle}\n*Added on ${new Date().toLocaleString()}*\n\n${content}`,
+            issueNumber: parseInt(issueNumber),
+            repository: repository,
+          };
+
+          const preview = formatCommentCreationPreview(commentPreviewData);
+
+          return {
+            content: [
+              {
+                type: "text",
+                text: preview,
               },
             ],
           };
@@ -1313,9 +1396,53 @@ export async function handleIssueManagementTool(
 
     case "issue:ProcessConversationalResponse": {
       const { message } = args;
+      const previewManager = PreviewStateManager.getInstance();
       const contextManager = InterviewContextManager.getInstance();
 
-      // Check if there's an active interview
+      // Check for pending preview operations first
+      const pendingOps = previewManager.getAllPendingOperations();
+      if (pendingOps.length > 0) {
+        const latestOp = pendingOps[pendingOps.length - 1]; // Get most recent
+
+        // Check for confirmation responses
+        const lowerMessage = message.toLowerCase().trim();
+        if (lowerMessage === 'yes' || lowerMessage === 'confirm' || lowerMessage === 'y' || lowerMessage === 'ok' || lowerMessage === 'proceed') {
+          // Import and use preview confirmation handler directly
+          const { handlePreviewConfirmation } = await import('./preview-confirmation.js');
+          return await handlePreviewConfirmation("preview:ConfirmOrRevise", {
+            operationId: latestOp.id,
+            action: "confirm"
+          });
+        }
+
+        if (lowerMessage === 'no' || lowerMessage === 'cancel' || lowerMessage === 'abort' || lowerMessage === 'n') {
+          const { handlePreviewConfirmation } = await import('./preview-confirmation.js');
+          return await handlePreviewConfirmation("preview:ConfirmOrRevise", {
+            operationId: latestOp.id,
+            action: "cancel"
+          });
+        }
+
+        // If it's not a simple yes/no, treat it as revision input
+        if (message.length > 10) { // Reasonable threshold for revision input
+          const { handlePreviewConfirmation } = await import('./preview-confirmation.js');
+          return await handlePreviewConfirmation("preview:ConfirmOrRevise", {
+            operationId: latestOp.id,
+            action: "revise",
+            revisionInput: message
+          });
+        }
+
+        // Unclear response with pending operation
+        return {
+          content: [{
+            type: "text",
+            text: `🤔 **I didn't understand your response**: "${message}"\n\n**You have a pending operation**: ${latestOp.type.replace('_', ' ')}\n\n✅ Say **"yes"** or **"confirm"** to proceed\n❌ Say **"no"** or **"cancel"** to abort\n🔄 Provide **additional details** to revise the operation\n\n**Operation ID**: \`${latestOp.id}\``
+          }]
+        };
+      }
+
+      // Check if there's an active interview (existing logic)
       if (contextManager.isInActiveInterview()) {
         const interviewId = contextManager.getActiveInterviewId()!;
 
@@ -1329,13 +1456,13 @@ export async function handleIssueManagementTool(
         }
       }
 
-      // Not an interview response, return helpful message
+      // Not a preview response or interview response, return helpful message
       return {
         content: [{
           type: "text",
           text: `📝 **Message received**: "${message}"\n\n${contextManager.isInActiveInterview()
             ? `💡 **Active Interview**: You're in an interview but your message doesn't look like an answer. The current question is:\n\n"${contextManager.getLastQuestion()}"\n\nPlease provide your answer, or use \`issue:ListActiveInterviews\` to see available interviews.`
-            : '💡 **No Active Interview**: Your message was received but there\'s no active interview. Use \`issue:StartInterview\` with your idea to start a new issue creation process.'}`
+            : '💡 **No Active Context**: Your message was received but there\'s no active interview or pending operation. Use \`issue:StartInterview\` with your idea to start a new issue creation process.'}`
         }]
       };
     }

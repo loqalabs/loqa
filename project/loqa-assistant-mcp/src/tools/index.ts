@@ -19,6 +19,7 @@ export { advancedGithubHandlers } from './github-advanced-handlers.js';
 export { qualityGateTools, handleQualityGateTools } from './quality-gate-tools.js';
 export { githubIssueTemplateTools, handleGitHubIssueTemplateTools } from './github-issue-templates.js';
 export { crossRepoCoordinationTools, handleCrossRepoCoordinationTools } from './cross-repo-coordination-tools.js';
+export { previewConfirmationTools, handlePreviewConfirmation } from './preview-confirmation.js';
 
 /**
  * Get all available tools as a single array
@@ -38,6 +39,7 @@ export async function getAllTools() {
   const { qualityGateTools } = await import('./quality-gate-tools.js');
   const { githubIssueTemplateTools } = await import('./github-issue-templates.js');
   const { crossRepoCoordinationTools } = await import('./cross-repo-coordination-tools.js');
+  const { previewConfirmationTools } = await import('./preview-confirmation.js');
 
   return [
     ...validationTools,
@@ -53,7 +55,8 @@ export async function getAllTools() {
     ...advancedGithubTools,
     ...qualityGateTools,
     ...githubIssueTemplateTools,
-    ...crossRepoCoordinationTools
+    ...crossRepoCoordinationTools,
+    ...previewConfirmationTools
   ];
 }
 
@@ -103,10 +106,17 @@ export async function handleToolCall(name: string, args: any, workspaceManager?:
   const { smartGitTools } = await import('./smart-git-tool-definitions.js');
   const { gitPreferenceTools } = await import('./git-preference-tool.js');
   
-  // Load quality gate, GitHub template, and cross-repo coordination tools
+  // Load quality gate, GitHub template, cross-repo coordination, and preview confirmation tools
   const { qualityGateTools } = await import('./quality-gate-tools.js');
   const { githubIssueTemplateTools } = await import('./github-issue-templates.js');
   const { crossRepoCoordinationTools } = await import('./cross-repo-coordination-tools.js');
+  const { previewConfirmationTools } = await import('./preview-confirmation.js');
+
+  // Preview confirmation tools (check first for preview workflow features)
+  if (previewConfirmationTools.find((tool: any) => tool.name === name)) {
+    const { handlePreviewConfirmation } = await import('./preview-confirmation.js');
+    return handlePreviewConfirmation(name, args);
+  }
 
   // Cross-repository coordination tools (check first for multi-repo workflow features)
   if (crossRepoCoordinationTools.find((tool: any) => tool.name === name)) {
