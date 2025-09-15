@@ -217,6 +217,142 @@ async function executeConfirmedOperation(pendingOp: PendingOperation): Promise<a
       };
     }
 
+    case "github:AddComment": {
+      // Delegate to Claude Code's GitHub MCP
+      const { owner, repo, issue_number, body } = pendingOp.originalArgs;
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: `🔄 **Delegating to GitHub MCP**\n\nExecuting: \`mcp__github__add_issue_comment\`\n- **Repository**: ${owner}/${repo}\n- **Issue**: #${issue_number}\n- **Comment**: ${body.substring(0, 100)}${body.length > 100 ? '...' : ''}`
+          }
+        ],
+        meta: {
+          delegation: {
+            tool: "mcp__github__add_issue_comment",
+            parameters: {
+              owner,
+              repo,
+              issue_number,
+              body
+            }
+          }
+        }
+      };
+    }
+
+    case "github:CreatePR": {
+      // Delegate to Claude Code's GitHub MCP for PR creation
+      const { owner, repo, title, head, base, body, draft } = pendingOp.originalArgs;
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: `🔄 **Delegating to GitHub MCP**\n\nExecuting: \`mcp__github__create_pull_request\`\n- **Repository**: ${owner}/${repo}\n- **Title**: ${title}\n- **Branch**: ${head} → ${base}\n- **Draft**: ${draft ? 'Yes' : 'No'}`
+          }
+        ],
+        meta: {
+          delegation: {
+            tool: "mcp__github__create_pull_request",
+            parameters: {
+              owner,
+              repo,
+              title,
+              head,
+              base,
+              body,
+              draft
+            }
+          }
+        }
+      };
+    }
+
+    case "github:CreateIssue": {
+      // Delegate to Claude Code's GitHub MCP for issue creation
+      const { owner, repo, title, body, labels, assignees } = pendingOp.originalArgs;
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: `🔄 **Delegating to GitHub MCP**\n\nExecuting: \`mcp__github__create_issue\`\n- **Repository**: ${owner}/${repo}\n- **Title**: ${title}\n- **Labels**: ${labels?.join(', ') || 'None'}\n- **Assignees**: ${assignees?.join(', ') || 'None'}`
+          }
+        ],
+        meta: {
+          delegation: {
+            tool: "mcp__github__create_issue",
+            parameters: {
+              owner,
+              repo,
+              title,
+              body,
+              labels,
+              assignees
+            }
+          }
+        }
+      };
+    }
+
+    case "github:UpdateIssue": {
+      // Delegate to Claude Code's GitHub MCP for issue updates
+      const { owner, repo, issue_number, title, body, state, labels } = pendingOp.originalArgs;
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: `🔄 **Delegating to GitHub MCP**\n\nExecuting: \`mcp__github__update_issue\`\n- **Repository**: ${owner}/${repo}\n- **Issue**: #${issue_number}\n- **Title**: ${title || 'No change'}\n- **State**: ${state || 'No change'}\n- **Labels**: ${labels?.join(', ') || 'No change'}`
+          }
+        ],
+        meta: {
+          delegation: {
+            tool: "mcp__github__update_issue",
+            parameters: {
+              owner,
+              repo,
+              issue_number,
+              title,
+              body,
+              state,
+              labels
+            }
+          }
+        }
+      };
+    }
+
+    case "github:UpdatePR": {
+      // Delegate to Claude Code's GitHub MCP for PR updates
+      const { owner, repo, pullNumber, title, body, state, draft } = pendingOp.originalArgs;
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: `🔄 **Delegating to GitHub MCP**\n\nExecuting: \`mcp__github__update_pull_request\`\n- **Repository**: ${owner}/${repo}\n- **PR**: #${pullNumber}\n- **Title**: ${title || 'No change'}\n- **State**: ${state || 'No change'}\n- **Draft**: ${draft !== undefined ? (draft ? 'Yes' : 'No') : 'No change'}`
+          }
+        ],
+        meta: {
+          delegation: {
+            tool: "mcp__github__update_pull_request",
+            parameters: {
+              owner,
+              repo,
+              pullNumber,
+              title,
+              body,
+              state,
+              draft
+            }
+          }
+        }
+      };
+    }
+
     default:
       throw new Error(`Unsupported tool for execution: ${pendingOp.toolName}`);
   }
