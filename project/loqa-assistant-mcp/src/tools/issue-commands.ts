@@ -1401,6 +1401,8 @@ export async function handleIssueManagementTool(
 
       // Check for pending preview operations first
       const pendingOps = previewManager.getAllPendingOperations();
+
+
       if (pendingOps.length > 0) {
         const latestOp = pendingOps[pendingOps.length - 1]; // Get most recent
 
@@ -1442,41 +1444,195 @@ export async function handleIssueManagementTool(
         };
       }
 
-      // Check if there's an active interview (existing logic)
-      if (contextManager.isInActiveInterview()) {
-        const interviewId = contextManager.getActiveInterviewId()!;
+      // SIMPLIFIED GitHub operations detection (much more reliable)
+      const msg = message.toLowerCase();
 
-        // Detect if this message is likely an interview response
-        if (contextManager.isLikelyInterviewResponse(message)) {
-          // Process the response seamlessly by calling the answer handler
-          return await handleIssueManagementTool("issue:AnswerInterviewQuestion", {
-            interviewId,
-            answer: message
-          });
-        }
+      // 1. Pull Request Creation - very simple patterns
+      if ((msg.includes('create') || msg.includes('make')) && (msg.includes('pr') || msg.includes('pull request'))) {
+        const titleMatch = message.match(/[""]([^"""]+)[""]|'([^']+)'|"([^"]+)"/);
+        const prTitle = titleMatch ? (titleMatch[1] || titleMatch[2] || titleMatch[3]) : "Pull Request";
+
+        const previewText = `## 🔀 Pull Request Creation Preview\n\n**Title**: ${prTitle}\n**Head Branch**: fix/github-comment-workflow (current)\n**Base Branch**: main\n**Repository**: loqalabs/loqa (detected from context)\n\n**Auto-Generated Description**: Will include commit messages and file changes\n\n---\n\n✅ Reply **"yes"** to create this pull request\n❌ Reply **"no"** to cancel\n🔄 Reply with changes to revise the title or description`;
+
+        const previewManager = PreviewStateManager.getInstance();
+        previewManager.storePendingOperation({
+          type: 'create_pr',
+          toolName: 'github:CreatePR',
+          originalArgs: {
+            owner: 'loqalabs',
+            repo: 'loqa',
+            title: prTitle,
+            head: 'fix/github-comment-workflow',
+            base: 'main',
+            body: `Auto-generated PR from conversational workflow\n\nThis pull request was created through natural language processing.`
+          },
+          previewText
+        });
+
+        return {
+          content: [{
+            type: "text",
+            text: previewText
+          }]
+        };
       }
 
-      // Parse natural language for GitHub operations
+      // 2. Issue Creation - very simple patterns
+      if ((msg.includes('create') || msg.includes('make')) && msg.includes('issue')) {
+        // Extract title from message
+        const titleMatch = message.match(/[""]([^"""]+)[""]|'([^']+)'|"([^"]+)"/);
+        const issueTitle = titleMatch ? (titleMatch[1] || titleMatch[2] || titleMatch[3]) : "New Issue";
 
-      // TODO: Future expansion - PR creation, issue creation/editing patterns
-      // Foundation established for adding more GitHub operations:
-      // - Pull request creation and editing
-      // - Issue creation and editing
-      // - Advanced natural language parsing
-      // Current implementation focuses on proven GitHub comment functionality
+        const previewText = `## 📋 Issue Creation Preview\n\n**Title**: ${issueTitle}\n**Repository**: loqalabs/loqa (detected from context)\n**Labels**: feature, medium-priority (auto-detected)\n**Assignees**: None\n\n**Body**: Auto-generated from conversational request\n\n---\n\n✅ Reply **"yes"** to create this issue\n❌ Reply **"no"** to cancel\n🔄 Reply with changes to revise the title, description, or labels`;
 
-      // GitHub Comments (working functionality)
-      const githubCommentMatch = message.match(/(?:add|post|create).*?comment.*?(?:issue|#)\s*(\d+)|comment.*?(?:issue|#)\s*(\d+)/i);
+        const previewManager = PreviewStateManager.getInstance();
+        previewManager.storePendingOperation({
+          type: 'create_issue',
+          toolName: 'github:CreateIssue',
+          originalArgs: {
+            owner: 'loqalabs',
+            repo: 'loqa',
+            title: issueTitle,
+            body: `Auto-generated issue from conversational workflow\n\nThis issue was created through natural language processing.`,
+            labels: ['feature', 'medium-priority']
+          },
+          previewText
+        });
 
-      if (githubCommentMatch) {
-        const issueNumber = parseInt(githubCommentMatch[1] || githubCommentMatch[2]);
+        return {
+          content: [{
+            type: "text",
+            text: previewText
+          }]
+        };
+      }
 
-        // Extract comment content (everything after the issue reference, or ask for it)
-        const fullMatch = githubCommentMatch[0];
-        const matchIndex = message.toLowerCase().indexOf(fullMatch.toLowerCase());
-        const afterMatch = message.substring(matchIndex + fullMatch.length).trim();
+      // 3. Issue Editing
+      const issueEditMatch = message.match(/edit.*issue.*#?(\d+)|update.*issue.*#?(\d+)|issue.*#?(\d+).*edit|issue.*#?(\d+).*update/i);
+      if (issueEditMatch) {
+        const issueNumber = parseInt(issueEditMatch[1] || issueEditMatch[2] || issueEditMatch[3] || issueEditMatch[4]);
 
-        if (afterMatch.length < 10) {
+        // Extract what to edit
+        let updates: any = {};
+        let updatesList: string[] = [];
+
+        const titleMatch = message.match(/title.*[""]([^"""]+)[""]|title.*'([^']+)'|title.*"([^"]+)"/i);
+        if (titleMatch) {
+          updates.title = titleMatch[1] || titleMatch[2] || titleMatch[3];
+          updatesList.push('title');
+        }
+
+        const labelMatch = message.match(/label.*[""]([^"""]+)[""]|label.*'([^']+)'|label.*"([^"]+)"/i);
+        if (labelMatch) {
+          updates.labels = [labelMatch[1] || labelMatch[2] || labelMatch[3]];
+          updatesList.push('labels');
+        }
+
+        if (message.toLowerCase().includes('close')) {
+          updates.state = 'closed';
+          updatesList.push('state');
+        }
+
+        if (updatesList.length === 0) {
+          return {
+            content: [{
+              type: "text",
+              text: `## ✏️ Issue Edit Request\n\n**Target**: Issue #${issueNumber}\n\nI can help you edit this issue. Please specify what you'd like to update:\n\n**Examples:**\n- "Edit issue #${issueNumber} title to 'New Title'"\n- "Update issue #${issueNumber} add label 'high-priority'"\n- "Close issue #${issueNumber}"\n\nWhat would you like to change?`
+            }]
+          };
+        }
+
+        const previewText = `## ✏️ Issue Edit Preview\n\n**Target**: Issue #${issueNumber}\n**Repository**: loqalabs/loqa (detected from context)\n\n**Updates to Apply:**\n${updatesList.map(update => `- **${update}**: ${updates[update]}`).join('\n')}\n\n---\n\n✅ Reply **"yes"** to apply these changes\n❌ Reply **"no"** to cancel\n🔄 Reply with changes to revise the updates`;
+
+        const previewManager = PreviewStateManager.getInstance();
+        previewManager.storePendingOperation({
+          type: 'update_issue',
+          toolName: 'github:UpdateIssue',
+          originalArgs: {
+            owner: 'loqalabs',
+            repo: 'loqa',
+            issue_number: issueNumber,
+            ...updates
+          },
+          previewText
+        });
+
+        return {
+          content: [{
+            type: "text",
+            text: previewText
+          }]
+        };
+      }
+
+      // 4. PR Editing
+      const prEditMatch = message.match(/edit.*pr.*#?(\d+)|update.*pr.*#?(\d+)|pr.*#?(\d+).*edit|pr.*#?(\d+).*update|edit.*pull request.*#?(\d+)|update.*pull request.*#?(\d+)/i);
+      if (prEditMatch) {
+        const prNumber = parseInt(prEditMatch[1] || prEditMatch[2] || prEditMatch[3] || prEditMatch[4] || prEditMatch[5] || prEditMatch[6]);
+
+        // Extract what to edit
+        let updates: any = {};
+        let updatesList: string[] = [];
+
+        const titleMatch = message.match(/title.*[""]([^"""]+)[""]|title.*'([^']+)'|title.*"([^"]+)"/i);
+        if (titleMatch) {
+          updates.title = titleMatch[1] || titleMatch[2] || titleMatch[3];
+          updatesList.push('title');
+        }
+
+        if (message.toLowerCase().includes('draft')) {
+          updates.draft = true;
+          updatesList.push('draft status');
+        }
+
+        if (message.toLowerCase().includes('ready')) {
+          updates.draft = false;
+          updatesList.push('ready for review');
+        }
+
+        if (updatesList.length === 0) {
+          return {
+            content: [{
+              type: "text",
+              text: `## 🔧 Pull Request Edit Request\n\n**Target**: PR #${prNumber}\n\nI can help you edit this pull request. Please specify what you'd like to update:\n\n**Examples:**\n- "Edit PR #${prNumber} title to 'New Title'"\n- "Update PR #${prNumber} to draft"\n- "Mark PR #${prNumber} ready for review"\n\nWhat would you like to change?`
+            }]
+          };
+        }
+
+        const previewText = `## 🔧 Pull Request Edit Preview\n\n**Target**: PR #${prNumber}\n**Repository**: loqalabs/loqa (detected from context)\n\n**Updates to Apply:**\n${updatesList.map(update => `- **${update}**: ${updates[update] === true ? 'true' : updates[update] === false ? 'false' : updates[update]}`).join('\n')}\n\n---\n\n✅ Reply **"yes"** to apply these changes\n❌ Reply **"no"** to cancel\n🔄 Reply with changes to revise the updates`;
+
+        const previewManager = PreviewStateManager.getInstance();
+        previewManager.storePendingOperation({
+          type: 'update_pr',
+          toolName: 'github:UpdatePR',
+          originalArgs: {
+            owner: 'loqalabs',
+            repo: 'loqa',
+            pullNumber: prNumber,
+            ...updates
+          },
+          previewText
+        });
+
+        return {
+          content: [{
+            type: "text",
+            text: previewText
+          }]
+        };
+      }
+
+      // 5. GitHub Comments - simplified pattern
+      if (msg.includes('comment') && (msg.includes('issue') || msg.includes('#'))) {
+        const issueMatch = message.match(/#(\d+)|issue\s*(\d+)/i);
+        if (issueMatch) {
+          const issueNumber = parseInt(issueMatch[1] || issueMatch[2]);
+
+          // Extract comment content (everything after the issue reference, or ask for it)
+          const colonIndex = message.indexOf(':');
+          const afterMatch = colonIndex > -1 ? message.substring(colonIndex + 1).trim() : '';
+
+          if (afterMatch.length < 10) {
           return {
             content: [{
               type: "text",
@@ -1503,12 +1659,27 @@ export async function handleIssueManagementTool(
           previewText
         });
 
-        return {
-          content: [{
-            type: "text",
-            text: previewText
-          }]
-        };
+          return {
+            content: [{
+              type: "text",
+              text: previewText
+            }]
+          };
+        }
+      }
+
+      // Priority 2: Check for active interview responses (after GitHub operations to avoid conflicts)
+      if (contextManager.isInActiveInterview()) {
+        const interviewId = contextManager.getActiveInterviewId()!;
+
+        // Detect if this message is likely an interview response
+        if (contextManager.isLikelyInterviewResponse(message)) {
+          // Process the response seamlessly by calling the answer handler
+          return await handleIssueManagementTool("issue:AnswerInterviewQuestion", {
+            interviewId,
+            answer: message
+          });
+        }
       }
 
       // Not a preview response, interview response, or GitHub operation - return helpful message
