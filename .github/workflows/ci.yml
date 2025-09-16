@@ -19,14 +19,36 @@ jobs:
     with:
       node-version: '20'
 
+  check-docs-changes:
+    name: Check for Documentation Changes
+    runs-on: ubuntu-latest
+    outputs:
+      docs-changed: ${{ steps.changes.outputs.docs }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            docs:
+              - '**/*.md'
+              - '**/*.rst'
+              - '**/*.txt'
+              - 'docs/**'
+
   spell-check:
     name: Spell Check
-    uses: loqalabs/.github/.github/workflows/spell-check.yml@main
+    needs: check-docs-changes
+    if: needs.check-docs-changes.outputs.docs-changed == 'true'
+    uses: loqalabs/.github/.github/workflows/spell-check-fast.yml@main
 
   build-site:
     name: Build Documentation Site
     uses: loqalabs/.github/.github/workflows/mkdocs-build-site.yml@main
     needs: [validate, spell-check]
+    if: always() && needs.validate.result == 'success' && (needs.spell-check.result == 'success' || needs.spell-check.result == 'skipped')
     with:
       artifact-name: documentation-site
 
