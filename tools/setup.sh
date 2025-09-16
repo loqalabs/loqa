@@ -67,49 +67,30 @@ docker-compose pull
 echo "🐳 Starting Loqa services..."
 docker-compose up -d
 
-echo "⏳ Waiting for services to start..."
-sleep 15
+echo "⏳ Waiting for services to be ready..."
+echo "   This may take a few minutes for the LLM model to download and load..."
+echo ""
 
-# Check if services are running
-echo "🔍 Checking service health..."
+# Wait a moment for services to start
+sleep 10
 
-# Function to check HTTP endpoints
-check_endpoint() {
-    local url=$1
-    local service_name=$2
-    
-    if command -v curl &> /dev/null; then
-        if curl -s -f "$url" > /dev/null 2>&1; then
-            echo "✅ $service_name is running"
-        else
-            echo "⚠️  $service_name may still be starting..."
-        fi
-    else
-        echo "ℹ️  $service_name status check skipped (no curl available)"
-    fi
-}
-
-check_endpoint "http://localhost:3000/health" "Hub service"
-check_endpoint "http://localhost:11434/api/tags" "Ollama service"
-check_endpoint "http://localhost:8000/health" "STT service"
-check_endpoint "http://localhost:8880/v1/audio/voices" "TTS service (Kokoro)"
+# Run comprehensive status check
+echo "🔍 Running system readiness check..."
+if ./tools/status.sh; then
+    echo ""
+    echo "🎉 Loqa setup complete and ready!"
+else
+    echo ""
+    echo "⚠️  Setup completed, but some services are still starting."
+    echo "   Run './tools/status.sh' again in a minute to check readiness"
+fi
 
 echo ""
-echo "🎉 Loqa setup complete!"
-echo ""
-echo "Services running:"
-echo "  🧠 Hub API: http://localhost:3000"
-echo "  🕹️  Commander UI: http://localhost:5173"  
-echo "  📡 gRPC Audio: localhost:50051"
-echo "  🤖 Ollama: http://localhost:11434"
-echo "  📨 NATS: localhost:4222"
-echo ""
-echo "Next steps:"
-echo "  📱 Open the Commander UI to see your voice assistant in action"
-echo "  🎙️  Use a test relay to send voice commands (requires audio setup)"
-echo ""
-echo "To stop services:"
-echo "  docker-compose down"
+echo "📖 Quick reference:"
+echo "  • Check system status: ./tools/status.sh"
+echo "  • Commander UI: http://localhost:5173"
+echo "  • Check logs: docker-compose logs -f"
+echo "  • Stop services: docker-compose down"
 echo ""
 echo "For development setup with source code:"
 echo "  Use: docker-compose -f docker-compose.dev.yml up -d"

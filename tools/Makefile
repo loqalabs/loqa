@@ -1,4 +1,4 @@
-.PHONY: help setup setup-dev build start start-dev stop clean test proto dev logs
+.PHONY: help setup setup-dev build start start-dev stop clean test proto dev logs status
 
 # Default target
 help:
@@ -15,6 +15,7 @@ help:
 	@echo "  proto     - Regenerate protocol buffers"
 	@echo "  dev       - Start development environment"
 	@echo "  logs      - View service logs"
+	@echo "  status    - Check system readiness and health"
 
 setup:
 	@echo "🦜 5-minute Loqa setup with pre-built images..."
@@ -75,6 +76,10 @@ dev: start
 logs:
 	@echo "📊 Showing service logs..."
 	cd .. && docker-compose logs -f
+
+status:
+	@echo "🔍 Checking Loqa system status..."
+	cd .. && ./tools/status.sh
 
 # Individual service commands
 start-hub:
