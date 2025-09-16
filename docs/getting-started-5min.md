@@ -61,7 +61,7 @@ docker logs loqa-mock-relay
 Use the automated voice testing script:
 
 ```bash
-curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/test-voice.sh?$(date +%s)" | bash
+curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/tools/test-voice.sh?$(date +%s)" | bash
 ```
 
 The script will:
