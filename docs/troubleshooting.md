@@ -113,13 +113,13 @@ sudo kill -9 <PID>
 **Solutions:**
 ```bash
 # Manual model download
-docker exec -it loqa-ollama ollama pull llama3.2:3b
+docker exec -it ollama ollama pull llama3.2:3b
 
 # Check available space (models are ~2GB)
 df -h
 
 # Try smaller model
-docker exec -it loqa-ollama ollama pull llama3.2:1b
+docker exec -it ollama ollama pull llama3.2:1b
 
 # Check Ollama logs
 docker-compose logs ollama
@@ -138,7 +138,7 @@ docker-compose logs ollama
 **Optimization:**
 ```bash
 # Monitor resource usage
-docker stats loqa-ollama
+docker stats ollama
 
 # Use CPU optimization flags
 export OLLAMA_NUM_THREAD=8  # Match your CPU cores

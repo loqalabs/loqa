@@ -57,8 +57,9 @@ PROJECT_NAME=$(basename "$(pwd)")
 
 # Create volumes that Docker Compose will use (prevents warning messages)
 docker volume create "${PROJECT_NAME}_ollama-data" >/dev/null 2>&1 || true
-docker volume create "${PROJECT_NAME}_hub-data" >/dev/null 2>&1 || true  
+docker volume create "${PROJECT_NAME}_hub-data" >/dev/null 2>&1 || true
 docker volume create "${PROJECT_NAME}_stt-cache" >/dev/null 2>&1 || true
+docker volume create "${PROJECT_NAME}_tts-cache" >/dev/null 2>&1 || true
 
 echo "📥 Pulling latest Docker images..."
 docker-compose pull
@@ -90,6 +91,8 @@ check_endpoint() {
 
 check_endpoint "http://localhost:3000/health" "Hub service"
 check_endpoint "http://localhost:11434/api/tags" "Ollama service"
+check_endpoint "http://localhost:8000/health" "STT service"
+check_endpoint "http://localhost:8880/v1/audio/voices" "TTS service (Kokoro)"
 
 echo ""
 echo "🎉 Loqa setup complete!"

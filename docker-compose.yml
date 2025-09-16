@@ -2,7 +2,7 @@ services:
   # NATS Message Bus
   nats:
     image: nats:2.10-alpine
-    container_name: loqa-nats
+    container_name: nats
     ports:
       - "4222:4222"
       - "8222:8222"
@@ -18,7 +18,7 @@ services:
   # Ollama LLM Service
   ollama:
     image: ollama/ollama:latest
-    container_name: loqa-ollama
+    container_name: ollama
     ports:
       - "11434:11434"
     volumes:
@@ -43,7 +43,7 @@ services:
   # Speech-to-Text Service (OpenAI-compatible API)
   stt:
     image: fedirz/faster-whisper-server:latest-cpu
-    container_name: loqa-stt
+    container_name: stt
     ports:
       - "8000:8000"
     environment:
@@ -60,10 +60,10 @@ services:
       retries: 3
       start_period: 30s
 
-  # Text-to-Speech Service (Kokoro-82M)
-  tts:
+  # Text-to-Speech Service (Kokoro-82M GPU)
+  tts-gpu:
     image: ghcr.io/remsky/kokoro-fastapi-gpu:latest
-    container_name: loqa-tts-kokoro
+    container_name: tts-gpu
     ports:
       - "8880:8880"
     environment:
@@ -91,10 +91,10 @@ services:
     profiles:
       - gpu  # Only start with GPU profile
 
-  # CPU-only TTS fallback (for development without GPU)
-  tts-cpu:
+  # CPU-only TTS service (default for 5-minute setup)
+  tts:
     image: ghcr.io/remsky/kokoro-fastapi-cpu:latest
-    container_name: loqa-tts-kokoro-cpu
+    container_name: tts
     ports:
       - "8880:8880"
     volumes:
@@ -113,13 +113,12 @@ services:
       timeout: 10s
       retries: 3
       start_period: 45s
-    profiles:
-      - cpu-dev  # For development without GPU
+    # No profile - runs by default for 5-minute setup compatibility
 
   # Loqa Hub - Central orchestrator
   hub:
     image: loqalabs/loqa-hub:latest
-    container_name: loqa-hub
+    container_name: hub
     ports:
       - "3000:3000"
       - "50051:50051"
@@ -156,6 +155,8 @@ services:
         condition: service_healthy
       stt:
         condition: service_healthy
+      tts:
+        condition: service_healthy
     volumes:
       - hub-data:/app/data
     networks:
@@ -169,7 +170,7 @@ services:
   # Commander Administrative Dashboard
   commander:
     image: loqalabs/loqa-commander:latest
-    container_name: loqa-commander
+    container_name: commander
     ports:
       - "5173:80"
     environment:
@@ -184,7 +185,7 @@ services:
   # For real voice testing, run the test relay directly on the host
   test-relay:
     image: loqalabs/loqa-mock-relay:latest
-    container_name: loqa-mock-relay
+    container_name: test-relay
     environment:
       - HUB_ADDRESS=hub:50051
       - RELAY_ID=docker-mock-relay

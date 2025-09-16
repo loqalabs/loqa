@@ -2,7 +2,7 @@ services:
   # NATS Message Bus
   nats:
     image: nats:2.10-alpine
-    container_name: loqa-nats
+    container_name: nats
     ports:
       - "4222:4222"
       - "8222:8222"
@@ -18,7 +18,7 @@ services:
   # Ollama LLM Service
   ollama:
     image: ollama/ollama:latest
-    container_name: loqa-ollama
+    container_name: ollama
     ports:
       - "11434:11434"
     volumes:
@@ -43,7 +43,7 @@ services:
   # STT Service
   stt:
     image: fedirz/faster-whisper-server:latest-cpu
-    container_name: loqa-stt
+    container_name: stt
     ports:
       - "8000:8000"
     volumes:
@@ -61,7 +61,7 @@ services:
   # TTS Service (CPU version for development)
   tts:
     image: ghcr.io/remsky/kokoro-fastapi-cpu:latest
-    container_name: loqa-tts-kokoro-dev
+    container_name: tts
     ports:
       - "8880:8880"
     volumes:
@@ -80,7 +80,7 @@ services:
     build:
       context: ..
       dockerfile: loqa-hub/Dockerfile
-    container_name: loqa-hub
+    container_name: hub
     ports:
       - "3000:3000"
       - "50051:50051"
@@ -110,6 +110,8 @@ services:
         condition: service_healthy
       stt:
         condition: service_healthy
+      tts:
+        condition: service_healthy
     volumes:
       - hub-data:/app/data
     networks:
@@ -125,7 +127,7 @@ services:
     build:
       context: ../loqa-commander
       dockerfile: Dockerfile
-    container_name: loqa-commander
+    container_name: commander
     ports:
       - "5173:80"
     environment:
@@ -141,7 +143,7 @@ services:
     build:
       context: ..
       dockerfile: loqa-relay/Dockerfile
-    container_name: loqa-mock-relay
+    container_name: test-relay
     environment:
       - HUB_ADDRESS=hub:50051
       - RELAY_ID=docker-test-relay
