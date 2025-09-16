@@ -13,6 +13,11 @@ import {
   formatIssueCreationPreview,
   formatCommentCreationPreview,
 } from "../utils/preview-formatter.js";
+import {
+  isGitHubOperationAllowed,
+  generateRedirectMessage,
+  isMultiRepoWorkspace
+} from "../config/github-conversational-config.js";
 
 // Interview system imports
 import { TaskCreationInterviewer } from "../utils/task-creation-interviewer.js";
@@ -1437,8 +1442,23 @@ export async function handleIssueManagementTool(
       // SIMPLIFIED GitHub operations detection (much more reliable)
       const msg = message.toLowerCase();
 
+      // Check if GitHub conversational operations are disabled
+      const isMultiRepo = isMultiRepoWorkspace(workspaceRoot);
+
       // 1. Pull Request Creation - very simple patterns
       if ((msg.includes('create') || msg.includes('make')) && (msg.includes('pr') || msg.includes('pull request'))) {
+        // Check if operation is allowed
+        if (!isGitHubOperationAllowed('create_pr')) {
+          const titleMatch = message.match(/[""]([^"""]+)[""]|'([^']+)'|"([^"]+)"/);
+          const prTitle = titleMatch ? (titleMatch[1] || titleMatch[2] || titleMatch[3]) : "Pull Request";
+
+          return {
+            content: [{
+              type: "text",
+              text: generateRedirectMessage('create_pr', { title: prTitle })
+            }]
+          };
+        }
         const titleMatch = message.match(/[""]([^"""]+)[""]|'([^']+)'|"([^"]+)"/);
         const prTitle = titleMatch ? (titleMatch[1] || titleMatch[2] || titleMatch[3]) : "Pull Request";
 
@@ -1469,6 +1489,18 @@ export async function handleIssueManagementTool(
 
       // 2. Issue Creation - very simple patterns
       if ((msg.includes('create') || msg.includes('make')) && msg.includes('issue')) {
+        // Check if operation is allowed
+        if (!isGitHubOperationAllowed('create_issue')) {
+          const titleMatch = message.match(/[""]([^"""]+)[""]|'([^']+)'|"([^"]+)"/);
+          const issueTitle = titleMatch ? (titleMatch[1] || titleMatch[2] || titleMatch[3]) : "New Issue";
+
+          return {
+            content: [{
+              type: "text",
+              text: generateRedirectMessage('create_issue', { title: issueTitle })
+            }]
+          };
+        }
         // Extract title from message
         const titleMatch = message.match(/[""]([^"""]+)[""]|'([^']+)'|"([^"]+)"/);
         const issueTitle = titleMatch ? (titleMatch[1] || titleMatch[2] || titleMatch[3]) : "New Issue";
@@ -1500,6 +1532,17 @@ export async function handleIssueManagementTool(
       // 3. Issue Editing
       const issueEditMatch = message.match(/edit.*issue.*#?(\d+)|update.*issue.*#?(\d+)|issue.*#?(\d+).*edit|issue.*#?(\d+).*update/i);
       if (issueEditMatch) {
+        // Check if operation is allowed
+        if (!isGitHubOperationAllowed('update_issue')) {
+          const issueNumber = parseInt(issueEditMatch[1] || issueEditMatch[2] || issueEditMatch[3] || issueEditMatch[4]);
+
+          return {
+            content: [{
+              type: "text",
+              text: generateRedirectMessage('update_issue', { issueNumber })
+            }]
+          };
+        }
         const issueNumber = parseInt(issueEditMatch[1] || issueEditMatch[2] || issueEditMatch[3] || issueEditMatch[4]);
 
         // Extract what to edit
@@ -1614,6 +1657,18 @@ export async function handleIssueManagementTool(
 
       // 5. GitHub Comments - simplified pattern
       if (msg.includes('comment') && (msg.includes('issue') || msg.includes('#'))) {
+        // Check if operation is allowed
+        if (!isGitHubOperationAllowed('add_comment')) {
+          const issueMatch = message.match(/#(\d+)|issue\s*(\d+)/i);
+          const issueNumber = issueMatch ? parseInt(issueMatch[1] || issueMatch[2]) : 0;
+
+          return {
+            content: [{
+              type: "text",
+              text: generateRedirectMessage('add_comment', { issueNumber })
+            }]
+          };
+        }
         const issueMatch = message.match(/#(\d+)|issue\s*(\d+)/i);
         if (issueMatch) {
           const issueNumber = parseInt(issueMatch[1] || issueMatch[2]);
