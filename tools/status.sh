@@ -123,28 +123,50 @@ echo ""
 echo "📊 System Readiness Summary:"
 echo "=============================="
 
-if [ $services_ready -eq $total_services ] && [ $pipeline_ready -eq $total_pipeline ]; then
+# Check if core voice services are ready (excluding Commander UI which is optional for voice functionality)
+core_services_ready=0
+total_core_services=5  # Exclude Commander UI
+
+check_service_health "NATS Message Bus" "nats" >/dev/null && ((core_services_ready++))
+check_service_health "Ollama LLM" "ollama" >/dev/null && ((core_services_ready++)) ||
+    # Ollama doesn't have health check, but if it's running, count it
+    (docker ps --format "table {{.Names}}\t{{.Status}}" | grep -q "ollama.*Up" && ((core_services_ready++)))
+check_service_health "Speech-to-Text" "stt" >/dev/null && ((core_services_ready++))
+check_service_health "Text-to-Speech" "tts" >/dev/null && ((core_services_ready++))
+check_service_health "Hub Service" "hub" >/dev/null && ((core_services_ready++))
+
+if [ $pipeline_ready -eq $total_pipeline ] && [ $core_services_ready -ge 4 ]; then
     echo -e "${READY} ${GREEN}System is READY for voice commands!${NC}"
-    echo -e "   ${SUCCESS} All services healthy ($services_ready/$total_services)"
+    echo -e "   ${SUCCESS} Core services operational ($core_services_ready/$total_core_services)"
     echo -e "   ${SUCCESS} Voice pipeline operational ($pipeline_ready/$total_pipeline)"
+    if [ $services_ready -lt $total_services ]; then
+        echo -e "   ${WARNING} Commander UI offline (voice commands still work)"
+    fi
     echo ""
     echo -e "${BLUE}🎤 To test voice commands:${NC}"
     echo -e "   ${BLUE}cd loqa-relay/test-go && go run ./cmd -hub localhost:50051${NC}"
     echo -e "   ${BLUE}Say: \"Hey Loqa, turn on the kitchen lights\"${NC}"
     exit 0
-elif [ $services_ready -eq $total_services ]; then
+elif [ $pipeline_ready -eq $total_pipeline ]; then
+    echo -e "${WARNING} ${YELLOW}Voice pipeline ready, but core services need attention...${NC}"
+    echo -e "   ${WARNING} Core services: ($core_services_ready/$total_core_services) ready"
+    echo -e "   ${SUCCESS} Voice pipeline: ($pipeline_ready/$total_pipeline) ready"
+    echo ""
+    echo -e "${YELLOW}🔧 Check service logs: docker-compose logs${NC}"
+    exit 1
+elif [ $core_services_ready -ge 4 ]; then
     echo -e "${WARNING} ${YELLOW}Services ready, but pipeline initializing...${NC}"
-    echo -e "   ${SUCCESS} All services healthy ($services_ready/$total_services)"
+    echo -e "   ${SUCCESS} Core services operational ($core_services_ready/$total_core_services)"
     echo -e "   ${WARNING} Voice pipeline: ($pipeline_ready/$total_pipeline) ready"
     echo ""
     echo -e "${YELLOW}💡 Wait a moment for LLM model to fully load, then try again${NC}"
     exit 1
 else
     echo -e "${ERROR} ${RED}System NOT ready${NC}"
-    echo -e "   ${WARNING} Services: ($services_ready/$total_services) healthy"
+    echo -e "   ${WARNING} Core services: ($core_services_ready/$total_core_services) ready"
     echo -e "   ${WARNING} Voice pipeline: ($pipeline_ready/$total_pipeline) ready"
     echo ""
     echo -e "${YELLOW}🔧 Run: docker-compose up -d${NC}"
-    echo -e "${YELLOW}⏳ Then wait for all services to become healthy${NC}"
+    echo -e "${YELLOW}⏳ Then wait for services to become healthy${NC}"
     exit 1
 fi
