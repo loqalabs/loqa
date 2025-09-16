@@ -1425,21 +1425,11 @@ export async function handleIssueManagementTool(
           });
         }
 
-        // If it's not a simple yes/no, treat it as revision input
-        if (message.length > 10) { // Reasonable threshold for revision input
-          const { handlePreviewConfirmation } = await import('./preview-confirmation.js');
-          return await handlePreviewConfirmation("preview:ConfirmOrRevise", {
-            operationId: latestOp.id,
-            action: "revise",
-            revisionInput: message
-          });
-        }
-
-        // Unclear response with pending operation
+        // For anything else with pending operation, ask for clarification
         return {
           content: [{
             type: "text",
-            text: `🤔 **I didn't understand your response**: "${message}"\n\n**You have a pending operation**: ${latestOp.type.replace('_', ' ')}\n\n✅ Say **"yes"** or **"confirm"** to proceed\n❌ Say **"no"** or **"cancel"** to abort\n🔄 Provide **additional details** to revise the operation\n\n**Operation ID**: \`${latestOp.id}\``
+            text: `🤔 **Please clarify your response**: "${message}"\n\n**You have a pending operation**: ${latestOp.type.replace('_', ' ')}\n\n✅ Say **"yes"** or **"confirm"** to proceed\n❌ Say **"no"** or **"cancel"** to abort\n\n**Operation ID**: \`${latestOp.id}\`\n\n*Clear responses help avoid processing loops.*`
           }]
         };
       }
