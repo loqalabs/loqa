@@ -1682,7 +1682,37 @@ export async function handleIssueManagementTool(
         }
       }
 
-      // Not a preview response, interview response, or GitHub operation - return helpful message
+      // Priority 3: Check for read/view operations before defaulting to issue creation suggestions
+      const readOperationPatterns = [
+        /show\s+(me\s+)?issue\s*#?\d+/i,
+        /view\s+issue\s*#?\d+/i,
+        /get\s+issue\s*#?\d+/i,
+        /display\s+issue\s*#?\d+/i,
+        /issue\s*#?\d+\s+details/i,
+        /details\s+(for\s+|of\s+)?issue\s*#?\d+/i,
+        /what\s+(is\s+)?issue\s*#?\d+/i,
+        /tell\s+me\s+about\s+issue\s*#?\d+/i,
+        /info\s+(for\s+|about\s+)?issue\s*#?\d+/i,
+      ];
+
+      const isReadOperation = readOperationPatterns.some(pattern => pattern.test(message));
+
+      if (isReadOperation) {
+        const issueMatch = message.match(/#(\d+)|\bissue\s*(\d+)/i);
+        const issueNumber = issueMatch ? (issueMatch[1] || issueMatch[2]) : null;
+
+        return {
+          content: [{
+            type: "text",
+            text: `🔍 **GitHub Issue Read Request Detected**\n\n${issueNumber
+              ? `**Target**: Issue #${issueNumber}\n\n**Note**: This looks like a request to view issue details. For reading GitHub issues, use:\n\n• **GitHub CLI**: \`gh issue view ${issueNumber}\`\n• **GitHub Web**: Browse to the issue in your browser\n• **Direct GitHub MCP tools**: (if available in your Claude Code setup)\n\nThe conversational processing is designed for **creating and managing** new issues, not viewing existing ones.`
+              : `**Note**: This looks like a request to view issue details, but I couldn't detect the issue number. Please specify the issue number you want to view.\n\n**For viewing existing issues**, use:\n• **GitHub CLI**: \`gh issue view [issue-number]\`\n• **GitHub Web**: Browse directly to the issue`
+            }`
+          }]
+        };
+      }
+
+      // Not a preview response, interview response, GitHub operation, or read operation - return helpful message
       return {
         content: [{
           type: "text",
