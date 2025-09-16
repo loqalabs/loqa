@@ -27,12 +27,7 @@ services:
       - OLLAMA_HOST=0.0.0.0
     networks:
       - loqa-network
-    healthcheck:
-      test: ["CMD", "sh", "-c", "ollama list | grep -q 'llama3.2:3b' && curl -f http://localhost:11434/api/generate -X POST -H 'Content-Type: application/json' -d '{\"model\":\"llama3.2:3b\",\"prompt\":\"test\",\"stream\":false}' --max-time 5 --silent --output /dev/null"]
-      interval: 30s
-      timeout: 15s
-      retries: 5
-      start_period: 120s  # Allow time for model download
+    # Health check handled by status script for better model availability testing
     # Pull model on startup
     entrypoint: ["/bin/sh", "-c"]
     command: >
@@ -153,7 +148,7 @@ services:
       nats:
         condition: service_healthy
       ollama:
-        condition: service_healthy
+        condition: service_started  # Start after Ollama starts, status script will verify model readiness
       stt:
         condition: service_healthy
       tts:
