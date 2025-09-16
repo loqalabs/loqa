@@ -18,7 +18,7 @@ docker --version && docker-compose --version
 **Just copy and paste this single command:**
 
 ```bash
-curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/setup.sh?$(date +%s)" | bash
+curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/tools/setup.sh?$(date +%s)" | bash
 ```
 
 That's it! This command:
@@ -93,9 +93,11 @@ go run ./cmd -hub localhost:50051
 1. 🎤 See "Voice detected!" in the terminal when you speak
 2. 📝 Watch speech-to-text conversion in real-time
 3. 🤖 See LLM parse your intent and extract commands
-4. 🔊 **Hear professional TTS voice responses** confirming your commands
-5. 💡 Observe device actions in the service logs
-6. 📊 **Watch events appear instantly in the Timeline UI at http://localhost:5173**
+4. ⚡ **Instant acknowledgment** - Hear immediate voice response (sub-200ms perceived)
+5. 🔊 **Professional TTS responses** - Natural voice confirmations via Kokoro-82M
+6. 🔄 **Async device execution** - Commands execute in background without delays
+7. 💡 Observe device actions in the service logs
+8. 📊 **Watch events appear instantly in the Timeline UI at http://localhost:5173**
 
 ## 🔍 Verify It's Working (1 minute)
 
@@ -133,10 +135,12 @@ nats pub loqa.devices.commands.lights '{
 
 **Complete Voice-to-Response Pipeline:**
 - 🗣️ **Voice Input** → Relay captures audio via microphone
-- 📡 **gRPC Streaming** → Audio sent to Hub service  
+- 📡 **gRPC Streaming** → Audio sent to Hub service
 - 📝 **Speech-to-Text** → OpenAI-compatible STT service converts to text
 - 🧠 **Intent Parsing** → Ollama LLM extracts commands
+- ⚡ **Predictive Response** → Instant acknowledgment (<200ms perceived) decoupled from execution
 - 🔊 **Voice Response** → Kokoro-82M TTS generates natural voice confirmation
+- 🔄 **Async Execution** → Commands execute in background without blocking conversation
 - 💾 **Event Storage** → Hub records structured event data in SQLite
 - 📨 **Message Routing** → NATS delivers to device service
 - 🏠 **Device Control** → Smart home devices respond
@@ -146,7 +150,7 @@ nats pub loqa.devices.commands.lights '{
 - ✅ No cloud services involved
 - ✅ No data leaves your network
 - ✅ Full offline functionality
-- ✅ Sub-2-second response times with professional TTS
+- ✅ Sub-200ms perceived response times with predictive acknowledgments
 - ✅ Complete observability of all voice interactions
 
 ## 🛠️ Next Steps
@@ -198,8 +202,10 @@ You now have a complete local-first voice assistant system running:
 
 **🎤 Voice Processing Stack:**
 - Relay client using your laptop's microphone/speakers
-- Hub service processing speech-to-text, intent parsing, and TTS generation
+- Hub service with predictive response architecture for instant acknowledgments
+- OpenAI-compatible STT service for speech recognition
 - Kokoro-82M TTS service providing professional voice responses
+- Async execution pipeline for non-blocking device control
 - Timeline UI automatically running at http://localhost:5173
 
 **📊 Complete Observability:**
