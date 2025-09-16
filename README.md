@@ -27,7 +27,7 @@ curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/tools/setup.sh?
 
 Then open http://localhost:5173 to see the voice assistant UI
 
-**For voice testing:** Run `curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/test-voice.sh?$(date +%s)" | bash` to test with your microphone, or see the **[5-Minute Setup Guide](./docs/getting-started-5min.md)** for details.
+**For voice testing:** Run `curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/tools/test-voice.sh?$(date +%s)" | bash` to test with your microphone, or see the **[5-Minute Setup Guide](./docs/getting-started-5min.md)** for details.
 
 👉 **Having issues?** Check **[Troubleshooting](./docs/troubleshooting.md)**
 
@@ -102,6 +102,13 @@ Then open http://localhost:5173 to see the voice assistant UI
 - ✅ **Multi-voice Support** - 10+ concurrent voice streams for professional environments
 - ✅ **Provider Flexibility** - Generic TTS interface supporting multiple backends
 - ✅ **GPU/CPU Variants** - Flexible deployment options for different hardware configurations
+
+**Milestone 5: Predictive Response Architecture (NEW):**
+- ✅ **Instant Acknowledgments** - Sub-200ms perceived response time regardless of device speed
+- ✅ **Asynchronous Execution** - Device commands execute in background without blocking conversation
+- ✅ **Smart Status Updates** - Intelligent follow-up strategy based on operation type and device reliability
+- ✅ **Error Recovery** - Graceful corrections when device operations fail after optimistic acknowledgment
+- ✅ **Hybrid Skills Support** - Framework for both Go modules and MCP server skills with unified API
 
 **All repositories now feature:**
 - Automated CI/CD pipelines with status badges

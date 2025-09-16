@@ -18,6 +18,8 @@ Loqa is built from the ground up as a **local-first**, event-driven voice assist
 - Uses OpenAI-compatible STT service for offline transcription
 - Sends text to Ollama (Llama 3.2) for command parsing
 - **NEW**: Integrates Kokoro-82M TTS for professional voice responses
+- **NEW**: Predictive Response Architecture for instant acknowledgments (<200ms perceived)
+- **NEW**: Hybrid Skills System supporting both Go modules and MCP servers
 - Records all voice events in SQLite database for observability
 - Exposes REST API for event access and provides real-time data
 - Publishes parsed commands to NATS message bus
@@ -46,6 +48,15 @@ Loqa is built from the ground up as a **local-first**, event-driven voice assist
 - Shows chronological timeline of all voice interactions
 - Provides detailed event inspection, audio playback, and system insights
 - Auto-refreshes to display new events as they occur
+
+### 🧩 Hybrid Skills System
+- **Go Module Skills**: High-performance compiled plugins with direct integration
+- **MCP Server Skills**: Language-agnostic skills (Python, Node.js, etc.) using Model Context Protocol
+- **Privacy Tier System**: Paranoid (local-only), Balanced (selective network), Convenient (full-featured)
+- **Dynamic Capability Discovery**: Real-time skill capability detection vs static categories
+- **Unified API**: Common interface abstracting implementation type (Go vs MCP)
+- **Security Sandboxing**: Process isolation and resource limits for MCP servers
+- **Vetted Registry**: Community-reviewed skills with transparent privacy metadata
 
 ---
 
@@ -117,12 +128,20 @@ graph TB
 
 ---
 
-## 🚀 Future Expansion
+## 🚀 Implemented & Future Features
 
+**✅ Recently Implemented:**
+- ✅ **Predictive Response Architecture** - Instant acknowledgments with async execution
+- ✅ **Hybrid Skills System** - Support for both Go modules and MCP server skills
+- ✅ **Privacy Tier Framework** - Transparent privacy classification for community skills
+- ✅ **Dynamic Capability Discovery** - Real-time skill capability detection
+- ✅ **Professional TTS** - Enterprise-grade voice synthesis with Kokoro-82M
+
+**🔮 Future Expansion:**
 - Multi-device coordination (room awareness, intercom)
-- Real smart home integrations (HomeKit, Zigbee, MQTT)
 - Contextual memory and task chaining
-- Plugin system for custom skills
+- Community skill marketplace with vetted MCP servers
+- Advanced Home Assistant integration features
 - Optional secure remote access (premium tier)
 
 ---
