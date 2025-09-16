@@ -142,18 +142,47 @@ export class TaskCreationInterviewer {
     const interview = await storage.loadInterview(interviewId);
     if (!interview) return null;
 
-    // Store the answer for the current question
-    const currentQuestion = this.INTERVIEW_QUESTIONS[interview.questionIndex];
-    interview.answers[currentQuestion.id] = answer;
+    // Determine what question we're currently answering
+    let currentQuestionId: string;
+    let isFollowUp = false;
 
-    // Check for follow-up questions
-    const followUps = currentQuestion.followUp ? currentQuestion.followUp(answer) : [];
+    // Check if we're answering a main question or follow-up
+    const mainQuestion = this.INTERVIEW_QUESTIONS[interview.questionIndex];
+    if (interview.currentQuestion === mainQuestion.question) {
+      currentQuestionId = mainQuestion.id;
+    } else {
+      // We're answering a follow-up question - find which one
+      const followUps = mainQuestion.followUp ? mainQuestion.followUp(interview.answers[mainQuestion.id] || '') : [];
+      const followUp = followUps.find(fu => fu.question === interview.currentQuestion);
+      if (followUp) {
+        currentQuestionId = followUp.id;
+        isFollowUp = true;
+      } else {
+        // Fallback - shouldn't happen but handle gracefully
+        currentQuestionId = mainQuestion.id;
+      }
+    }
 
-    // Add follow-up questions to the queue if they don't already exist
-    if (followUps.length > 0) {
+    // Store the answer
+    interview.answers[currentQuestionId] = answer;
+
+    // Handle special field mappings
+    if (currentQuestionId === 'issue_type') {
+      interview.issueType = answer as TaskInterviewState['issueType'];
+    }
+    if (currentQuestionId === 'priority') {
+      interview.priority = answer as TaskInterviewState['priority'];
+    }
+
+    // If this was a main question, check for follow-ups
+    if (!isFollowUp && mainQuestion.followUp) {
+      const followUps = mainQuestion.followUp(answer);
+
+      // Find the first unanswered follow-up question
       for (const followUp of followUps) {
         if (!interview.answers.hasOwnProperty(followUp.id)) {
           interview.currentQuestion = followUp.question;
+          interview.updatedAt = new Date();
           await storage.saveInterview(interview);
           return interview;
         }
@@ -171,6 +200,7 @@ export class TaskCreationInterviewer {
       interview.currentQuestion = nextQuestion.question;
     }
 
+    interview.updatedAt = new Date();
     await storage.saveInterview(interview);
     return interview;
   }
