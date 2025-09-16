@@ -56,10 +56,10 @@ echo "📦 Creating Docker volumes..."
 PROJECT_NAME=$(basename "$(pwd)")
 
 # Create volumes that Docker Compose will use (prevents warning messages)
-docker volume create "${PROJECT_NAME}_ollama-data" >/dev/null 2>&1 || true
-docker volume create "${PROJECT_NAME}_hub-data" >/dev/null 2>&1 || true
-docker volume create "${PROJECT_NAME}_stt-cache" >/dev/null 2>&1 || true
-docker volume create "${PROJECT_NAME}_tts-cache" >/dev/null 2>&1 || true
+docker volume create "loqa_ollama-data" >/dev/null 2>&1 || true
+docker volume create "loqa_hub-data" >/dev/null 2>&1 || true
+docker volume create "loqa_stt-cache" >/dev/null 2>&1 || true
+docker volume create "loqa_tts-cache" >/dev/null 2>&1 || true
 
 echo "📥 Pulling latest Docker images..."
 docker-compose pull

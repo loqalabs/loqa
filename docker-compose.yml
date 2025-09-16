@@ -204,16 +204,16 @@ services:
 volumes:
   ollama-data:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_ollama-data
+    name: loqa_ollama-data
   hub-data:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_hub-data
+    name: loqa_hub-data
   stt-cache:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_stt-cache
+    name: loqa_stt-cache
   tts-cache:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_tts-cache
+    name: loqa_tts-cache
 
 networks:
   loqa-network:
