@@ -28,10 +28,11 @@ services:
     networks:
       - loqa-network
     healthcheck:
-      test: ["CMD", "ollama", "list"]
+      test: ["CMD", "sh", "-c", "ollama list | grep -q 'llama3.2:3b' && curl -f http://localhost:11434/api/generate -X POST -H 'Content-Type: application/json' -d '{\"model\":\"llama3.2:3b\",\"prompt\":\"test\",\"stream\":false}' --max-time 5 --silent --output /dev/null"]
       interval: 30s
-      timeout: 10s
-      retries: 3
+      timeout: 15s
+      retries: 5
+      start_period: 120s  # Allow time for model download
     # Pull model on startup
     entrypoint: ["/bin/sh", "-c"]
     command: >
