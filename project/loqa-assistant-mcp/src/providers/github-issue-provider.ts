@@ -365,13 +365,12 @@ export class GitHubIssueProvider extends IssueProviderBase {
   async listIssues(filters?: IssueFilters): Promise<Issue[]> {
     try {
       const [owner, repo] = this.parseRepository(filters?.repository?.[0]);
-      
+
       if (this.mcpToolCallback) {
         return await this.listIssuesViaMcp(owner, repo, filters);
       }
-      
       return await this.listIssuesViaGhCli(owner, repo, filters);
-      
+
     } catch (error) {
       console.error('Failed to list GitHub issues:', error);
       return [];
@@ -411,29 +410,29 @@ export class GitHubIssueProvider extends IssueProviderBase {
       '--json', 'number,title,body,state,url,labels,assignees,createdAt,updatedAt',
       '--limit', '100'
     ];
-    
+
     // Apply filters
     if (filters?.status?.includes(IssueStatus.COMPLETED)) {
       args.push('--state', 'closed');
     } else {
       args.push('--state', 'open');
     }
-    
+
     if (filters?.assignee?.length) {
       args.push('--assignee', filters.assignee.join(','));
     }
-    
+
     if (filters?.labels?.length) {
       args.push('--label', filters.labels.join(','));
     }
-    
+
     const result = await this.executeGhCommand(args);
-    
+
     if (!result.success) {
       console.error('gh CLI list failed:', result.stderr);
       return [];
     }
-    
+
     try {
       const issues = JSON.parse(result.stdout);
       return issues.map((issue: any) => this.convertToUnifiedIssue(issue));

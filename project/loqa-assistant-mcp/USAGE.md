@@ -246,6 +246,99 @@ The interview system seamlessly integrates with:
 - ✅ **Assess Urgency**: Is this blocking other work?
 - ✅ **Think About Resources**: What's the development cost vs. benefit?
 
+## 🎯 Intelligent Issue Prioritization
+
+### **Discovering High-Priority Work**
+
+The intelligent prioritization system scans all GitHub repositories in the Loqa ecosystem to find and rank issues based on priority, complexity, and your role context.
+
+#### **Basic Usage**
+
+**Natural Language (Recommended)**:
+```bash
+# Via Claude Code - most user-friendly
+"What are the highest priority GitHub issues right now?"
+"Show me high-priority issues I should work on today"
+"What issues should a developer focus on this week?"
+```
+
+**Direct MCP Tool**:
+```typescript
+{
+  "name": "workspace:IntelligentIssuePrioritization",
+  "arguments": {
+    "timeframe": "today",    // today, week, sprint, month
+    "role": "developer"      // developer, qa, devops, architect
+  }
+}
+```
+
+#### **Example Response**
+
+```
+🎯 Intelligent Issue Prioritization
+
+📊 Analysis Summary:
+- Total issues found: 43
+- Eligible issues: 43
+- Context: developer role, today timeframe, all repository focus
+
+⭐ Recommended Issue:
+- **🛠️ Developer-First Installation & Setup Experience** (loqa)
+- Priority: High, Status: open, Score: 4/10
+
+🔄 Alternative Issues:
+- **💰 GitHub Sponsors Setup & Community Funding** (loqa) - Score: 4/10
+- **🌊 Real-Time Streaming LLM Implementation** (loqa) - Score: 4/10
+
+🧠 Enhanced Analysis:
+📈 Work Focus: Moderate - focused on specific area
+🏥 Project Health: Stable - normal issue distribution
+⏰ Timeline Insight: Flexible timeline allows smart selection
+
+💡 Optimization Recommendations:
+• High volume of high-priority issues - consider re-evaluating priorities
+
+🚀 Next Steps:
+• Use: "Create a feature branch for issue #[number]"
+• Or: smart-git_branch(branchName: "feature/[issue-name]")
+```
+
+#### **Advanced Filtering**
+
+**Role-Based Prioritization**:
+```bash
+# Get issues optimized for your role
+"Show me QA-focused issues this sprint"
+"What should a DevOps engineer work on this week?"
+"Find architecture-related issues for this month"
+```
+
+**Repository-Specific Focus**:
+```bash
+# Focus on specific repositories
+"Show high-priority issues in loqa-hub"
+"What are the critical issues in loqa-commander?"
+```
+
+#### **Integration with Workflow**
+
+**Creating Feature Branches from Prioritized Issues**:
+```bash
+# After finding a priority issue, create a branch
+"Create a feature branch for issue #40"
+
+# Or use smart git tools
+smart-git_branch(branchName: "feature/developer-first-setup")
+```
+
+**Cross-Repository Coordination**:
+```bash
+# Find issues that affect multiple repositories
+"Show me cross-repository issues that need coordination"
+"What breaking changes are planned across repositories?"
+```
+
 ### **Troubleshooting**
 
 #### **Interview Not Starting**

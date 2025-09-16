@@ -14,6 +14,8 @@ import { simpleGit } from "simple-git";
 // Import modular components
 import { LoqaWorkspaceManager } from "../managers/index.js";
 import { LoqaIssueManager } from "../managers/issue-manager.js";
+import { IssueProviderManager } from "../managers/issue-provider-manager.js";
+import { IssueProvider } from "../types/issue-provider.js";
 import {
   DEPENDENCY_ORDER,
   TESTABLE_REPOSITORIES,
@@ -51,24 +53,80 @@ export class MCPWorkspaceManager extends LoqaWorkspaceManager {
       ? [options.repositoryFocus]
       : this.knownRepositories;
 
-    // Collect issues from repositories
-    for (const repoName of repositoriesToCheck) {
-      const repoPath = join(this.actualWorkspaceRoot, repoName);
-      try {
-        await fs.access(join(repoPath, ".git"));
-        // Create a issue manager for this specific repository (deprecated but functional)
-        const repoIssueManager = new LoqaIssueManager(repoPath);
-        const issueList = await repoIssueManager.listIssues();
+    // Collect issues from repositories using direct GitHub CLI (bypassing problematic provider)
+    try {
+      // Include the main repository in addition to individual service repositories
+      const allRepositoriesToCheck = ['loqa', ...repositoriesToCheck.filter(r => r !== 'loqa')];
 
-        // Note: Since LoqaIssueManager now returns empty arrays, we'll skip processing
-        // until full migration to IssueProviderManager is complete
-        if (issueList.issues.length === 0) {
-          continue; // Skip repositories with no issues for now
+      // Query issues from GitHub across all repositories using direct CLI
+      for (const repoName of allRepositoriesToCheck) {
+        try {
+          // Use direct GitHub CLI command to get issues
+          const ghResult = await this.runCommand('gh', [
+            'issue', 'list',
+            '--repo', `loqalabs/${repoName}`,
+            '--json', 'number,title,body,state,url,assignees,createdAt,updatedAt',
+            '--limit', '50',
+            '--state', 'open'
+          ], process.cwd());
+
+          if (!ghResult.success) {
+            console.warn(`GitHub CLI failed for ${repoName}:`, ghResult.stderr);
+            continue;
+          }
+
+          let issues;
+          try {
+            issues = JSON.parse(ghResult.stdout);
+          } catch (parseError) {
+            console.warn(`Failed to parse GitHub response for ${repoName}:`, parseError);
+            continue;
+          }
+
+          // Get detailed information for each issue (including labels)
+          for (const issue of issues) {
+            try {
+              // Fetch detailed issue information including labels
+              const detailResult = await this.runCommand('gh', [
+                'issue', 'view', issue.number.toString(),
+                '--repo', `loqalabs/${repoName}`,
+                '--json', 'number,title,body,state,url,labels,assignees,createdAt,updatedAt'
+              ], process.cwd());
+
+              if (detailResult.success) {
+                const detailedIssue = JSON.parse(detailResult.stdout);
+                const priority = this.extractPriorityFromGitHubLabels(detailedIssue.labels || []);
+                const type = this.extractTypeFromLabels((detailedIssue.labels || []).map((l: any) => l.name));
+
+                allIssues.push({
+                  id: detailedIssue.number.toString(),
+                  title: detailedIssue.title,
+                  repository: repoName,
+                  priority: priority,
+                  type: type,
+                  content: detailedIssue.body || detailedIssue.title,
+                  url: detailedIssue.url,
+                  number: detailedIssue.number,
+                  state: detailedIssue.state,
+                  labels: (detailedIssue.labels || []).map((l: any) => l.name),
+                  createdAt: detailedIssue.createdAt,
+                  updatedAt: detailedIssue.updatedAt
+                });
+              } else {
+                console.warn(`Failed to get details for issue #${issue.number}: ${detailResult.stderr}`);
+              }
+            } catch (error) {
+              console.warn(`Error processing issue #${issue.number}:`, error);
+            }
+          }
+        } catch (error) {
+          console.warn(`Failed to fetch GitHub issues for ${repoName}:`, error);
+          continue;
         }
-      } catch (error) {
-        // Repository doesn't exist or no Git access
-        continue;
       }
+
+    } catch (error) {
+      console.warn("Failed to fetch GitHub issues:", error);
     }
 
     // Score issues based on various criteria
@@ -871,5 +929,44 @@ export class MCPWorkspaceManager extends LoqaWorkspaceManager {
     }
 
     return "Medium";
+  }
+
+  /**
+   * Extract priority from GitHub Issue labels (with label objects)
+   */
+  private extractPriorityFromGitHubLabels(labels: any[]): string {
+    if (!labels) return "Medium";
+
+    for (const label of labels) {
+      const name = (label.name || label).toLowerCase();
+      if (name.includes("priority: high") || name.includes("priority:high")) return "High";
+      if (name.includes("priority: critical") || name.includes("priority:critical")) return "Critical";
+      if (name.includes("priority: low") || name.includes("priority:low")) return "Low";
+      if (name.includes("priority: medium") || name.includes("priority:medium")) return "Medium";
+      // Fallback patterns
+      if (name.includes("high") || name.includes("urgent")) return "High";
+      if (name.includes("critical")) return "Critical";
+      if (name.includes("low")) return "Low";
+    }
+
+    return "Medium";
+  }
+
+  /**
+   * Extract type from GitHub Issue labels
+   */
+  private extractTypeFromLabels(labels: string[]): string {
+    if (!labels) return "general";
+
+    for (const label of labels) {
+      const name = label.toLowerCase();
+      if (name.includes("bug") || name.includes("defect")) return "bug";
+      if (name.includes("feature") || name.includes("enhancement")) return "feature";
+      if (name.includes("documentation") || name.includes("docs")) return "documentation";
+      if (name.includes("infrastructure") || name.includes("infra")) return "infrastructure";
+      if (name.includes("protocol") || name.includes("api")) return "protocol";
+    }
+
+    return "general";
   }
 }

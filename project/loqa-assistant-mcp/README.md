@@ -5,6 +5,8 @@ Comprehensive development workflow assistance for the Loqa ecosystem. This syste
 ## ✨ Recent Updates
 
 **September 2025**:
+- ✅ **NEW: Intelligent Issue Prioritization**: AI-powered GitHub issue discovery and ranking across all repositories with smart scoring
+- ✅ **FIXED: GitHub Issue Provider**: Complete rewrite with direct GitHub CLI integration, now properly finds and parses all issues
 - ✅ **NEW: GitHub Comment Preview Workflow**: Added conversational GitHub comment functionality with preview, confirmation, and delegation to GitHub MCP
 - ✅ **Fixed Critical Workflow Bug**: ProcessConversationalResponse now properly handles GitHub operations instead of bypassing preview workflow
 - ✅ **Enhanced Natural Language Parsing**: Intelligent detection of "add comment to issue #X" patterns with content extraction
@@ -120,18 +122,33 @@ grep "Loqa Pre-commit Hook" .git/hooks/pre-commit
 
 ## 🐙 GitHub Integration
 
-For GitHub operations, use the **official GitHub MCP server** instead of custom implementations:
+### **Built-in GitHub Issue Provider** ⭐ (Recommended)
+
+The Loqa Assistant MCP server includes a **robust built-in GitHub Issue Provider** with direct GitHub CLI integration:
+
+**✅ Current Status**: Fully functional with comprehensive issue discovery and management
+- 🎯 **Intelligent Issue Prioritization**: AI-powered discovery across all repositories
+- 📊 **Complete Issue Parsing**: Full GitHub issue data including labels, descriptions, metadata
+- 🚀 **Direct GitHub CLI Integration**: Reliable, fast, and comprehensive
+- 🏢 **Multi-Repository Support**: Scans all Loqa repositories (loqa, loqa-hub, loqa-commander, etc.)
+
+### **Official GitHub MCP Server** (Alternative)
+
+For advanced GitHub operations beyond issue management, you can also use the **official GitHub MCP server**:
 
 📘 **See [GITHUB_MCP_SETUP.md](./GITHUB_MCP_SETUP.md)** for complete setup instructions.
 
 **Benefits of Official GitHub MCP Server:**
 - ✅ Native GitHub API integration (not CLI command parsing)
-- ✅ Multi-repository workflow support 
-- ✅ Granular tool control (Issues, PRs, Actions, etc.)
+- ✅ Advanced PR management and Actions integration
+- ✅ Granular tool control for complex workflows
 - ✅ Official GitHub support and maintenance
-- ✅ Better Claude Code compatibility
 
-**Migration Note**: The `github-cli-specialist` role has been removed in favor of the official solution.
+### **Recommendation**
+
+- **✅ Use Built-in Provider**: For issue discovery, prioritization, and basic issue management
+- **🔧 Add Official Server**: For advanced PR workflows, Actions, and complex GitHub operations
+- **🚀 Best of Both**: Many users run both for comprehensive GitHub integration
 
 ## 🚀 GitHub Issues Integration
 
@@ -306,6 +323,72 @@ await callTool("issue:ProcessConversationalResponse", {
 - **Format**: JSON with full interview state and metadata
 - **Cleanup**: Automatic cleanup of completed interviews
 - **Resume**: Interrupted interviews can be resumed anytime
+
+### 🏢 Workspace Management Tools
+
+**Cross-repository coordination and intelligent issue discovery across the entire Loqa ecosystem.**
+
+**`workspace:IntelligentIssuePrioritization` - AI-Powered Issue Discovery ⭐**
+```typescript
+{
+  "name": "workspace:IntelligentIssuePrioritization",
+  "arguments": {
+    "timeframe": "today",  // today, week, sprint, month
+    "role": "developer",   // optional: developer, qa, devops, architect
+    "repository": "loqa-hub" // optional: focus on specific repo
+  }
+}
+```
+
+**Key Features**:
+- 🎯 **Smart Issue Discovery**: Scans all GitHub repositories (loqa, loqa-hub, loqa-commander, etc.)
+- 📊 **AI-Powered Scoring**: Intelligent ranking based on priority, type, role context, and complexity
+- 🔍 **Complete Issue Details**: Fetches full issue data including labels, descriptions, and metadata
+- 🧠 **Enhanced Analysis**: Project health assessment, bottleneck identification, and optimization recommendations
+
+**Example Response**:
+```
+🎯 Intelligent Issue Prioritization
+
+📊 Analysis Summary:
+- Total issues found: 43
+- Eligible issues: 43
+- Context: developer role, today timeframe, all repository focus
+
+⭐ Recommended Issue:
+- **🛠️ Developer-First Installation & Setup Experience** (loqa)
+- Priority: High, Score: 4/10
+
+🔄 Alternative Issues:
+- **💰 GitHub Sponsors Setup & Community Funding** (loqa) - Score: 4/10
+- **🌊 Real-Time Streaming LLM Implementation** (loqa) - Score: 4/10
+```
+
+**`workspace:Status` - Multi-Repository Overview**
+```typescript
+{
+  "name": "workspace:Status",
+  "arguments": {}
+}
+```
+
+**`workspace:Health` - GitHub Issues Health Check**
+```typescript
+{
+  "name": "workspace:Health",
+  "arguments": {}
+}
+```
+
+**`workspace:RunQualityChecks` - Cross-Repository Validation**
+```typescript
+{
+  "name": "workspace:RunQualityChecks",
+  "arguments": {
+    "repository": "loqa-hub" // optional: specific repo
+  }
+}
+```
 
 ### 🔍 Validation Tools
 
