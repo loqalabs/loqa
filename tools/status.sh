@@ -23,6 +23,7 @@ SUCCESS="✅"
 ERROR="❌"
 WARNING="⚠️"
 READY="🚀"
+INFO="ℹ️"
 
 # Function to perform the complete status check
 perform_status_check() {
@@ -49,7 +50,7 @@ check_service_health() {
     fi
 }
 
-# Function to check specific functionality
+# Function to check specific functionality (informational only - hub handles Ollama recovery)
 check_ollama_model() {
     if curl -s http://localhost:11434/api/tags | grep -q "llama3.2:3b"; then
         # Test if model can actually generate
@@ -61,10 +62,12 @@ check_ollama_model() {
             return 0
         else
             echo -e "${WARNING} LLM Model: ${YELLOW}llama3.2:3b loaded but not responding${NC}"
+            echo -e "   ${INFO} Hub service will use fallback logic until model is ready"
             return 1
         fi
     else
-        echo -e "${ERROR} LLM Model: ${RED}llama3.2:3b not available${NC}"
+        echo -e "${WARNING} LLM Model: ${YELLOW}llama3.2:3b not available${NC}"
+        echo -e "   ${INFO} Hub service will automatically retry connection (up to 10 attempts)"
         return 1
     fi
 }
@@ -121,28 +124,35 @@ echo "🧠 AI/Voice Pipeline Status:"
 echo "-----------------------------"
 
 pipeline_ready=0
-total_pipeline=2
+total_pipeline=1  # Only voice pipeline (STT/TTS) is required for readiness
 
-check_ollama_model && ((pipeline_ready++))
+# Check Ollama status (informational only - not required for readiness)
+echo ""
+echo -e "${INFO} LLM Status (informational only):"
+check_ollama_model
+
+echo ""
+echo "🎙️  Voice Pipeline Status:"
+echo "-------------------------"
 check_voice_pipeline && ((pipeline_ready++))
 
 echo ""
 echo "📊 System Readiness Summary:"
 echo "=============================="
 
-# Check if core voice services are ready (excluding Commander UI which is optional for voice functionality)
+# Check if core voice services are ready (excluding Commander UI which is optional)
 core_services_ready=0
-total_core_services=5  # Exclude Commander UI
+total_core_services=5  # NATS, Ollama (container), STT, TTS, Hub
 
 check_service_health "NATS Message Bus" "nats" >/dev/null && ((core_services_ready++))
-check_service_health "Ollama LLM" "ollama" >/dev/null && ((core_services_ready++)) ||
-    # Ollama doesn't have health check, but if it's running, count it
-    (docker ps --format "table {{.Names}}\t{{.Status}}" | grep -q "ollama.*Up" && ((core_services_ready++)))
+# Ollama container should be running (model readiness is separate)
+(check_service_health "Ollama LLM" "ollama" >/dev/null ||
+ docker ps --format "table {{.Names}}\t{{.Status}}" | grep -q "ollama.*Up") && ((core_services_ready++))
 check_service_health "Speech-to-Text" "stt" >/dev/null && ((core_services_ready++))
 check_service_health "Text-to-Speech" "tts" >/dev/null && ((core_services_ready++))
 check_service_health "Hub Service" "hub" >/dev/null && ((core_services_ready++))
 
-if [ $pipeline_ready -eq $total_pipeline ] && [ $core_services_ready -ge 4 ]; then
+if [ $pipeline_ready -eq $total_pipeline ] && [ $core_services_ready -eq $total_core_services ]; then
     echo -e "${READY} ${GREEN}System is READY for voice commands!${NC}"
     echo -e "   ${SUCCESS} Core services operational ($core_services_ready/$total_core_services)"
     echo -e "   ${SUCCESS} Voice pipeline operational ($pipeline_ready/$total_pipeline)"
