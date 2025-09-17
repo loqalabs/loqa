@@ -74,10 +74,11 @@ echo ""
 # Wait a moment for services to start
 sleep 10
 
-# Download status checker for ongoing use
-echo "📥 Setting up status checker..."
+# Download additional files for ongoing use
+echo "📥 Setting up additional tools..."
 curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/tools/status.sh" -o status.sh
 chmod +x status.sh
+curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/docker-compose.dev.yml" -o docker-compose.dev.yml
 
 # Run comprehensive status check
 echo "🔍 Running system readiness check..."
