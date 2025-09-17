@@ -7,8 +7,8 @@
 set -e
 
 # Configuration
-MAX_RETRIES=3
-RETRY_DELAY=10  # seconds between retries
+MAX_RETRIES=5
+RETRY_DELAY=15  # seconds between retries
 
 # Colors for output
 RED='\033[0;31m'
