@@ -171,6 +171,7 @@ services:
       - "5173:80"
     environment:
       - VITE_HUB_API_URL=http://localhost:3000
+      - HUB_SERVICE_NAME=hub
     depends_on:
       hub:
         condition: service_healthy
