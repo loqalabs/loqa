@@ -2,8 +2,13 @@
 
 # Loqa System Status Checker
 # Shows real-time status of all services and overall system readiness
+# Includes automatic retry logic for better reliability
 
 set -e
+
+# Configuration
+MAX_RETRIES=3
+RETRY_DELAY=10  # seconds between retries
 
 # Colors for output
 RED='\033[0;31m'
@@ -19,8 +24,10 @@ ERROR="❌"
 WARNING="⚠️"
 READY="🚀"
 
-echo "🔍 Loqa System Status Check"
-echo "=================================="
+# Function to perform the complete status check
+perform_status_check() {
+    echo "🔍 Loqa System Status Check"
+    echo "=================================="
 
 # Function to check service health
 check_service_health() {
@@ -146,21 +153,21 @@ if [ $pipeline_ready -eq $total_pipeline ] && [ $core_services_ready -ge 4 ]; th
     echo -e "${BLUE}🎤 To test voice commands:${NC}"
     echo -e "   ${BLUE}cd loqa-relay/test-go && go run ./cmd -hub localhost:50051${NC}"
     echo -e "   ${BLUE}Say: \"Hey Loqa, turn on the kitchen lights\"${NC}"
-    exit 0
+    return 0
 elif [ $pipeline_ready -eq $total_pipeline ]; then
     echo -e "${WARNING} ${YELLOW}Voice pipeline ready, but core services need attention...${NC}"
     echo -e "   ${WARNING} Core services: ($core_services_ready/$total_core_services) ready"
     echo -e "   ${SUCCESS} Voice pipeline: ($pipeline_ready/$total_pipeline) ready"
     echo ""
     echo -e "${YELLOW}🔧 Check service logs: docker-compose logs${NC}"
-    exit 1
+    return 1
 elif [ $core_services_ready -ge 4 ]; then
     echo -e "${WARNING} ${YELLOW}Services ready, but pipeline initializing...${NC}"
     echo -e "   ${SUCCESS} Core services operational ($core_services_ready/$total_core_services)"
     echo -e "   ${WARNING} Voice pipeline: ($pipeline_ready/$total_pipeline) ready"
     echo ""
     echo -e "${YELLOW}💡 Wait a moment for LLM model to fully load, then try again${NC}"
-    exit 1
+    return 1
 else
     echo -e "${ERROR} ${RED}System NOT ready${NC}"
     echo -e "   ${WARNING} Core services: ($core_services_ready/$total_core_services) ready"
@@ -168,5 +175,33 @@ else
     echo ""
     echo -e "${YELLOW}🔧 Run: docker-compose up -d${NC}"
     echo -e "${YELLOW}⏳ Then wait for services to become healthy${NC}"
-    exit 1
+    return 1
 fi
+}
+
+# Main script execution with retry logic
+attempt=1
+while [ $attempt -le $MAX_RETRIES ]; do
+    if [ $attempt -gt 1 ]; then
+        echo ""
+        echo "${LOADING} Attempt $attempt of $MAX_RETRIES (waiting ${RETRY_DELAY}s before retry...)"
+        sleep $RETRY_DELAY
+        echo ""
+    fi
+
+    if perform_status_check; then
+        # Success - exit with 0
+        exit 0
+    else
+        # Failed - check if we should retry
+        if [ $attempt -eq $MAX_RETRIES ]; then
+            echo ""
+            echo "${ERROR} System not ready after $MAX_RETRIES attempts"
+            echo "   ${WARNING} Services may still be starting up"
+            echo "   ${WARNING} Try running this script again in a few minutes"
+            exit 1
+        fi
+
+        attempt=$((attempt + 1))
+    fi
+done
