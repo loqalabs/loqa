@@ -108,7 +108,7 @@ services:
       nats:
         condition: service_healthy
       ollama:
-        condition: service_healthy
+        condition: service_started  # Start container but don't wait for model readiness - hub handles that
       stt:
         condition: service_healthy
       tts:
