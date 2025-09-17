@@ -74,20 +74,25 @@ echo ""
 # Wait a moment for services to start
 sleep 10
 
+# Download status checker for ongoing use
+echo "📥 Setting up status checker..."
+curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/tools/status.sh" -o status.sh
+chmod +x status.sh
+
 # Run comprehensive status check
 echo "🔍 Running system readiness check..."
-if ./tools/status.sh; then
+if ./status.sh; then
     echo ""
     echo "🎉 Loqa setup complete and ready!"
 else
     echo ""
     echo "⚠️  Setup completed, but some services are still starting."
-    echo "   Run './tools/status.sh' again in a minute to check readiness"
+    echo "   Run './status.sh' again in a minute to check readiness"
 fi
 
 echo ""
 echo "📖 Quick reference:"
-echo "  • Check system status: ./tools/status.sh"
+echo "  • Check system status: ./status.sh"
 echo "  • Commander UI: http://localhost:5173"
 echo "  • Check logs: docker-compose logs -f"
 echo "  • Stop services: docker-compose down"
