@@ -89,6 +89,9 @@ else
     echo "⚠️  MCP server directory not found, skipping MCP setup"
 fi
 
+echo "🐳 Building Loqa Docker services..."
+docker-compose -f docker-compose.dev.yml build
+
 echo "🐳 Starting Loqa services with development build..."
 docker-compose -f docker-compose.dev.yml up -d
 
