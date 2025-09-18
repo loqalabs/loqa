@@ -90,7 +90,7 @@ services:
       - TTS_URL=http://tts:8880/v1
       - TTS_VOICE=af_bella
       - TTS_SPEED=1.0
-      - TTS_FORMAT=mp3
+      - TTS_FORMAT=wav
       - TTS_NORMALIZE=true
       - TTS_MAX_CONCURRENT=5  # Lower for dev
       - TTS_TIMEOUT=10s

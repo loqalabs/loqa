@@ -12,7 +12,7 @@ Configuration options and environment variables for Loqa services.
 | `TTS_URL` | TTS service base URL (OpenAI-compatible) | `http://tts:8880/v1` |
 | `TTS_VOICE` | Voice ID (provider-specific) | `af_bella` |
 | `TTS_SPEED` | Speech speed multiplier (0.5-2.0) | `1.0` |
-| `TTS_FORMAT` | Audio format (mp3, wav, opus, flac) | `mp3` |
+| `TTS_FORMAT` | Audio format (mp3, wav, opus, flac) | `wav` |
 | `TTS_NORMALIZE` | Enable audio normalization | `true` |
 | `TTS_MAX_CONCURRENT` | Max concurrent TTS requests | `10` |
 | `TTS_TIMEOUT` | Request timeout | `10s` |
@@ -54,7 +54,7 @@ services:
       - TTS_URL=http://tts:8880/v1
       - TTS_VOICE=af_bella
       - TTS_SPEED=1.0
-      - TTS_FORMAT=mp3
+      - TTS_FORMAT=wav
       - TTS_NORMALIZE=true
       - TTS_MAX_CONCURRENT=10
       - TTS_TIMEOUT=10s
@@ -130,6 +130,6 @@ Recommended minimum requirements:
 **TTS Optimization:**
 - Use GPU variant (`ghcr.io/remsky/kokoro-fastapi-gpu`) for best performance
 - Adjust `TTS_MAX_CONCURRENT` based on your CPU/GPU capacity
-- Set `TTS_FORMAT=mp3` for best compression vs quality
+- Set `TTS_FORMAT=wav` for compatibility with relay audio processing (mp3 requires additional decoding)
 - Use `TTS_SPEED=1.2` for slightly faster speech if needed
 - Enable `TTS_FALLBACK_ENABLED=true` for graceful degradation
