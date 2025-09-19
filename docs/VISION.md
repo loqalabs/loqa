@@ -2,6 +2,8 @@
 
 Loqa exists to reclaim voice computing for the people.
 
+> 🧱 This document reflects the vision for Loqa as a platform. The current architecture implements **Loqa Core** — the foundational scaffolding for local-first voice assistants. Core includes audio streaming, intent parsing, skill execution, and arbitration. Innovation vectors like Natural Skill Learning, Conversational Memory, and Multi-Agent Collaboration are planned as post-MVP directions.
+
 We believe voice assistants can be **powerful, private, and personal** — without requiring you to surrender your data to Big Tech. We're building Loqa to prove that privacy-first AI is not only possible, but better.
 
 ---
@@ -44,7 +46,7 @@ We’re starting with home voice control, but that’s just the beginning.
 
 Loqa is a foundation. A privacy-respecting voice layer for whatever you dream up — from personal productivity to public infrastructure.
 
-If you’ve ever said “I wish my voice assistant could do ___, but I don’t trust it” — this is for you.
+If you’ve ever said “I wish my voice assistant could do \_\_\_, but I don’t trust it” — this is your moment. Loqa Core is just the beginning. The real Loqa Magic comes next.
 
 ---
 

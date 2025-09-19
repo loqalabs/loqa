@@ -7,9 +7,40 @@
 
 # 🦜 Loqa – A Rebellion Against the Cloud
 
-[![CI/CD Pipeline](https://github.com/loqalabs/loqa/actions/workflows/ci.yml/badge.svg)](https://github.com/loqalabs/loqa/actions/workflows/ci.yml)
+🔉 A local-first voice assistant core — built for privacy, sub-300ms interaction, and extensibility. Designed to grow into ambient intelligence.
 
-**Your voice. Your rules.**
+---
+
+## 🌱 About Loqa Core
+
+This repository contains **Loqa Core** — the foundational architecture for a local-first, privacy-preserving voice assistant.
+
+It includes:
+
+- Streaming audio capture and playback
+- Arbitration between multiple relays
+- Reflex intent parsing and local LLM fallback
+- Plugin-based skill execution
+- Fallback handling and Commander UI
+
+### ❗This is not the final product
+
+Loqa Core is the **scaffolding** — a solid base from which truly innovative interaction can grow.
+
+We're building a platform that can one day support:
+
+- Natural skill learning (teach Loqa by example)
+- Long-term conversational memory
+- Multi-agent collaboration across rooms
+- Context-aware emotional intelligence
+
+### 🧠 Our goal:
+
+> “Build the foundation for the future of voice AI — not just another clone.”
+
+Join us in shaping what comes next.
+
+---
 
 Loqa is an open-source, privacy-first voice platform for developers, makers, and tinkerers who believe voice interfaces should be as local and controllable as any keyboard or shell script. Run it where Big Tech can't listen.
 
@@ -38,7 +69,7 @@ Then open http://localhost:5173 to see the voice assistant UI
 - 🧠 **State-of-the-art, not state-of-the-shelf** - WhisperX, streaming STT/LLM pipelines, experimental sandboxing. We're exploring what's next, not rebuilding Alexa
 - 🧩 **Composable, not monolith** - Swap Piper for Dia or Moshi. Replace OpenAI's Whisper with Meta's SeamlessM4T. Use symbolic reasoning engines instead of Ollama. Every component is modular
 - 🔒 **Privacy-first, always** - Nothing leaves your network unless you explicitly opt in. No metrics collection, no voice recording, no cloud surveillance
-- 🌍 **Run from anywhere** - Your Raspberry Pi, air-gapped homelab, or offline cabin. Built for mobility and location independence  
+- 🌍 **Run from anywhere** - Your Raspberry Pi, air-gapped homelab, or offline cabin. Built for mobility and location independence
 - 🛠️ **Hackable APIs and plugin SDK** - Write skills in Python, shell scripts, or WASM modules. Built for homelab and Raspberry Pi setups
 - 💡 **Community-powered innovation** - We'd rather be the Blender of voice than the Salesforce. Think weird, prototype freely, take Loqa in unexpected directions
 
@@ -60,6 +91,7 @@ Then open http://localhost:5173 to see the voice assistant UI
 ## 📋 What You Need
 
 **Minimum:**
+
 - Computer with 4+ CPU cores and 8GB+ RAM
 - Docker installed
 - Microphone (built-in or USB)
@@ -70,125 +102,34 @@ Then open http://localhost:5173 to see the voice assistant UI
 
 ---
 
-## 🔧 Recent Improvements
+## 🧮 Reference Hardware
 
-**2025 Infrastructure Enhancements:**
-- ✅ **Modern CI/CD** - GitHub Actions with automated testing, security scanning, and multi-platform builds
-- ✅ **Quality Assurance** - Automated commit message validation and coding standards enforcement  
-- ✅ **Security-First** - Comprehensive security policies and vulnerability reporting processes
-- ✅ **AGPLv3 License** - Strong copyleft protection ensuring community contributions stay open source
-- ✅ **Cross-Platform** - Linux, Docker, and embedded device support with proper dependency management
-- ✅ **Developer Experience** - Consistent tooling, documentation, and contribution workflows across all repositories
+All timing SLAs and performance benchmarks assume the following hardware:
 
-**Milestone 2: Observability & Event Tracking:**
-- ✅ **Complete Voice Traceability** - Every voice interaction generates structured, queryable events with full metadata
-- ✅ **SQLite Integration** - Persistent storage with optimized performance (WAL mode, indexes, migrations)
-- ✅ **Structured Logging** - Rich context logging with Zap (JSON/console output, configurable levels)
-- ✅ **HTTP API** - RESTful endpoints for event access: `/api/voice-events` with filtering and pagination
-- ✅ **Audio Fingerprinting** - SHA-256 hashing for deduplication and analysis
-- ✅ **Real-time Metrics** - Processing time tracking and error state capture throughout the pipeline
+| Role      | Device           | Cores | RAM   | Notes                               |
+| --------- | ---------------- | ----- | ----- | ----------------------------------- |
+| Hub       | Mac Mini M2      | 8     | 8GB   | Baseline for Standard tier SLAs     |
+| Hub (Pro) | Mac Mini M2 Pro  | 10    | 16GB  | Used to validate Pro-tier targets   |
+| Hub (R&D) | Mac Studio Ultra | 24    | 64GB  | Future chaining / NSL experiments   |
+| Relay     | ESP32-S3         | 1     | 512KB | Constrained streaming target device |
 
-**Milestone 3: Voice Command Timeline UI (NEW):**
-- ✅ **Real-time Web Interface** - Vue.js timeline showing all voice interactions as they happen
-- ✅ **Event Visualization** - See transcriptions, intents, confidence scores, and success/failure states
-- ✅ **Audio Playback** - Listen to original voice commands directly in the browser
-- ✅ **Detailed Event Inspection** - Drill-down modals with complete JSON payloads for debugging
-- ✅ **Dark Mode Support** - Modern, responsive interface that adapts to your preferences
-- ✅ **Auto-refresh** - Timeline updates automatically every 5 seconds to show new voice events
-
-**Milestone 4: Professional TTS Integration (NEW):**
-- ✅ **OpenAI-compatible TTS** - Standard API interface with professional voice synthesis (Kokoro-82M)
-- ✅ **Sub-0.3s Synthesis** - Ultra-fast voice generation optimized for real-time interactions
-- ✅ **Multi-voice Support** - 10+ concurrent voice streams for professional environments
-- ✅ **Provider Flexibility** - Generic TTS interface supporting multiple backends
-- ✅ **GPU/CPU Variants** - Flexible deployment options for different hardware configurations
-
-**Milestone 5: Predictive Response Architecture (NEW):**
-- ✅ **Instant Acknowledgments** - Sub-200ms perceived response time regardless of device speed
-- ✅ **Asynchronous Execution** - Device commands execute in background without blocking conversation
-- ✅ **Smart Status Updates** - Intelligent follow-up strategy based on operation type and device reliability
-- ✅ **Error Recovery** - Graceful corrections when device operations fail after optimistic acknowledgment
-- ✅ **Hybrid Skills Support** - Framework for both Go modules and MCP server skills with unified API
-
-**All repositories now feature:**
-- Automated CI/CD pipelines with status badges
-- Security vulnerability scanning with Trivy
-- Modern Go 1.24+ with static analysis
-- Protocol buffer integration and code generation
-- Comprehensive documentation and security policies
+All tests are run on real hardware. Loqa avoids cloud dependencies and GPU assumptions by design.
 
 ---
 
-## 🤖 MCP-Powered Development Workflow
+## 📖 Learn More
 
-Loqa now includes a powerful **Model Context Protocol (MCP) server** that transforms development experience with Claude Code:
-
-### GitHub Issues-First Development
-```bash
-# Claude Code + MCP integration provides:
-"Create a new issue for implementing JWT authentication with high priority"
-"Show me what issues I should work on next"
-"Create a feature branch for issue #123"
-"Run quality checks across all repositories"
-```
-
-### Smart Multi-Repository Coordination
-- **Cross-Repository Impact Analysis** - AI-powered change impact detection across 8 service repositories
-- **Dependency-Aware Quality Gates** - Automated quality validation in proper dependency order
-- **Coordinated Feature Branches** - Create matching branches across affected repositories
-- **GitHub Issues Templates** - Structured issue creation with AI-enhanced acceptance criteria
-
-### AI-Enhanced Development Tools
-- **Quality Gates Integration** - `make quality-check` automation across all repositories
-- **Smart Git Operations** - Repository-aware git commands with multi-repo context
-- **Cross-Repository Workflows** - Breaking change coordination and protocol update management
-- **Role-Based Specialization** - Developer, architect, DevOps contexts with specialized tooling
-
-👉 **[MCP Server Setup Guide](./project/loqa-assistant-mcp/README.md)** for Claude Code integration
+- [Getting Started Guide](./docs/getting-started-5min.md)
+- [Architecture Overview](./docs/architecture.md)
+- [Skills Development](./docs/skills.md)
+- [FAQ](./docs/faq.md)
+- [Security Policy](./SECURITY.md)
 
 ---
 
 ## 🏗️ Setup Options
 
-### 🚀 5-Minute User Setup (Recommended)
-
-For users who just want to run Loqa quickly with pre-built images:
-
-```bash
-curl -fsSL "https://raw.githubusercontent.com/loqalabs/loqa/main/tools/setup.sh?$(date +%s)" | bash
-```
-
-This downloads the docker-compose.yml and uses pre-built Docker images from our CI/CD pipeline - no compilation needed!
-
-### 🛠️ Development Setup
-
-For developers who want to build from source and modify the code:
-
-```bash
-git clone https://github.com/loqalabs/loqa.git
-cd loqa/scripts && ./setup-dev.sh
-# OR use Make commands
-cd loqa/scripts && make setup-dev
-```
-
-This clones all repositories and builds Docker images locally from source.
-
-### 📋 Development Roadmap
-
-- **[TODO.md](./project/TODO.md)** - Priority 1 & 2 tasks: Must-fix issues and high-impact UX improvements
-- **[GitHub Issues](https://github.com/loqalabs/loqa/issues)** - All development tasks managed via GitHub Issues with proper labeling and projects
-
-### 🔧 Developer Resources
-
-Building something with Loqa? Start here:
-
-- **[AI Development Commands](./DEVELOPER_COMMANDS.md)** - Interactive commands for AI-enhanced development workflows
-- **[Pragmatic Workflow System](./docs/workflow/README.md)** - GitHub Issues-first development with MCP-powered automation
-- **[Developer Guide](./docs/DEVELOPER.md)** - Repository structure, workflows, and contribution
-- **[Architecture Overview](./docs/architecture.md)** - How everything fits together  
-- **[Skills Development](./docs/skills.md)** - Build your own voice commands
-- **[API Reference](./docs/messaging.md)** - NATS messaging and protocols
-- **[Security Policy](./SECURITY.md)** - Vulnerability reporting and security guidelines
+See the [Setup Guide](./docs/getting-started-5min.md) for quick install instructions and dev setup.
 
 ---
 
@@ -217,9 +158,4 @@ Loqa isn't just another voice assistant — it's a **rebellion against the cloud
 
 ---
 
-*Created with 🧠 + ❤️ by [Anna Barnes](https://www.linkedin.com/in/annabethbarnes) — because voice assistants should serve you, not surveillance capitalism.* 
- 
- 
- 
- 
- 
+_Created with 🧠 + ❤️ by [Anna Barnes](https://www.linkedin.com/in/annabethbarnes) — because voice assistants should serve you, not surveillance capitalism._

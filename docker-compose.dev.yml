@@ -25,6 +25,8 @@ services:
       - ollama-data:/root/.ollama
     environment:
       - OLLAMA_HOST=0.0.0.0
+    env_file:
+      - ./config/models.env
     networks:
       - loqa-network
     healthcheck:
@@ -37,7 +39,7 @@ services:
     command: >
       "ollama serve &
        sleep 10 &&
-       ollama pull llama3.2:3b &&
+       ollama pull ${OLLAMA_MODEL} &&
        wait"
 
   # STT Service
@@ -48,8 +50,8 @@ services:
       - "8000:8000"
     volumes:
       - stt-cache:/app/cache
-    environment:
-      - WHISPER_MODEL=tiny
+    env_file:
+      - ./config/models.env
     networks:
       - loqa-network
     healthcheck:
@@ -96,7 +98,6 @@ services:
       - TTS_TIMEOUT=10s
       - TTS_FALLBACK_ENABLED=true
       - OLLAMA_URL=http://ollama:11434
-      - OLLAMA_MODEL=llama3.2:3b
       - NATS_URL=nats://nats:4222
       - NATS_SUBJECT=loqa.commands
       - LOQA_HOST=0.0.0.0
@@ -104,6 +105,8 @@ services:
       - LOQA_GRPC_PORT=50051
       - LOG_LEVEL=info
       - LOG_FORMAT=json
+    env_file:
+      - ./config/models.env
     depends_on:
       nats:
         condition: service_healthy

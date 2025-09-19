@@ -6,6 +6,43 @@
 
 set -e
 
+# Load centralized model configuration
+# Try multiple possible locations for the config file
+CONFIG_PATHS=(
+    "./config/models.env"           # When run from loqa/ directory
+    "./loqa/config/models.env"      # When run from workspace root
+    "../config/models.env"          # When run from loqa/tools/
+)
+
+CONFIG_LOADED=false
+for config_path in "${CONFIG_PATHS[@]}"; do
+    if [ -f "$config_path" ]; then
+        echo "🔍 Found config file at: $config_path"
+        source "$config_path"
+        CONFIG_LOADED=true
+        echo "📋 Loaded model configuration from $config_path"
+        echo "🔍 After loading: OLLAMA_MODEL='$OLLAMA_MODEL', WHISPER_MODEL='$WHISPER_MODEL'"
+        break
+    fi
+done
+
+# Set defaults if variables are empty or unset, regardless of whether config was loaded
+if [ -z "$OLLAMA_MODEL" ]; then
+    OLLAMA_MODEL="llama3.2:3b"
+    echo "⚠️  OLLAMA_MODEL not set, using default: $OLLAMA_MODEL"
+fi
+
+if [ -z "$WHISPER_MODEL" ]; then
+    WHISPER_MODEL="base.en"
+    echo "⚠️  WHISPER_MODEL not set, using default: $WHISPER_MODEL"
+fi
+
+if [ "$CONFIG_LOADED" = false ]; then
+    echo "⚠️  Model config file not found in any expected location"
+fi
+
+echo "🎯 Using models: LLM=${OLLAMA_MODEL}, STT=${WHISPER_MODEL}"
+
 # Configuration
 MAX_RETRIES=5
 RETRY_DELAY=15  # seconds between retries
@@ -52,21 +89,21 @@ check_service_health() {
 
 # Function to check specific functionality (informational only - hub handles Ollama recovery)
 check_ollama_model() {
-    if curl -s http://localhost:11434/api/tags | grep -q "llama3.2:3b"; then
+    if curl -s http://localhost:11434/api/tags | grep -q "${OLLAMA_MODEL}"; then
         # Test if model can actually generate
         if curl -s -X POST http://localhost:11434/api/generate \
            -H "Content-Type: application/json" \
-           -d '{"model":"llama3.2:3b","prompt":"test","stream":false}' \
+           -d "{\"model\":\"${OLLAMA_MODEL}\",\"prompt\":\"test\",\"stream\":false}" \
            --max-time 10 >/dev/null 2>&1; then
-            echo -e "${SUCCESS} LLM Model: ${GREEN}llama3.2:3b loaded and responding${NC}"
+            echo -e "${SUCCESS} LLM Model: ${GREEN}${OLLAMA_MODEL} loaded and responding${NC}"
             return 0
         else
-            echo -e "${WARNING} LLM Model: ${YELLOW}llama3.2:3b loaded but not responding${NC}"
+            echo -e "${WARNING} LLM Model: ${YELLOW}${OLLAMA_MODEL} loaded but not responding${NC}"
             echo -e "   ${INFO} Hub service will use fallback logic until model is ready"
             return 1
         fi
     else
-        echo -e "${WARNING} LLM Model: ${YELLOW}llama3.2:3b not available${NC}"
+        echo -e "${WARNING} LLM Model: ${YELLOW}${OLLAMA_MODEL} not available${NC}"
         echo -e "   ${INFO} Hub service will automatically retry connection (up to 10 attempts)"
         return 1
     fi

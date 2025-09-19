@@ -1,5 +1,9 @@
 .PHONY: help setup setup-dev build start start-dev stop clean test proto dev logs status
 
+# Docker Compose with centralized model configuration
+COMPOSE_WITH_ENV = cd .. && set -a && source ./config/models.env && set +a && docker-compose
+COMPOSE_DEV_WITH_ENV = cd .. && set -a && source ./config/models.env && set +a && docker-compose -f docker-compose.dev.yml
+
 # Default target
 help:
 	@echo "Loqa Development Commands"
@@ -27,11 +31,11 @@ setup-dev:
 
 build:
 	@echo "🔨 Building all Docker images for development..."
-	cd .. && docker-compose -f docker-compose.dev.yml build
+	$(COMPOSE_DEV_WITH_ENV) build
 
 start:
 	@echo "🚀 Starting Loqa services (5-minute setup)..."
-	cd .. && docker-compose up -d
+	$(COMPOSE_WITH_ENV) up -d
 	@echo "✅ Services started. Access at:"
 	@echo "   Hub API: http://localhost:3000"
 	@echo "   Commander Timeline: http://localhost:5173"
@@ -39,7 +43,7 @@ start:
 
 start-dev:
 	@echo "🛠️ Starting Loqa development services..."
-	cd .. && docker-compose -f docker-compose.dev.yml up -d
+	$(COMPOSE_DEV_WITH_ENV) up -d
 	@echo "✅ Development services started. Access at:"
 	@echo "   Hub API: http://localhost:3000"
 	@echo "   Commander Timeline: http://localhost:5173"
@@ -47,13 +51,13 @@ start-dev:
 
 stop:
 	@echo "🛑 Stopping Loqa services..."
-	cd .. && docker-compose down
-	cd .. && docker-compose -f docker-compose.dev.yml down
+	$(COMPOSE_WITH_ENV) down
+	$(COMPOSE_DEV_WITH_ENV) down
 
 clean:
 	@echo "🧹 Cleaning up containers and volumes..."
-	cd .. && docker-compose down -v
-	cd .. && docker-compose -f docker-compose.dev.yml down -v
+	$(COMPOSE_WITH_ENV) down -v
+	$(COMPOSE_DEV_WITH_ENV) down -v
 	docker system prune -f
 
 test:
